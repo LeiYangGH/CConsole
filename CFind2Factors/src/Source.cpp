@@ -1,86 +1,63 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define N 10000000
+#define N 100000000
 
-long factors_count(long num)
-{
-	long  i = 2, k = 0;
-	while (num > 1)
-	{
-		if (num % i == 0)
-		{
-			k++;
-			num /= i;
-		}
-		else i++;
-	}
-	return k;
-}
+long type[N] = { 0 };
+long p[N] = { 0 };
+long pmaxindex = 0;
 
-long odd[N] = { 0 };
-long faster_factors_count(long n)
+long gettype(long n)
 {
-	long d = 2, cnt = 0;
-	double sqr = sqrt(n);
-	while (d <= sqr)
+	long d = 2, index;
+	for (index = 0; d * d <= n; index++)
 	{
+		d = p[index];
 		if (n % d == 0)
-		{
-			switch (odd[d])
-			{
-			case 1:
-				cnt++;
-				if (odd[n / d] == 2)
-					return 3;
-				else if (cnt > 2)
-					return 3;
-				break;
-			case 2:
-				return 3;
-				break;
-			default:
-				printf("case default= %ld \n", odd[d]);
-				break;
-			}
-		}
-		d++;
-		//printf("d=%ld\t", d);
+			return 1 + type[n / d];
 	}
-	return cnt + 1;
+	p[++pmaxindex] = n;
+	return 1;
 }
-
 
 void init()
 {
-	odd[0] = 0;
-	odd[1] = 0;
-	odd[2] = 1;
-	odd[3] = 1;
-	odd[4] = 2;
-	odd[5] = 1;
+	type[0] = 0;
+	type[1] = 0;
+	type[2] = 1;
+	type[3] = 1;
+	type[4] = 2;
+	type[5] = 1;
+
+	p[0] = 2;
+	p[1] = 3;
+	p[2] = 5;
+	p[3] = 7;
+	pmaxindex = 3;
 }
 
 int main()
 {
+	long n = 20000000;//3704340
+	//long n = 1000000;//210035
 	//long n = 100000;//23378
-	long n = 50;//34
+	//long n = 100;//34
 	long i, j = 0;
 	init();
 	//printf("input n:\n");
 	//scanf("%ld", &n);
-	if (n > 9999999)
+	if (n > 99999999)
 	{
-		printf("已经超过7个0，没有比较的意义:\n");
+		printf("已经超过8个0，没有比较的意义:\n");
 	}
 	else
 	{
-		for (i = 1; i <= n; i++)
+		for (i = 4; i <= n; i++)
 		{
-			if ((odd[i] = faster_factors_count(i)) == 2)
+			if ((type[i] = gettype(i)) == 2)
 				//if (factors_count(i) == 2)
 			{
-				printf("%ld\t", i);
+				//printf("%ld\t", i);
 				j++;
 			}
 		}
