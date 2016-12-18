@@ -146,7 +146,7 @@ void printallinfectedmembers()
 
 int main()
 {
-	int t, m;
+	int t, m, first;
 	for (t = 0; t < TEAM_COUNT; t++)
 	{
 		inputteammembers(t);
@@ -154,7 +154,10 @@ int main()
 	printf("---------\n");
 	printallteammembers();
 	printf("---------\n");
-	getallinfectedmembers(0);
+	printf("请输入一个疑似病例学生：");
+	scanf("%d", &first);
+	printf("---------\n");
+	getallinfectedmembers(first);
 	printallinfectedmembers();
 	system("pause");
 	return 0;
