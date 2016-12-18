@@ -77,24 +77,14 @@ int readstu(STU s[], int num, char filename[]) {
 }
 /**********qsort********************/
 int sortindex;
-/*
-*首先定义两个数据怎么比较
-*参数类型是固定的
-*然后里面就照模画样转换成你在用的类型，不管简单的int或者复杂的struct都可以
-*这里由于科目序号传不进去，我只好加了个全局变量sortindex
-*/
 int cmpfunc(const void * a, const void * b)
 {
 	return ((STU*)a)->score[sortindex] - ((STU*)b)->score[sortindex];
 }
 
-
 void sorttotal(STU s[], int num, int index)
 {
-	sortindex = index;//排序科目
-	//这句非常是stdlib的自带快速排序函数
-	//参数列表见http://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm
-	//分别是被排序的数组名，元素个数，元素占用的字节长度，比较函数也就是前面定义好的cmpfunc
+	sortindex = index;
 	qsort(s, N, sizeof(student), cmpfunc);
 }
 /**********qsort********************/
@@ -159,7 +149,6 @@ int main()//测试成功后把你的整个main函数都注释掉
 		if (j >= 0 && j <= 10)
 		{
 			//sortscore(a, N, j);
-			//快速排序
 			sorttotal(a, N, j);
 			for (i = 0; i < N; i++)
 				printf("%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.2lf\n", a[i].id, a[i].name, a[i].sid, a[i].cid, a[i].score[0], a[i].score[1], a[i].score[2], a[i].score[3], a[i].score[4], a[i].score[5], a[i].score[6], a[i].score[7], a[i].score[8], a[i].score[9], a[i].ave);
