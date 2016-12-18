@@ -4,145 +4,158 @@
 #include<iostream>
 #include <stdio.h>
 #include <string.h>
-#define SALESMAN_COUNT 3
+#define TEAM_COUNT 4
+#define MAX_MEMBER 50
 #define GOODS_TYPES 5
-
-int amount[SALESMAN_COUNT][GOODS_TYPES] =
+//int teammembers[4][MAX_MEMBER] = {
+//	{1,2},
+//	{10,13,11,12,14},
+//	{0,1},
+//	{99,2},
+//};
+//int teamlen[4] = { 2,5,2,2 };
+int teammembers[4][MAX_MEMBER];
+int teamlen[4];
+int infectedmembers[TEAM_COUNT*MAX_MEMBER];
+int infectedmemberslen;
+int teamisinfectedandrecorded[TEAM_COUNT] = { 0 };
+//int infectedteamslen;
+//字符串转整数
+int toint(char *s)
 {
-	{ 33,32,56,45,33 },
-	{ 77,33,68,45,23 },
-	{ 43,55,43,67,65 }
-};
-
-
-typedef struct salesman
-{
-	int id;
-	int total;
-}salesman;
-
-typedef struct good
-{
-	char id;
-	int price;
-	int total;
-}good;
-
-salesman sales[SALESMAN_COUNT];
-good goods[GOODS_TYPES];
-
-void initsales()
-{
-	sales[0].id = 1;
-	sales[1].id = 2;
-	sales[2].id = 3;
+	char *end;
+	return (int)strtol(s, &end, 10);
 }
 
-void initgoods()
+int getnumsfromline(char *line, int nums[])
 {
-	goods[0].id = 'A';
-	goods[0].price = 12;
-
-	goods[1].id = 'B';
-	goods[1].price = 16;
-
-	goods[2].id = 'C';
-	goods[2].price = 10;
-
-	goods[3].id = 'D';
-	goods[3].price = 14;
-
-	goods[4].id = 'E';
-	goods[4].price = 15;
-}
-
-void printtalbe()
-{
-	int i, j;
-	printf("-----------所有数据-----------\n");
-
-	for (i = 0; i < SALESMAN_COUNT; i++)
+	char *part;
+	int index = 0;
+	part = strtok(line, " ");
+	while (part != NULL)// && part[0] != 'y')
 	{
-		printf("销售员%d\t\t", sales[i].id);
-		for (j = 0; j < GOODS_TYPES; j++)
+		nums[index++] = toint(part);
+		//printf("%d\n", nums[index - 1]);
+		part = strtok(NULL, " ");
+	}
+	return index;
+}
+
+void inputteammembers(int team)
+{
+	int cnt;
+	char line[200];
+	int nums[MAX_MEMBER];
+	printf("NO.%d:（输入y结束）\n", team + 1);
+	fgets(line, 1024, stdin);
+	teamlen[team] = getnumsfromline(line, teammembers[team]);
+}
+
+void printallteammembers()
+{
+	int t, m;
+	for (t = 0; t < TEAM_COUNT; t++)
+	{
+		printf("团体%d的学生如下：\n", t + 1);
+		for (m = 0; m < teamlen[t]; m++)
 		{
-			printf("%d\t", amount[i][j]);
+			printf("%d\t", teammembers[t][m]);
 		}
-		printf("\n");
+		printf("\n", t);
 	}
 }
 
-void calcbysales()
+int isteaminfected(int team)
 {
-	int i, j;
-	printf("-----------每个销售人员的销售额-----------\n");
-
-	for (i = 0; i < SALESMAN_COUNT; i++)
+	int i, m, teaminfected = 0;
+	for (m = 0; m < teamlen[team]; m++)
 	{
-		sales[i].total = 0;
-		printf("销售员%d\t\t", sales[i].id);
-		for (j = 0; j < GOODS_TYPES; j++)
-			sales[i].total += amount[i][j] * goods[j].price;
-		printf("%d\n", sales[i].total);
-	}
-}
-
-void calcbygoods()
-{
-	int i, j;
-	printf("-----------每个商品的销售额-----------\n");
-
-	for (j = 0; j < GOODS_TYPES; j++)
-	{
-		goods[j].total = 0;
-		printf("货物%c\t\t", goods[j].id);
-		for (i = 0; i < SALESMAN_COUNT; i++)
-			goods[j].total += amount[i][j] * goods[j].price;
-		printf("%d\n", goods[j].total);
-	}
-
-}
-
-void getbestsalesman()
-{
-	int i, j, t = 0;
-	printf("-----------销售额最多的销售人员-----------\n");
-
-	for (i = 0; i < SALESMAN_COUNT; i++)
-	{
-		if (sales[i].total > t)
+		int member = teammembers[team][m];
+		for (i = 0; i < infectedmemberslen; i++)
 		{
-			j = i;
-			t = sales[i].total;
+			if (infectedmembers[i] == member)
+			{
+				teaminfected = 1;
+				break;
+			}
 		}
 	}
-	printf("销售员%d\n", sales[j].id);
+	return teaminfected;
 }
 
-void getbestgoods()
+int addinfectedteam(int team)
 {
-	int i, j, t = 0;
-	printf("-----------销售额最多的销售人员-----------\n");
-	for (j = 0; j < GOODS_TYPES; j++)
+	int i, m, exist, newmemberfound = 0;
+	teamisinfectedandrecorded[team] = 1;
+	for (m = 0; m < teamlen[team]; m++)
 	{
-		if (goods[j].total > t)
+		int member = teammembers[team][m];
+		exist = 0;
+		for (i = 0; i < infectedmemberslen; i++)
 		{
-			i = j;
-			t = goods[i].total;
+			if (infectedmembers[i] == member)
+			{
+				exist = 1;
+				break;
+			}
+		}
+		if (!exist)
+		{
+			infectedmembers[infectedmemberslen++] = member;
+			newmemberfound = 1;
 		}
 	}
-	printf("商品%c\n", goods[i].id);
+	return newmemberfound;
+}
+
+void findmoreinfectedmembers()
+{
+	int foundnew = 1;
+	int t, m;
+	while (foundnew > 0)
+	{
+		foundnew = 0;
+		for (t = 0; t < TEAM_COUNT; t++)
+		{
+			if (!teamisinfectedandrecorded[t] && isteaminfected(t))
+			{
+				foundnew += addinfectedteam(t);
+			}
+		}
+	}
+}
+
+void getallinfectedmembers(int firstmember)
+{
+	infectedmembers[0] = firstmember;
+	infectedmemberslen = 1;
+	findmoreinfectedmembers();
+}
+
+void printallinfectedmembers()
+{
+	int i;
+	printf("疑似感染的学生如下：\n");
+
+	for (i = 0; i < infectedmemberslen; i++)
+	{
+		printf("%d\t", infectedmembers[i]);
+	}
+	printf("\n");
 }
 
 int main()
 {
-	initsales();
-	initgoods();
-	printtalbe();
-	calcbysales();
-	calcbygoods();
-	getbestsalesman();
-	getbestgoods();
+	int t, m;
+	for (t = 0; t < TEAM_COUNT; t++)
+	{
+		inputteammembers(t);
+	}
+	printf("---------\n");
+	printallteammembers();
+	printf("---------\n");
+	getallinfectedmembers(0);
+	printallinfectedmembers();
 	system("pause");
 	return 0;
 }
