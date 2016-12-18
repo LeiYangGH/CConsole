@@ -75,7 +75,19 @@ int readstu(STU s[], int num, char filename[]) {
 	fclose(fp);
 	return 0;
 }
+/**********qsort********************/
+int sortindex;
+int cmpfunc(const void * a, const void * b)
+{
+	return ((STU*)a)->score[sortindex] - ((STU*)b)->score[sortindex];
+}
 
+void sorttotal(STU s[], int num, int index)
+{
+	sortindex = index;
+	qsort(s, N, sizeof(student), cmpfunc);
+}
+/**********qsort********************/
 void sortscore(STU s[], int num, int index)
 {             //插入法排序                                                
 	int i, n, k, j, t;
@@ -136,7 +148,8 @@ int main()//测试成功后把你的整个main函数都注释掉
 		}
 		if (j >= 0 && j <= 10)
 		{
-			sortscore(a, N, j);
+			//sortscore(a, N, j);
+			sorttotal(a, N, j);
 			for (i = 0; i < N; i++)
 				printf("%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.2lf\n", a[i].id, a[i].name, a[i].sid, a[i].cid, a[i].score[0], a[i].score[1], a[i].score[2], a[i].score[3], a[i].score[4], a[i].score[5], a[i].score[6], a[i].score[7], a[i].score[8], a[i].score[9], a[i].ave);
 		}
