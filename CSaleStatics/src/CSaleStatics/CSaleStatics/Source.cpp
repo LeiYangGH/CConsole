@@ -18,14 +18,14 @@ int amount[SALESMAN_COUNT][GOODS_TYPES] =
 typedef struct salesman
 {
 	int id;
-	int tatal;
+	int total;
 }salesman;
 
 typedef struct good
 {
 	char id;
 	int price;
-	int tatal;
+	int total;
 }good;
 
 salesman sales[SALESMAN_COUNT];
@@ -72,11 +72,77 @@ void printtalbe()
 	}
 }
 
+void calcbysales()
+{
+	int i, j;
+	printf("-----------每个销售人员的销售额-----------\n");
+
+	for (i = 0; i < SALESMAN_COUNT; i++)
+	{
+		sales[i].total = 0;
+		printf("销售员%d\t\t", sales[i].id);
+		for (j = 0; j < GOODS_TYPES; j++)
+			sales[i].total += amount[i][j] * goods[j].price;
+		printf("%d\n", sales[i].total);
+	}
+}
+
+void calcbygoods()
+{
+	int i, j;
+	printf("-----------每个商品的销售额-----------\n");
+
+	for (j = 0; j < GOODS_TYPES; j++)
+	{
+		goods[j].total = 0;
+		printf("货物%c\t\t", goods[j].id);
+		for (i = 0; i < SALESMAN_COUNT; i++)
+			goods[j].total += amount[i][j] * goods[j].price;
+		printf("%d\n", goods[j].total);
+	}
+
+}
+
+void getbestsalesman()
+{
+	int i, j, t = 0;
+	printf("-----------销售额最多的销售人员-----------\n");
+
+	for (i = 0; i < SALESMAN_COUNT; i++)
+	{
+		if (sales[i].total > t)
+		{
+			j = i;
+			t = sales[i].total;
+		}
+	}
+	printf("销售员%d\n", sales[j].id);
+}
+
+void getbestgoods()
+{
+	int i, j, t = 0;
+	printf("-----------销售额最多的销售人员-----------\n");
+	for (j = 0; j < GOODS_TYPES; j++)
+	{
+		if (goods[j].total > t)
+		{
+			i = j;
+			t = goods[i].total;
+		}
+	}
+	printf("商品%c\n", goods[i].id);
+}
+
 int main()
 {
 	initsales();
 	initgoods();
 	printtalbe();
+	calcbysales();
+	calcbygoods();
+	getbestsalesman();
+	getbestgoods();
 	system("pause");
 	return 0;
 }
