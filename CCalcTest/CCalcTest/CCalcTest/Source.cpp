@@ -21,7 +21,7 @@ int testone(int qid)
 	printf("-----Test %d----\n\n", qid + 1);
 	printf("%d %c %d =\n", a, o ? '+' : '-', b);
 	r = o ? a + b : a - b;
-	while (++repeat < 3 && answer != r)
+	while (++repeat < 2 && answer != r)
 	{
 		printf("Input your answer:");
 		scanf("%d", &answer);
