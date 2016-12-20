@@ -42,27 +42,28 @@ student getstudentfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	student rec;
-	rec.total = 0;
-	part = strtok(line, ",");
+	student stu;
+	stu.total = 0;
+	part = strtok(line, "\t");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
+			stu.no = toint(part);
 			break;
 		case 2:
-			strcpy(rec.name, part);
+			strcpy(stu.name, part);
 			break;
 		case 3:
-			strcpy(rec.choice, part);
+			stu.score = toint(part);
 			break;
 		default:
 			break;
 		}
-		part = strtok(NULL, ",");
+		part = strtok(NULL, "\t");
 	}
-	return rec;
+	return stu;
 }
 
 //显示一个成绩 
@@ -89,8 +90,9 @@ void readallstudents()
 	{
 		if (strlen(line) < 5)
 			continue;
-		++allstudentscount;
-		allstudents[allstudentscount - 1] = getstudentfromline(line);
+		//++allstudentscount;
+		//allstudents[allstudentscount - 1] = getstudentfromline(line);
+		allstudents[allstudentscount++] = getstudentfromline(line);
 	}
 }
 
@@ -252,6 +254,48 @@ int login()
 		&& streq(pwd, "password");
 }
 
+void writeallstudents()
+{
+	FILE *fp = fopen(FILE_STU, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+
+	int i;
+	student rec;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		rec = allstudents[i];
+		fprintf(fp, FORMAT3DSD, rec.no, rec.name, rec.score);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
+void addstudent(int no, char name[], int score)
+{
+	student stu;
+	stu.no = no;
+	strcpy(stu.name, name);
+	stu.score = score;
+	allstudents[allstudentscount++] = stu;
+	//writeallstudents();
+}
+
+void promptaddstudent()
+{
+	int no = 99;
+	char name[MAX_STRLEN] = "newadd";
+	int score = 100;
+
+	addstudent(no, name, score);
+	printf("完成第%d个入库录入!\r\n", allstudentscount);
+}
+
+
 int main()
 {
 	int choice = -1;
@@ -266,8 +310,9 @@ int main()
 	createsamplestudents();
 
 	readallstudents();
-	printf("\n%d\n", allstudentscount);
-
+	//printf("\n%d\n", allstudentscount);
+	promptaddstudent();
+	writeallstudents();
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
