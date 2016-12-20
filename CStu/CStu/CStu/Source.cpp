@@ -382,7 +382,7 @@ void calcanddisplaytotalandaverage()
 {
 	int i;
 	student stu;
-	printf("所有%d分数如下\r\n", allstudentscount);
+	printf("所有各科总分、平均分如下\r\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -524,8 +524,7 @@ int main()
 			countbygrades();
 			break;
 		case 7:
-			printf("\n\n你选择了 7\n");
-			writeallstudents();
+			sortanddisplay();
 			break;
 		case 8:
 			writeallstudents();
