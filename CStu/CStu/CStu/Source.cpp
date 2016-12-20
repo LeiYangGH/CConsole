@@ -8,7 +8,7 @@
 //#define FILE_BEST "best.txt"
 //#define FILE_SCORES "scores.txt"
 //#define FILE_ANALYSIS "analysis.txt"
-#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%f\r\n"
+#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%.1f\r\n"
 #define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\r\n"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
@@ -395,11 +395,60 @@ void calcanddisplaytotalandaverage()
 		stu = allstudents[i];
 		allstudents[i].total = stu.total = calctotal(stu.math, stu.english, stu.chinese, stu.c);
 		allstudents[i].average = stu.average = calcave(stu.total);
-		printf("%d\t%s\t%d\t%f\r\n", stu.no, stu.name, stu.total, stu.average);
+		printf("%d\t%s\t%d\t%.1f\r\n", stu.no, stu.name, stu.total, stu.average);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
+void calcanddisplaysubject(char *subuject, int scores[])
+{
+	int i, sum = 0, below60 = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		sum += scores[i];
+		if (scores[i] < 60)
+			below60++;
+	}
+	printf("科目:%s 平均分%.1f、及格率百分之%.1f、不及格率百分之%.1f\r\n", subuject,
+		(sum / (float)allstudentscount),
+		(1 - below60 / (float)allstudentscount)*100.0f,
+		(below60 / (float)allstudentscount)*100.0f
+	);
+}
+
+
+void calcanddisplayallsubjects()
+{
+	int i, sum = 0, below60 = 0;
+	int scores[100];
+	student stu;
+	printf("所有科目成绩统计如下\r\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		scores[i] = allstudents[i].math;
+	}
+	calcanddisplaysubject("数学", scores);
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		scores[i] = allstudents[i].english;
+	}
+	calcanddisplaysubject("英语", scores);
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		scores[i] = allstudents[i].chinese;
+	}
+	calcanddisplaysubject("语文", scores);
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		scores[i] = allstudents[i].c;
+	}
+	calcanddisplaysubject("C语言", scores);
+	printf("--------------------------------------------\r\n");
+}
 
 void promptaddstudent()
 {
@@ -440,6 +489,7 @@ int main()
 	//displayallstudents();
 	calcanddisplaytotalandaverage();
 	sortanddisplay();
+	calcanddisplayallsubjects();
 	//addstudent();
 	//writeallstudents();
 
