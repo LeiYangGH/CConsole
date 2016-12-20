@@ -234,13 +234,35 @@ void createsamplestudents()
 
 
 
-
-
-void promptdeletebyname()
+int getstudentidexbyid(int no)
 {
-	char name[50] = "";
-	inputname(name);
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		student b = allstudents[i];
+		if (b.no == no)
+			return i;
+	}
 }
+
+void removestudent(int no)
+{
+	int i;
+	int index;
+	index = getstudentidexbyid(no);
+	for (i = index; i < allstudentscount - 1; i++)
+		allstudents[i] = allstudents[i + 1];
+	allstudentscount--;
+	printf("É¾³ýÍê±Ï£¬Ê£ÏÂ%d¸ö¡£\r\n", allstudentscount);
+
+}
+
+void promptremovestudent()
+{
+	int no = 99;
+	removestudent(no);
+}
+
 
 int login()
 {
@@ -313,6 +335,9 @@ int main()
 	//printf("\n%d\n", allstudentscount);
 	promptaddstudent();
 	writeallstudents();
+	promptremovestudent();
+	writeallstudents();
+
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
