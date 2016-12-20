@@ -27,6 +27,7 @@ typedef struct student
 }student;
 
 student allstudents[100];
+student sortstudents[100];
 int allstudentscount = 0;
 
 int streq(char *s1, char *s2)
@@ -136,9 +137,26 @@ int cmpfunc(const void * a, const void * b)
 }
 void sorttotal()
 {
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		sortstudents[i] = allstudents[i];
+	}
+	qsort(sortstudents, allstudentscount, sizeof(student), cmpfunc);
 }
 
+void sortanddisplay()
+{
+	int i;
+	sorttotal();
+	printf("排序后如下\r\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		displaystudent(sortstudents[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
 
 int below60()
 {
@@ -269,11 +287,11 @@ void createsamplestudents()
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, FORMATNET, 11, "Flex", 75, 2, 3, 4);
-	fprintf(fp, FORMATNET, 22, "Tony", 80, 2, 3, 4);
-	fprintf(fp, FORMATNET, 33, "Smile", 90, 2, 3, 4);
-	fprintf(fp, FORMATNET, 44, "Lukas", 88, 2, 3, 4);
-	fprintf(fp, FORMATNET, 55, "Shawn", 100, 2, 3, 4);
+	fprintf(fp, FORMATNET, 33, "Smile", 13, 23, 33, 43);
+	fprintf(fp, FORMATNET, 44, "Lukas", 14, 24, 34, 44);
+	fprintf(fp, FORMATNET, 55, "Shawn", 15, 25, 35, 45);
+	fprintf(fp, FORMATNET, 22, "Tony", 12, 22, 32, 42);
+	fprintf(fp, FORMATNET, 11, "Flex", 11, 21, 31, 41);
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
 }
@@ -375,8 +393,8 @@ void calcanddisplaytotalandaverage()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		stu.total = calctotal(stu.math, stu.english, stu.chinese, stu.c);
-		stu.average = calcave(stu.total);
+		allstudents[i].total = stu.total = calctotal(stu.math, stu.english, stu.chinese, stu.c);
+		allstudents[i].average = stu.average = calcave(stu.total);
 		printf("%d\t%s\t%d\t%f\r\n", stu.no, stu.name, stu.total, stu.average);
 	}
 	printf("--------------------------------------------\r\n");
@@ -419,8 +437,9 @@ int main()
 	//promptsearchtotalbyname();
 	//promptsearchtotalbyno();
 
-	displayallstudents();
+	//displayallstudents();
 	calcanddisplaytotalandaverage();
+	sortanddisplay();
 	//addstudent();
 	//writeallstudents();
 
