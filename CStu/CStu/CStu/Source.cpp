@@ -184,6 +184,23 @@ int promptsearchtotalbyname()
 
 
 
+int searchtotalbyno(int no)
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+		if (allstudents[i].no == no)
+			return allstudents[i].score;
+	printf("没找到对应学生的信息。\r\n");
+	return 0;
+}
+
+void promptsearchtotalbyno()
+{
+	int no;
+	printf("请输入要查询的学号:");
+	scanf("%d", &no);
+	printf("学号%d的成绩为%d：", no, searchtotalbyno(no));
+}
 
 //输入成绩信息
 void inputname(char str[])
@@ -337,7 +354,9 @@ int main()
 	writeallstudents();
 	/*promptremovestudent();
 	writeallstudents();*/
-	promptsearchtotalbyname();
+	//promptsearchtotalbyname();
+	promptsearchtotalbyno();
+
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
