@@ -8,10 +8,12 @@
 //#define FILE_BEST "best.txt"
 //#define FILE_SCORES "scores.txt"
 //#define FILE_ANALYSIS "analysis.txt"
-#define FORMAT3DSD "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%f\r\n"
+#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%f\r\n"
+#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\r\n"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
-#define STU_MEMBERS stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c, stu.total, stu.average
+#define STU_MEMBERS_FULL stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c, stu.total, stu.average
+#define STU_MEMBERS_NET stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c
 typedef struct student
 {
 	int no;
@@ -51,13 +53,13 @@ int tofloat(char *s)
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf(FORMAT3DSD, STU_MEMBERS);
+	printf(FORMATNET, STU_MEMBERS_NET);
 }
 
 void displayallstudents()
 {
 	int i;
-	printf("所有%d电影如下\r\n", allstudentscount);
+	printf("所有%d分数如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -257,8 +259,6 @@ int inputscore()
 	return n;
 }
 
-
-
 void createsamplestudents()
 {
 	FILE *fp = fopen(FILE_STU, "wb");
@@ -269,11 +269,11 @@ void createsamplestudents()
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, FORMAT3DSD, 11, "Flex", 75, 2, 3, 4, 5, 6.0f);
-	fprintf(fp, FORMAT3DSD, 22, "Tony", 80, 2, 3, 4, 5, 6.0f);
-	fprintf(fp, FORMAT3DSD, 33, "Smile", 90, 2, 3, 4, 5, 6.0f);
-	fprintf(fp, FORMAT3DSD, 44, "Lukas", 88, 2, 3, 4, 5, 6.0f);
-	fprintf(fp, FORMAT3DSD, 55, "Shawn", 100, 2, 3, 4, 5, 6.0f);
+	fprintf(fp, FORMATNET, 11, "Flex", 75, 2, 3, 4);
+	fprintf(fp, FORMATNET, 22, "Tony", 80, 2, 3, 4);
+	fprintf(fp, FORMATNET, 33, "Smile", 90, 2, 3, 4);
+	fprintf(fp, FORMATNET, 44, "Lukas", 88, 2, 3, 4);
+	fprintf(fp, FORMATNET, 55, "Shawn", 100, 2, 3, 4);
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
 }
@@ -338,7 +338,7 @@ void writeallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		fprintf(fp, FORMAT3DSD, STU_MEMBERS);
+		fprintf(fp, FORMATNET, STU_MEMBERS_NET);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -363,11 +363,25 @@ void addstudent(int no, char name[], int math, int english, int chinese, int c)
 	stu.english = english;
 	stu.chinese = chinese;
 	stu.c = c;
-	stu.total = calctotal(math, english, chinese, c);
-	stu.average = calcave(stu.total);
 	allstudents[allstudentscount++] = stu;
-	//writeallstudents();
 }
+
+void calcanddisplaytotalandaverage()
+{
+	int i;
+	student stu;
+	printf("所有%d分数如下\r\n", allstudentscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		stu = allstudents[i];
+		stu.total = calctotal(stu.math, stu.english, stu.chinese, stu.c);
+		stu.average = calcave(stu.total);
+		printf("%d\t%s\t%d\t%f\r\n", stu.no, stu.name, stu.total, stu.average);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
 
 void promptaddstudent()
 {
@@ -398,14 +412,15 @@ int main()
 
 	readallstudents();
 	//printf("\n%d\n", allstudentscount);
-	promptaddstudent();
-	writeallstudents();
+	/*promptaddstudent();
+	writeallstudents();*/
 	/*promptremovestudent();
 	writeallstudents();*/
 	//promptsearchtotalbyname();
 	//promptsearchtotalbyno();
 
 	displayallstudents();
+	calcanddisplaytotalandaverage();
 	//addstudent();
 	//writeallstudents();
 
