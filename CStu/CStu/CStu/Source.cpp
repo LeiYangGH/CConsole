@@ -12,6 +12,11 @@ typedef struct student
 	student *next;
 }student;
 
+int streq(char *s1, char *s2)
+{
+	return strcmp(s1, s2) == 0;
+}
+
 char *scoresfile = "scores.txt";
 student *head;
 
@@ -352,15 +357,32 @@ void promptdeletebyname()
 	deletestudent(name);
 }
 
-
+int login()
+{
+	char name[50] = "";
+	char pwd[50] = "";
+	printf("\n请输入用户名\n");
+	scanf("%s", name);
+	printf("\n请输入密码\n");
+	scanf("%s", pwd);
+	return streq(name, "username")
+		&& streq(pwd, "password");
+}
 
 int main()
 {
 	int choice = -1;
 
+	if (login())
+	{
+		printf("login ok\n");
+	}
+	else
+		printf("login fail\n");
+
 	//createsamplestudents();
 
-	readallstudents();
+	//readallstudents();
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
@@ -376,65 +398,63 @@ int main()
 	if (insert(head, 3, name, sc))
 	printf("\nisnerted\n");*/
 	//viewallstudents();
-	while (choice != 0)
-	{
-		//system("CLS");
-		printf("\n\t菜单(如果输入后没立即显示，请重新输入或按回车)");
-		printf("\n\t------------------------------");
-		printf("\n\n\t 0. 退出 0");
-		printf("\n\n\t 1. 添加 1");
-		printf("\n\t 2. 删除 2");
-		printf("\n\t 3. 查看所有 3");
-		printf("\n\t 4. 根据姓名查找单个 4");
-		printf("\n\t 5. 按成绩递增排序 5");
-		printf("\n\t 6. 插入 6");
-		printf("\n\t 7. 保存 7");
-		printf("\n\n 请选择: ");
-		scanf("%1[01234567]d%*c", &choice);
-		choice = getche();
-		switch (choice)
-		{
-		case '0':
-			//writeallstudents();
-			printf("\n\n 你选择了退出: ");
-			fseek(stdin, 0, SEEK_END);
-			system("pause");
-			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			addstudent();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			promptdeletebyname();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			viewallstudents();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptsearchtotalbyname();
-			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			sortandviewall();
-			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
-			promptinsertbeforeno();
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			writeallstudents();
-			break;
-		default:
-			printf("\n\n输入有误，请重选\n");
-			break;
-		}
-		getch();
-	}
+	//while (choice != 0)
+	//{
+	//	printf("\n\t菜单(如果输入后没立即显示，请重新输入或按回车)");
+	//	printf("\n\t------------------------------");
+	//	printf("\n\n\t 0. 退出 0");
+	//	printf("\n\n\t 1. 添加 1");
+	//	printf("\n\t 2. 删除 2");
+	//	printf("\n\t 3. 查看所有 3");
+	//	printf("\n\t 4. 根据姓名查找单个 4");
+	//	printf("\n\t 5. 按成绩递增排序 5");
+	//	printf("\n\t 6. 插入 6");
+	//	printf("\n\t 7. 保存 7");
+	//	printf("\n\n 请选择: ");
+	//	scanf("%1[01234567]d%*c", &choice);
+	//	choice = getche();
+	//	switch (choice)
+	//	{
+	//	case '0':
+	//		printf("\n\n 你选择了退出: ");
+	//		fseek(stdin, 0, SEEK_END);
+	//		system("pause");
+	//		exit(0);
+	//		break;
+	//	case '1':
+	//		printf("\n\n你选择了 1\n");
+	//		addstudent();
+	//		break;
+	//	case '2':
+	//		printf("\n\n你选择了 2\n");
+	//		promptdeletebyname();
+	//		break;
+	//	case '3':
+	//		printf("\n\n你选择了 3\n");
+	//		viewallstudents();
+	//		break;
+	//	case '4':
+	//		printf("\n\n你选择了 4\n");
+	//		promptsearchtotalbyname();
+	//		break;
+	//	case '5':
+	//		printf("\n\n你选择了 5\n");
+	//		sortandviewall();
+	//		break;
+	//	case '6':
+	//		printf("\n\n你选择了 6\n");
+	//		promptinsertbeforeno();
+	//		break;
+	//	case '7':
+	//		printf("\n\n你选择了 7\n");
+	//		writeallstudents();
+	//		break;
+	//	default:
+	//		printf("\n\n输入有误，请重选\n");
+	//		break;
+	//	}
+	//	getch();
+	//}
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
