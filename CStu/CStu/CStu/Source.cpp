@@ -3,21 +3,32 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
+#define FILE_INPUT "input.txt"
+//#define FILE_INPUT "sample.txt"
+#define FILE_BEST "best.txt"
+#define FILE_SCORES "scores.txt"
+#define FILE_ANALYSIS "analysis.txt"
 #define FORMAT3DSD "%d\t%s\t%d\r\n"
+#define MAX_STRLEN 20
+#define QUESTIONS_COUNT 35
 typedef struct student
 {
 	int no;
 	char name[50];
+	char choice[QUESTIONS_COUNT];
 	int score;
-	student *next;
+	int total;
 }student;
+
+student allstudents[100];
+int allstudentscount = 0;
 
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
 
-char *scoresfile = "scores.txt";
+char *studentfile = "stu.txt";
 student *head;
 
 //字符串转整数
@@ -62,64 +73,163 @@ void displaystudent(student stu)
 	printf("\r\n");
 }
 
-//读取所有成绩到链表
+
 void readallstudents()
 {
-	char line[200];
-	student *p1, *p2;
-	FILE *fp = fopen(scoresfile, "r");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
+	//char line[200];
+	//FILE *fp = fopen(FILE_INPUT, "r");
+	//if (fp == NULL)
+	//{
+	//	printf("\n打开文件%s失败!", FILE_INPUT);
+	//	getchar();
+	//	exit(1);
+	//}
+	//allstudentscount = 0;
 
-	p1 = p2 = (student *)malloc(sizeof(student));
-	head = p1;
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			break;
-		//读进来的行去掉末尾换行符，重要
-		//http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input 
-		strtok(line, "\n");
-		getstudentfromline(line, p1);
-		if (head == NULL)
-			head = p1;
-		else
-			p2->next = p1;
-		p2 = p1;
-		p1 = (student*)malloc(sizeof(student));
-	}
-	p2->next = NULL;
+	//while (fgets(line, 1024, fp) != NULL)
+	//{
+	//	if (strlen(line) < 5)
+	//		continue;
+	//	++allstudentscount;
+	//	allstudents[allstudentscount - 1] = getstudentfromline(line);
+	//}
 }
 
 
-//保存所有成绩
-void writeallstudents()
+
+int cmpfunc(const void * a, const void * b)
 {
-	student *p;
-	FILE *fp = fopen(scoresfile, "wb");
+	return ((student*)a)->total - ((student*)b)->total;
+}
+void sorttotal()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+}
+
+void writetotal()
+{
+	int i;
+	FILE *fp;
+	fp = fopen(FILE_SCORES, "wb");
 	if (fp == NULL)
 	{
-		printf("\nerror on open file!");
+		printf("\n打开文件%s失败!", FILE_SCORES);
 		getchar();
 		exit(1);
 	}
-
-	p = head;
-
-	while (p != NULL)
+	sorttotal();
+	for (i = 0; i < allstudentscount; i++)
 	{
-		student stu = *p;
-
-		fprintf(fp, FORMAT3DSD, stu.no, stu.name, stu.score);
-		p = p->next;
+		printf("%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
+		fprintf(fp, "%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
 	}
 	fclose(fp);
-	printf("已保存到文件。");
 }
+
+int below60()
+{
+	int i, c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].total < 60)
+			c++;
+	}
+	return c;
+}
+
+int below60_80()
+{
+	int i, c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].total >= 60 && allstudents[i].total < 80)
+			c++;
+	}
+	return c;
+}
+
+int above80()
+{
+	int i, c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].total >= 80)
+			c++;
+	}
+	return c;
+}
+
+float ave()
+{
+	int i;
+	float sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+		sum += allstudents[i].total;
+	return sum / (float)allstudentscount;
+}
+
+void writeanalysis()
+{
+	int i;
+	FILE *fp;
+	fp = fopen(FILE_ANALYSIS, "wb");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_ANALYSIS);
+		getchar();
+		exit(1);
+	}
+	printf("%s\t%d\r\n", "<60", below60());
+	printf("%s\t%d\r\n", "60~80", below60_80());
+	printf("%s\t%d\r\n", ">80", above80());
+	printf("%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
+	printf("%s\t%d\r\n", "最低", allstudents[0].total);
+	printf("%s\t%f\r\n", "平均", ave());
+	printf("%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
+
+	fprintf(fp, "%s\t%d\r\n", "<60", below60());
+	fprintf(fp, "%s\t%d\r\n", "60~80", below60_80());
+	fprintf(fp, "%s\t%d\r\n", ">80", above80());
+	fprintf(fp, "%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
+	fprintf(fp, "%s\t%d\r\n", "最低", allstudents[0].total);
+	fprintf(fp, "%s\t%f\r\n", "平均", ave());
+	fprintf(fp, "%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
+	fclose(fp);
+}
+
+void inputstring(char str[])
+{
+	int len = -1;
+	char input[50] = "";
+	while (len < 1 || len > MAX_STRLEN)
+	{
+		printf("请输入姓名,输入q退出查询:");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%s", input);
+		len = strlen(input);
+	}
+	strcpy(str, input);
+}
+
+int searchtotalbyname(char *name)
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+		if (strcmp(name, allstudents[i].name) == 0)
+			return allstudents[i].total;
+	printf("没找到对应学生的信息。\r\n");
+	return 0;
+}
+
+int promptsearchtotalbyname()
+{
+	char name[MAX_STRLEN] = "";
+	inputstring(name);
+	printf("学生%s的成绩为%d：", name, searchtotalbyname(name));
+	return strcmp(name, "q");
+}
+
+
 
 
 //输入成绩信息
@@ -147,145 +257,11 @@ int inputscore()
 	return n;
 }
 
-int getnewno(student **tail)
-{
-	int newno = 0;
-	student *p = head;
-	if (head->no > newno)
-		newno = head->no;
-	while (p->next != NULL)
-	{
-		if (p->no > newno)
-			newno = p->no;
-		p = p->next;
-	}
-	if (p->no > newno)
-		newno = p->no;
-	newno++;
-	*tail = p;
-	return newno;
-}
 
-//新增成绩
-void addstudent()
-{
-	int newno = 0, score;//新成绩编号，当前最大+1
-	student *p = head;
-	student *n;
-	char name[50] = "";
-
-	inputname(name);
-
-	newno = getnewno(&p);
-
-	n = (student *)malloc(sizeof(student));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	score = inputscore();
-	n->score = score;
-
-	p->next = n;
-	n->next = NULL;
-	printf("\n%s成绩%d添加成功!\n", name, score);
-}
-
-
-bool insert(student *pHead, int front, char *name, int score)
-{
-	int i = 0, newno;
-	student *_node = pHead;
-	student *pSwap;
-	student *pNew;
-	student *x;
-	newno = getnewno(&x);
-	if ((front < 1) && (NULL != _node))
-	{
-		return false;
-	}
-	while (i < front - 1)
-	{
-		_node = _node->next;
-		++i;
-	}
-	pNew = (student*)malloc(sizeof(student));
-
-	pNew->no = newno;
-	strcpy(pNew->name, name);
-	pNew->score = score;
-	pSwap = _node->next;
-	_node->next = pNew;
-	pNew->next = pSwap;
-	return true;
-
-}
-
-//删除成绩
-//http://blog.csdn.net/iwm_next/article/details/7450734
-void deletestudent(char * name)
-{
-	student *p1 = head, *p2;
-	if (head == NULL)
-	{
-		printf("\n成绩为空!\n");
-		return;
-	}
-	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
-	{
-		p2 = p1;
-		p1 = p1->next;
-	}
-	if (strcmp(p1->name, name) == 0)
-	{
-
-		if (p1 == head)
-			head = p1->next;
-		else
-		{
-			p2->next = p1->next;
-			free(p1);
-			printf("已删除姓名为%s的学生的成绩。\r\n", name);
-		}
-	}
-	else
-		printf("没找到姓名为%s的学生!\r\n", name);
-}
-
-void viewstudent(char * name)
-{
-	int found = 0;
-	student *p = head;
-
-	while (p != NULL)
-	{
-		if (strcmp(p->name, name) == 0)
-		{
-			found = 1;
-			printf("%s的成绩如下\r\n", name);
-
-			displaystudent(*p);
-		}
-		p = p->next;
-	}
-	if (!found)
-		printf("没找到名为%s的学生\r\n", name);
-}
-
-void viewallstudents()
-{
-	student *p = head;
-
-	printf("所有学生成绩如下\r\n");
-	while (p != NULL)
-	{
-		displaystudent(*p);
-		p = p->next;
-	}
-}
 
 void createsamplestudents()
 {
-	FILE *fp = fopen(scoresfile, "wb");
+	FILE *fp = fopen(studentfile, "wb");
 	printf("创建示例成绩数据...");
 	if (fp == NULL)
 	{
@@ -293,68 +269,24 @@ void createsamplestudents()
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, FORMAT3DSD, 1, "Flex", 75);
-	fprintf(fp, FORMAT3DSD, 2, "Tony", 80);
-	fprintf(fp, FORMAT3DSD, 3, "测试中文姓名", 90);
-	fprintf(fp, FORMAT3DSD, 4, "Lukas", 88);
-	fprintf(fp, FORMAT3DSD, 5, "Shawn", 100);
+	fprintf(fp, FORMAT3DSD, 11, "Flex", 75);
+	fprintf(fp, FORMAT3DSD, 22, "Tony", 80);
+	fprintf(fp, FORMAT3DSD, 33, "测试中文姓名", 90);
+	fprintf(fp, FORMAT3DSD, 44, "Lukas", 88);
+	fprintf(fp, FORMAT3DSD, 55, "Shawn", 100);
 
 	fclose(fp);
-	printf("5条示例成绩数据已保存到student.txt。");
+	printf("5条示例成绩数据已保存到student.txt。\n");
 }
 
-int cmpfunc(const void * a, const void * b)
-{
-	return ((student*)a)->score - ((student*)b)->score;
-}
-void sortandviewall()
-{
-	int i, cnt = 0;
-	student all[50];
-	student *p = head;
 
-	printf("所有学生成绩升序排序输出如下\r\n");
-	while (p != NULL)
-	{
-		student stu;
-		stu.no = p->no;
-		strcpy(stu.name, p->name);
-		stu.score = p->score;
-		all[cnt++] = stu;
-		p = p->next;
-	}
-	qsort(all, cnt, sizeof(student), cmpfunc);
-	for (i = 0; i < cnt; i++)
-	{
-		displaystudent(all[i]);
-	}
-}
 
-void promptinsertbeforeno()
-{
-	int no, score;
-	char name[50] = "";
-	printf("\n请输入要在哪个编号的学生之后插入?\n");
-	scanf("%d", &no);
 
-	inputname(name);
-	score = inputscore();
-	if (insert(head, no, name, score))
-		printf("\n插入成功！\n");
-}
-
-void promptsearchtotalbyname()
-{
-	char name[50] = "";
-	inputname(name);
-	viewstudent(name);
-}
 
 void promptdeletebyname()
 {
 	char name[50] = "";
 	inputname(name);
-	deletestudent(name);
 }
 
 int login()
@@ -373,14 +305,14 @@ int main()
 {
 	int choice = -1;
 
-	if (login())
+	/*if (login())
 	{
 		printf("login ok\n");
 	}
 	else
-		printf("login fail\n");
+		printf("login fail\n");*/
 
-	//createsamplestudents();
+	createsamplestudents();
 
 	//readallstudents();
 	//viewallstudents();
