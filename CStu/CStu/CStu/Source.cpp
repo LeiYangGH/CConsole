@@ -3,11 +3,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define FILE_INPUT "input.txt"
-//#define FILE_INPUT "sample.txt"
-#define FILE_BEST "best.txt"
-#define FILE_SCORES "scores.txt"
-#define FILE_ANALYSIS "analysis.txt"
+#define FILE_STU "stu.txt"
+//#define FILE_STU "sample.txt"
+//#define FILE_BEST "best.txt"
+//#define FILE_SCORES "scores.txt"
+//#define FILE_ANALYSIS "analysis.txt"
 #define FORMAT3DSD "%d\t%s\t%d\r\n"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
@@ -28,7 +28,7 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-char *studentfile = "stu.txt";
+//char *FILE_STU = "stu.txt";
 student *head;
 
 //字符串转整数
@@ -38,33 +38,32 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-//从一行文本拆分出成绩 
-void getstudentfromline(char *line, student *adg)
+student getstudentfromline(char *line)
 {
-	char * part;
+	char *part;
 	int index = 0;
-
-	part = strtok(line, "\t");
+	student rec;
+	rec.total = 0;
+	part = strtok(line, ",");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
-			adg->no = toint(part);
 			break;
 		case 2:
-			strcpy(adg->name, part);
+			strcpy(rec.name, part);
 			break;
 		case 3:
-			adg->score = toint(part);
+			strcpy(rec.choice, part);
 			break;
 		default:
 			break;
 		}
-		part = strtok(NULL, "\t");
+		part = strtok(NULL, ",");
 	}
+	return rec;
 }
-
 
 //显示一个成绩 
 void displaystudent(student stu)
@@ -76,23 +75,23 @@ void displaystudent(student stu)
 
 void readallstudents()
 {
-	//char line[200];
-	//FILE *fp = fopen(FILE_INPUT, "r");
-	//if (fp == NULL)
-	//{
-	//	printf("\n打开文件%s失败!", FILE_INPUT);
-	//	getchar();
-	//	exit(1);
-	//}
-	//allstudentscount = 0;
+	char line[200];
+	FILE *fp = fopen(FILE_STU, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+	allstudentscount = 0;
 
-	//while (fgets(line, 1024, fp) != NULL)
-	//{
-	//	if (strlen(line) < 5)
-	//		continue;
-	//	++allstudentscount;
-	//	allstudents[allstudentscount - 1] = getstudentfromline(line);
-	//}
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		++allstudentscount;
+		allstudents[allstudentscount - 1] = getstudentfromline(line);
+	}
 }
 
 
@@ -106,25 +105,6 @@ void sorttotal()
 	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
 }
 
-void writetotal()
-{
-	int i;
-	FILE *fp;
-	fp = fopen(FILE_SCORES, "wb");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_SCORES);
-		getchar();
-		exit(1);
-	}
-	sorttotal();
-	for (i = 0; i < allstudentscount; i++)
-	{
-		printf("%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-		fprintf(fp, "%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-	}
-	fclose(fp);
-}
 
 int below60()
 {
@@ -166,35 +146,6 @@ float ave()
 	for (i = 0; i < allstudentscount; i++)
 		sum += allstudents[i].total;
 	return sum / (float)allstudentscount;
-}
-
-void writeanalysis()
-{
-	int i;
-	FILE *fp;
-	fp = fopen(FILE_ANALYSIS, "wb");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_ANALYSIS);
-		getchar();
-		exit(1);
-	}
-	printf("%s\t%d\r\n", "<60", below60());
-	printf("%s\t%d\r\n", "60~80", below60_80());
-	printf("%s\t%d\r\n", ">80", above80());
-	printf("%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
-	printf("%s\t%d\r\n", "最低", allstudents[0].total);
-	printf("%s\t%f\r\n", "平均", ave());
-	printf("%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
-
-	fprintf(fp, "%s\t%d\r\n", "<60", below60());
-	fprintf(fp, "%s\t%d\r\n", "60~80", below60_80());
-	fprintf(fp, "%s\t%d\r\n", ">80", above80());
-	fprintf(fp, "%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
-	fprintf(fp, "%s\t%d\r\n", "最低", allstudents[0].total);
-	fprintf(fp, "%s\t%f\r\n", "平均", ave());
-	fprintf(fp, "%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
-	fclose(fp);
 }
 
 void inputstring(char str[])
@@ -261,7 +212,7 @@ int inputscore()
 
 void createsamplestudents()
 {
-	FILE *fp = fopen(studentfile, "wb");
+	FILE *fp = fopen(FILE_STU, "wb");
 	printf("创建示例成绩数据...");
 	if (fp == NULL)
 	{
@@ -314,7 +265,9 @@ int main()
 
 	createsamplestudents();
 
-	//readallstudents();
+	readallstudents();
+	printf("\n%d\n", allstudentscount);
+
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
