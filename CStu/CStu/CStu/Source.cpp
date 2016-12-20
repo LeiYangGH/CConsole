@@ -344,23 +344,41 @@ void writeallstudents()
 	printf("已保存记录到文件。");
 }
 
-void addstudent(int no, char name[], int score)
+int calctotal(int math, int english, int chinese, int c)
+{
+	return math + english + chinese + c;
+}
+
+float calcave(int total)
+{
+	return total / 4.0f;
+}
+
+void addstudent(int no, char name[], int math, int english, int chinese, int c)
 {
 	student stu;
 	stu.no = no;
 	strcpy(stu.name, name);
-	stu.average = score;
+	stu.math = math;
+	stu.english = english;
+	stu.chinese = chinese;
+	stu.c = c;
+	stu.total = calctotal(math, english, chinese, c);
+	stu.average = calcave(stu.total);
 	allstudents[allstudentscount++] = stu;
 	//writeallstudents();
 }
 
 void promptaddstudent()
 {
-	int no = 99;
-	char name[MAX_STRLEN] = "newadd";
-	int score = 100;
-
-	addstudent(no, name, score);
+	int no; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
+	printf("\n请输入学号\n");
+	scanf("%d", &no);
+	printf("\n请输入用户名\n");
+	scanf("%s", name);
+	printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
+	scanf("%d%d%d%d", &math, &english, &chinese, &c);
+	addstudent(no, name, math, english, chinese, c);
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
@@ -380,8 +398,8 @@ int main()
 
 	readallstudents();
 	//printf("\n%d\n", allstudentscount);
-	//promptaddstudent();
-	//writeallstudents();
+	promptaddstudent();
+	writeallstudents();
 	/*promptremovestudent();
 	writeallstudents();*/
 	//promptsearchtotalbyname();
