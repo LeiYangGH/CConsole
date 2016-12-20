@@ -169,7 +169,7 @@ int searchtotalbyname(char *name)
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 		if (strcmp(name, allstudents[i].name) == 0)
-			return allstudents[i].total;
+			return allstudents[i].score;
 	printf("没找到对应学生的信息。\r\n");
 	return 0;
 }
@@ -335,9 +335,9 @@ int main()
 	//printf("\n%d\n", allstudentscount);
 	promptaddstudent();
 	writeallstudents();
-	promptremovestudent();
-	writeallstudents();
-
+	/*promptremovestudent();
+	writeallstudents();*/
+	promptsearchtotalbyname();
 	//viewallstudents();
 	//addstudent();
 	//writeallstudents();
