@@ -8,16 +8,20 @@
 //#define FILE_BEST "best.txt"
 //#define FILE_SCORES "scores.txt"
 //#define FILE_ANALYSIS "analysis.txt"
-#define FORMAT3DSD "%d\t%s\t%d\r\n"
+#define FORMAT3DSD "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%f\r\n"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
+#define STU_MEMBERS stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c, stu.total, stu.average
 typedef struct student
 {
 	int no;
 	char name[50];
-	char choice[QUESTIONS_COUNT];
-	int score;
+	int math;
+	int english;
+	int chinese;
+	int c;
 	int total;
+	float average;
 }student;
 
 student allstudents[100];
@@ -38,10 +42,16 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+int tofloat(char *s)
+{
+	char *end;
+	return (float)strtol(s, &end, 10);
+}
+
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf(FORMAT3DSD, stu.no, stu.name, stu.score);
+	printf(FORMAT3DSD, STU_MEMBERS);
 }
 
 void displayallstudents()
@@ -49,7 +59,6 @@ void displayallstudents()
 	int i;
 	printf("所有%d电影如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
-	printf(FORMAT3DSD, "片名", "日期", "时间");
 	for (i = 0; i < allstudentscount; i++)
 	{
 		displaystudent(allstudents[i]);
@@ -62,7 +71,6 @@ student getstudentfromline(char *line)
 	char *part;
 	int index = 0;
 	student stu;
-	stu.total = 0;
 	part = strtok(line, "\t");
 	while (part != NULL)
 	{
@@ -75,7 +83,22 @@ student getstudentfromline(char *line)
 			strcpy(stu.name, part);
 			break;
 		case 3:
-			stu.score = toint(part);
+			stu.math = toint(part);
+			break;
+		case 4:
+			stu.english = toint(part);
+			break;
+		case 5:
+			stu.chinese = toint(part);
+			break;
+		case 6:
+			stu.c = toint(part);
+			break;
+		case 7:
+			stu.total = toint(part);
+			break;
+		case 8:
+			stu.average = tofloat(part);
 			break;
 		default:
 			break;
@@ -84,9 +107,6 @@ student getstudentfromline(char *line)
 	}
 	return stu;
 }
-
- 
-
 
 void readallstudents()
 {
@@ -104,13 +124,9 @@ void readallstudents()
 	{
 		if (strlen(line) < 5)
 			continue;
-		//++allstudentscount;
-		//allstudents[allstudentscount - 1] = getstudentfromline(line);
 		allstudents[allstudentscount++] = getstudentfromline(line);
 	}
 }
-
-
 
 int cmpfunc(const void * a, const void * b)
 {
@@ -183,7 +199,7 @@ int searchtotalbyname(char *name)
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 		if (strcmp(name, allstudents[i].name) == 0)
-			return allstudents[i].score;
+			return allstudents[i].average;
 	printf("没找到对应学生的信息。\r\n");
 	return 0;
 }
@@ -203,7 +219,7 @@ int searchtotalbyno(int no)
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 		if (allstudents[i].no == no)
-			return allstudents[i].score;
+			return allstudents[i].average;
 	printf("没找到对应学生的信息。\r\n");
 	return 0;
 }
@@ -253,12 +269,11 @@ void createsamplestudents()
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, FORMAT3DSD, 11, "Flex", 75);
-	fprintf(fp, FORMAT3DSD, 22, "Tony", 80);
-	fprintf(fp, FORMAT3DSD, 33, "测试中文姓名", 90);
-	fprintf(fp, FORMAT3DSD, 44, "Lukas", 88);
-	fprintf(fp, FORMAT3DSD, 55, "Shawn", 100);
-
+	fprintf(fp, FORMAT3DSD, 11, "Flex", 75, 2, 3, 4, 5, 6.0f);
+	fprintf(fp, FORMAT3DSD, 22, "Tony", 80, 2, 3, 4, 5, 6.0f);
+	fprintf(fp, FORMAT3DSD, 33, "Smile", 90, 2, 3, 4, 5, 6.0f);
+	fprintf(fp, FORMAT3DSD, 44, "Lukas", 88, 2, 3, 4, 5, 6.0f);
+	fprintf(fp, FORMAT3DSD, 55, "Shawn", 100, 2, 3, 4, 5, 6.0f);
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
 }
@@ -309,6 +324,8 @@ int login()
 
 void writeallstudents()
 {
+	int i;
+	student stu;
 	FILE *fp = fopen(FILE_STU, "w+");
 	if (fp == NULL)
 	{
@@ -317,12 +334,11 @@ void writeallstudents()
 		exit(1);
 	}
 
-	int i;
-	student rec;
+
 	for (i = 0; i < allstudentscount; i++)
 	{
-		rec = allstudents[i];
-		fprintf(fp, FORMAT3DSD, rec.no, rec.name, rec.score);
+		stu = allstudents[i];
+		fprintf(fp, FORMAT3DSD, STU_MEMBERS);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -333,7 +349,7 @@ void addstudent(int no, char name[], int score)
 	student stu;
 	stu.no = no;
 	strcpy(stu.name, name);
-	stu.score = score;
+	stu.average = score;
 	allstudents[allstudentscount++] = stu;
 	//writeallstudents();
 }
@@ -364,8 +380,8 @@ int main()
 
 	readallstudents();
 	//printf("\n%d\n", allstudentscount);
-	promptaddstudent();
-	writeallstudents();
+	//promptaddstudent();
+	//writeallstudents();
 	/*promptremovestudent();
 	writeallstudents();*/
 	//promptsearchtotalbyname();
