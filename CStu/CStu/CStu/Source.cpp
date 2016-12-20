@@ -38,6 +38,25 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+void displaystudent(student stu)
+{
+	printf("\r\n");
+	printf(FORMAT3DSD, stu.no, stu.name, stu.score);
+}
+
+void displayallstudents()
+{
+	int i;
+	printf("所有%d电影如下\r\n", allstudentscount);
+	printf("--------------------------------------------\r\n");
+	printf(FORMAT3DSD, "片名", "日期", "时间");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		displaystudent(allstudents[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
 student getstudentfromline(char *line)
 {
 	char *part;
@@ -66,12 +85,7 @@ student getstudentfromline(char *line)
 	return stu;
 }
 
-//显示一个成绩 
-void displaystudent(student stu)
-{
-	printf(FORMAT3DSD, stu.no, stu.name, stu.score);
-	printf("\r\n");
-}
+ 
 
 
 void readallstudents()
@@ -355,9 +369,9 @@ int main()
 	/*promptremovestudent();
 	writeallstudents();*/
 	//promptsearchtotalbyname();
-	promptsearchtotalbyno();
+	//promptsearchtotalbyno();
 
-	//viewallstudents();
+	displayallstudents();
 	//addstudent();
 	//writeallstudents();
 
