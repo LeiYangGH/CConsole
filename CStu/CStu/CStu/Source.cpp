@@ -315,7 +315,9 @@ void removestudent(int no)
 
 void promptremovestudent()
 {
-	int no = 99;
+	int no;
+	printf("请输入要删除的学号:");
+	scanf("%d", &no);
 	removestudent(no);
 }
 
