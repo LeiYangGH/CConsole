@@ -607,13 +607,15 @@ void inputstudentandexam()
 	readalltfqs();
 	testallselqs();
 	testalltfqs();
+	score = displayselqstestresult() + displaytfqstestresult();
 	printf("\n题目全部做完，请选择是否保存成绩？选1保存，否则考试记录清除。以回车结束:");
 	scanf("%d", &save);
 	if (save == 1)
 	{
-		score = displayselqstestresult() + displaytfqstestresult();
 		appendscores(no, name, score);
 	}
+	printf("\n\n要选其他菜单，请按任意键\n");
+	system("pause");
 }
 
 void avehighlowescores()
