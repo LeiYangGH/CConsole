@@ -443,21 +443,79 @@ void testallselqs()
 	for (i = 0; i < USE_QUESTIONS_COUNT; i++)
 	{
 		useselqs[i] = allselqs[useids[i]];
-		//displayquestion(useselqs[i]);
 		testoneselq(&useselqs[i]);
 	}
 }
 
-int main()
+int displayselqstestresult()
+{
+	int i, score = 0;
+	int useids[USE_QUESTIONS_COUNT] = { 0 };
+	generateuseids(allselqcnt, USE_QUESTIONS_COUNT, useids);
+	for (i = 0; i < USE_QUESTIONS_COUNT; i++)
+	{
+		printf("\n第%d题：%s\n", i + 1, useselqs[i].title);
+		printf("你的答案：%s\n", useselqs[i].choices[useselqs[i].userchoice - 1]);
+
+		if (useselqs[i].userchoice == useselqs[i].best)
+		{
+			printf("\t\t\t\t正确！\n");
+			score++;
+		}
+		else
+			printf("--错误，正确答案是：%s\n", useselqs[i].choices[useselqs[i].best - 1]);
+	}
+	printf("\n你的总分：%d\n", score);
+	return score;
+}
+
+void appendscores(int no, char *name, int score)
 {
 	int i;
+	selq q;
+	FILE *fp = fopen(FILE_SCORE, "a");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_SCORE);
+		getchar();
+		exit(1);
+	}
+	fprintf(fp, "%d\t%s\t%d", no, name, score);
+	fclose(fp);
+	printf("已添加成绩到文件。");
+}
+
+void inputstudentandexam()
+{
+	int i, no, score;
+	char name[50] = "";
 	srand(time(NULL));
 	readallquestions();
-	//displayallquestions();
+	printf("\n请输入要考生学号(1~100)，并以回车结束:");
+	scanf("%d", &no);
+	printf("\n请输入考生姓名，不能带空格、Tab或回车符，并以回车结束:");
+	scanf("%s", name);
 
 	testallselqs();
+	score = displayselqstestresult();
+	appendscores(no, name, score);
+}
+
+int main()
+{
+	//int i, no, score;
+	//char name[50] = "";
+	//srand(time(NULL));
+	//readallquestions();
 
 
+	////displayallquestions();
+
+	//testallselqs();
+	//score = displayselqstestresult();
+
+
+	inputstudentandexam();
 	system("pause");
 	return 0;
 }
