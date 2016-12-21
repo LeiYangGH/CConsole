@@ -221,15 +221,20 @@ void readallescores()
 
 
 
-int cmpfunc(const void * a, const void * b)
+int cmpbyno(const void * a, const void * b)
 {
 	return  ((escore*)a)->no - ((escore*)b)->no;
+}
+
+int cmpbyscore(const void * a, const void * b)
+{
+	return  ((escore*)a)->score - ((escore*)b)->score;
 }
 
 void sortanddisplayallescores()
 {
 	int i;
-	qsort(allescores, allescorecnt, sizeof(escore), cmpfunc);
+	qsort(allescores, allescorecnt, sizeof(escore), cmpbyno);
 	printf("所有成绩按学好排序后如下\r\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allescorecnt; i++)
@@ -542,7 +547,7 @@ int displayselqstestresult()
 		if (useselqs[i].userchoice == useselqs[i].best)
 		{
 			printf("\t\t\t\t正确！\n");
-			score++;
+			score += 5;
 		}
 		else
 			printf("--错误，正确答案是：%s\n", useselqs[i].choices[useselqs[i].best - 1]);
@@ -564,7 +569,7 @@ int displaytfqstestresult()
 		if (useselqs[i].userchoice == useselqs[i].best)
 		{
 			printf("\t\t\t\t正确！\n");
-			score++;
+			score += 5;
 		}
 		else
 			printf("--错误，正确答案是：%s\n", useselqs[i].choices[useselqs[i].best - 1]);
@@ -591,7 +596,7 @@ void appendscores(int no, char *name, int score)
 
 void inputstudentandexam()
 {
-	int i, no, score;
+	int i, no, score, save;
 	char name[50] = "";
 	srand(time(NULL));
 	printf("\n请输入要考生学号(1~100)，并以回车结束:");
@@ -602,17 +607,22 @@ void inputstudentandexam()
 	readalltfqs();
 	testallselqs();
 	testalltfqs();
-	score = displayselqstestresult() + displaytfqstestresult();
-	appendscores(no, name, score);
+	printf("\n题目全部做完，请选择是否保存成绩？选1保存，否则考试记录清除。以回车结束:");
+	scanf("%d", &save);
+	if (save == 1)
+	{
+		score = displayselqstestresult() + displaytfqstestresult();
+		appendscores(no, name, score);
+	}
 }
 
 void avehighlowescores()
 {
 	int i;
 	float sum = 0;
+	qsort(allescores, allescorecnt, sizeof(escore), cmpbyscore);
 	for (i = 0; i < allescorecnt; i++)
 		sum += allescores[i].score;
-	;
 	printf("%s\t%d\r\n", "最高", allescores[allescorecnt - 1].score);
 	printf("%s\t%d\r\n", "最低", allescores[0].score);
 	printf("%s\t%.1f\r\n", "平均", sum / (float)allescorecnt);
@@ -621,7 +631,6 @@ void avehighlowescores()
 void escoresstatic()
 {
 	readallescores();
-
 	sortanddisplayallescores();
 	countbygrades();
 	avehighlowescores();
