@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdio.h>
 #include <time.h>
-#define QESTIONS_COUNT 3
+#define TEST_QUESTIONS_COUNT 3
 
 #define FILE_SEL "file1.txt"
 #define FILE_TF "file2.txt"
@@ -21,6 +21,7 @@ typedef struct selectiveqestion
 }selq;
 
 selq allselqs[100];
+selq useselqs[100];
 selq sortqs[100];
 int allselqcnt = 0;
 
@@ -416,33 +417,45 @@ int testone(int qid)
 		return 0;
 }
 
-void showresult(int score)
+void generateuseids(int allcnt, int usecnt, int useids[])
 {
-	if (score >= 90)
-		printf("SMART!\n");
-	else if (score >= 80 && score < 90)
-		printf("GOOD\n");
-	else if (score >= 70 && score < 80)
-		printf("OK\n");
-	else if (score >= 60 && score < 70)
-		printf("PASS\n");
-	else if (score < 60)
-		printf("TRY AGAIN!\n");
+	int i;
+	int r, ri, ucnt = 0, tmp, top;
+	int allids[100];
+	for (i = 0; i < allcnt; i++)
+	{
+		allids[i] = i;
+	}
+	while (ucnt < usecnt)
+	{
+		ri = random(0, allcnt - ucnt);
+		useids[ucnt++] = r = allids[ri];
+		top = allcnt - ucnt - 1;
+		if (r < top)
+		{
+			allids[r] = allids[top];
+		}
+		printf("r=%d\t", r);
+	}
+	printf("\n", r);
 }
 
 int main()
 {
-	readallquestions();
-	displayallquestions();
-	/*int t, m, first, score = 0;
+	int i;
+	int allcnt = 20;
+	int usecnt = 10;
+	int useids[10] = { 0 };
 	srand(time(NULL));
-	for (t = 0; t < QESTIONS_COUNT; t++)
+	/*readallquestions();
+	displayallquestions();*/
+
+	for (i = 0; i < 20; i++)
 	{
-		score += testone(t);
+		generateuseids(allcnt, usecnt, useids);
 	}
-	printf("---------\n");
-	printf("%d\n", score);
-	showresult(score);*/
+
+
 	system("pause");
 	return 0;
 }
