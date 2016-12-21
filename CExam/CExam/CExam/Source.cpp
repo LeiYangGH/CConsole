@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdio.h>
 #include <time.h>
-#define TEST_QUESTIONS_COUNT 3
+#define USE_QUESTIONS_COUNT 3
 
 #define FILE_SEL "file1.txt"
 #define FILE_TF "file2.txt"
@@ -22,7 +22,7 @@ typedef struct selectiveqestion
 
 selq allselqs[100];
 selq useselqs[100];
-selq sortqs[100];
+selq sortqs[USE_QUESTIONS_COUNT];
 int allselqcnt = 0;
 
 typedef struct truefalseqestion
@@ -435,24 +435,23 @@ void generateuseids(int allcnt, int usecnt, int useids[])
 		{
 			allids[r] = allids[top];
 		}
-		printf("r=%d\t", r);
+		//printf("r=%d\t", r);
 	}
-	printf("\n", r);
+	//printf("\n", r);
 }
 
 int main()
 {
 	int i;
-	int allcnt = 20;
-	int usecnt = 10;
-	int useids[10] = { 0 };
+	int useids[USE_QUESTIONS_COUNT] = { 0 };
 	srand(time(NULL));
-	/*readallquestions();
-	displayallquestions();*/
-
-	for (i = 0; i < 20; i++)
+	readallquestions();
+	//displayallquestions();
+	generateuseids(allselqcnt, USE_QUESTIONS_COUNT, useids);
+	for (i = 0; i < USE_QUESTIONS_COUNT; i++)
 	{
-		generateuseids(allcnt, usecnt, useids);
+		useselqs[i] = allselqs[useids[i]];
+		displayquestion(useselqs[i]);
 	}
 
 
