@@ -5,14 +5,9 @@
 #include <conio.h>
 #include <time.h>
 #define USE_QUESTIONS_COUNT 3
-
 #define FILE_SEL "file1.txt"
 #define FILE_TF "file2.txt"
 #define FILE_SCORE "num_name.txt"
-#define FORMATNET "%s\t%s\t%s\t%s\t%s\t%d\r\n"
-#define MAX_STRLEN 20
-#define QUESTIONS_COUNT 35
-#define STU_MEMBERS_NET q.title, q.choices[0],  q.choices[1], q.choices[2], q.choices[3], q.best
 typedef struct selectiveqestion
 {
 	char title[50];
@@ -20,11 +15,6 @@ typedef struct selectiveqestion
 	int best;//1~4
 	int userchoice;
 }selq;
-
-selq allselqs[100];
-selq useselqs[USE_QUESTIONS_COUNT];
-selq sortqs[USE_QUESTIONS_COUNT];
-int allselqcnt = 0;
 
 typedef struct truefalseqestion
 {
@@ -40,9 +30,15 @@ typedef struct examscore
 	char name[50];
 	int score;
 }escore;
+
+
+selq allselqs[100];
+selq useselqs[USE_QUESTIONS_COUNT];
+selq sortqs[USE_QUESTIONS_COUNT];
+int allselqcnt = 0;
+
 escore allescores[100];
 int allescorecnt = 0;
-
 
 tfq alltfqs[100];
 tfq usetfqs[USE_QUESTIONS_COUNT];
@@ -53,22 +49,12 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-//char *FILE_STU = "q.txt";
-selq *head;
-
 //字符串转整数
 int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
-
-int tofloat(char *s)
-{
-	char *end;
-	return (float)strtol(s, &end, 10);
-}
-
 
 selq getselqfromline(char *line)
 {
@@ -196,7 +182,6 @@ void readalltfqs()
 
 }
 
-
 void readallescores()
 {
 	char line[200];
@@ -218,8 +203,6 @@ void readallescores()
 	printf("\n已读入文件!", FILE_SEL);
 
 }
-
-
 
 int cmpbyno(const void * a, const void * b)
 {
@@ -244,8 +227,6 @@ void sortanddisplayallescores()
 	printf("--------------------------------------------\r\n");
 }
 
-
-
 void countbygrades()
 {
 	int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt59 = 0;
@@ -269,198 +250,10 @@ void countbygrades()
 	printf("--------------------------------------------\r\n");
 }
 
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
-}
-
-void searchtotalbyname(char *name)
-{
-	int i;
-	/*for (i = 0; i < allquestionscount; i++)
-		if (strcmp(name, allquestions[i].name) == 0)
-		{
-			displayquestion(allquestions[i]);
-			return;
-		}*/
-	printf("没找到对应学生的信息。\r\n");
-}
-
-int promptsearchtotalbyname()
-{
-	char name[MAX_STRLEN] = "";
-	inputstring(name);
-	searchtotalbyname(name);
-	return strcmp(name, "q");
-}
-
-
-
-void searchtotalbyno(int no)
-{
-	int i;
-	/*for (i = 0; i < allquestionscount; i++)
-		if (allquestions[i].no == no)
-		{
-			displayquestion(allquestions[i]);
-			return;
-		}*/
-	printf("没找到对应学生的信息。\r\n");
-}
-
-void promptsearchtotalbyno()
-{
-	int no;
-	printf("请输入要查询的学号:");
-	scanf("%d", &no);
-	searchtotalbyno(no);
-}
-
-//输入成绩信息
-void inputname(char str[])
-{
-	printf("请输入姓名(2-45个字符)，不能带空格、Tab或回车符:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \r\n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
-}
-
-
-
-void writeallquestions()
-{
-	int i;
-	selq q;
-	FILE *fp = fopen(FILE_SEL, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_SEL);
-		getchar();
-		exit(1);
-	}
-
-
-	for (i = 0; i < allselqcnt; i++)
-	{
-		q = allselqs[i];
-		fprintf(fp, FORMATNET, STU_MEMBERS_NET);
-	}
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
-
-int calctotal(int math, int english, int chinese, int c)
-{
-	return math + english + chinese + c;
-}
-
-float calcave(int total)
-{
-	return total / 4.0f;
-}
-
-void addquestion(int no, char name[], int math, int english, int chinese, int c)
-{
-	selq q;
-	/*q.no = no;
-	strcpy(q.name, name);
-	q.math = math;
-	q.english = english;
-	q.chinese = chinese;
-	q.c = c;*/
-	allselqs[allselqcnt++] = q;
-}
-
-void calcanddisplaytotalandaverage()
-{
-	int i;
-	selq q;
-	printf("所有各科总分、平均分如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allselqcnt; i++)
-	{
-		q = allselqs[i];
-		//allquestions[i].total = q.total = calctotal(q.math, q.english, q.chinese, q.c);
-		//allquestions[i].average = q.average = calcave(q.total);
-		//printf("%d\t%s\t%d\t%.1f\r\n", q.no, q.name, q.total, q.average);
-	}
-	printf("--------------------------------------------\r\n");
-}
-
-void calcanddisplaysubject(char *subuject, int scores[])
-{
-	int i, sum = 0, below60 = 0;
-	for (i = 0; i < allselqcnt; i++)
-	{
-		sum += scores[i];
-		if (scores[i] < 60)
-			below60++;
-	}
-	printf("科目:%s 平均分%.1f、及格率百分之%.1f、不及格率百分之%.1f\r\n", subuject,
-		(sum / (float)allselqcnt),
-		(1 - below60 / (float)allselqcnt)*100.0f,
-		(below60 / (float)allselqcnt)*100.0f
-	);
-}
-
-
-void calcanddisplayallsubjects()
-{
-	int i, sum = 0, below60 = 0;
-	int scores[100];
-	selq q;
-	printf("所有科目成绩统计如下\r\n");
-	printf("--------------------------------------------\r\n");
-
-	/*for (i = 0; i < allquestionscount; i++)
-	{
-		scores[i] = allquestions[i].c;
-	}*/
-	calcanddisplaysubject("C语言", scores);
-	printf("--------------------------------------------\r\n");
-}
-
-void promptaddquestion()
-{
-	int no; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
-	printf("\n请输入学号\n");
-	scanf("%d", &no);
-	printf("\n请输入用户名\n");
-	scanf("%s", name);
-	printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
-	scanf("%d%d%d%d", &math, &english, &chinese, &c);
-	addquestion(no, name, math, english, chinese, c);
-	printf("完成第%d个入库录入!\r\n", allselqcnt);
-}
-
-int repeatscore[3] = { 10,7,5 };
-
 int random(int min, int max)
 {
 	return rand() % (max - min) + min;
 }
-
-
-
 
 void generateuseids(int allcnt, int usecnt, int useids[])
 {
