@@ -32,6 +32,17 @@ typedef struct truefalseqestion
 	int userchoice;
 }tfq;
 
+
+typedef struct examscore
+{
+	int no;
+	char name[50];
+	int score;
+}escore;
+escore allescores[100];
+int allescorecnt = 0;
+
+
 selq alltfqs[100];
 int alltfqcnt = 0;
 
@@ -104,6 +115,34 @@ selq getquestionfromline(char *line)
 	return q;
 }
 
+escore getescorefromline(char *line)
+{
+	char *part;
+	int index = 0;
+	escore q;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			q.no = toint(part);
+			break;
+		case 2:
+			strcpy(q.name, part);
+			break;
+		case 3:
+			q.score = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	return q;
+}
+
+
 void readallquestions()
 {
 	char line[200];
@@ -122,33 +161,48 @@ void readallquestions()
 			continue;
 		allselqs[allselqcnt++] = getquestionfromline(line);
 	}
+	printf("\n已读入文件!");
+
+}
+
+void readallescores()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_SCORE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_SCORE);
+		getchar();
+		exit(1);
+	}
+	allescorecnt = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allescores[allescorecnt++] = getescorefromline(line);
+	}
 	printf("\n已读入文件!", FILE_SEL);
 
 }
 
+
+
 int cmpfunc(const void * a, const void * b)
 {
-	return 0;// ((selectiveq*)a)->total - ((selectiveq*)b)->total;
-}
-void sorttotal()
-{
-	int i;
-	for (i = 0; i < allselqcnt; i++)
-	{
-		sortqs[i] = allselqs[i];
-	}
-	qsort(sortqs, allselqcnt, sizeof(selq), cmpfunc);
+	return  ((escore*)a)->no - ((escore*)b)->no;
 }
 
-void sortanddisplay()
+void sortanddisplayallescores()
 {
 	int i;
-	sorttotal();
-	printf("排序后如下\r\n");
+	qsort(allescores, allescorecnt, sizeof(escore), cmpfunc);
+	printf("所有成绩按学好排序后如下\r\n");
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allselqcnt; i++)
+	for (i = 0; i < allescorecnt; i++)
 	{
-		displayquestion(sortqs[i]);
+		printf("%d  %s %d\n", allescores[i].no, allescores[i].name, allescores[i].score);
 	}
 	printf("--------------------------------------------\r\n");
 }
@@ -264,24 +318,7 @@ int inputscore()
 	return n;
 }
 
-//void createsamplequestions()
-//{
-//	FILE *fp = fopen(file, "wb");
-//	printf("创建示例成绩数据...");
-//	if (fp == NULL)
-//	{
-//		printf("\nerror on open file!");
-//		getchar();
-//		exit(1);
-//	}
-//	fprintf(fp, FORMATNET, 33, "Smile", 13, 83, 63, 93);
-//	fprintf(fp, FORMATNET, 44, "Lukas", 14, 84, 64, 94);
-//	fprintf(fp, FORMATNET, 55, "Shawn", 15, 85, 65, 95);
-//	fprintf(fp, FORMATNET, 22, "Tony", 12, 82, 62, 92);
-//	fprintf(fp, FORMATNET, 11, "Flex", 11, 81, 61, 91);
-//	fclose(fp);
-//	printf("5条示例成绩数据已保存到question.txt。\n");
-//}
+
 
 void writeallquestions()
 {
@@ -505,17 +542,11 @@ int main()
 {
 	//int i, no, score;
 	//char name[50] = "";
-	//srand(time(NULL));
-	//readallquestions();
 
 
-	////displayallquestions();
-
-	//testallselqs();
-	//score = displayselqstestresult();
-
-
-	inputstudentandexam();
+	readallescores();
+	sortanddisplayallescores();
+	//inputstudentandexam();
 	system("pause");
 	return 0;
 }
