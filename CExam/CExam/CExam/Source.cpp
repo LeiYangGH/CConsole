@@ -538,11 +538,24 @@ void inputstudentandexam()
 	appendscores(no, name, score);
 }
 
+void avehighlowescores()
+{
+	int i;
+	float sum = 0;
+	for (i = 0; i < allescorecnt; i++)
+		sum += allescores[i].score;
+	;
+	printf("%s\t%d\r\n", "最高", allescores[allescorecnt - 1].score);
+	printf("%s\t%d\r\n", "最低", allescores[0].score);
+	printf("%s\t%.1f\r\n", "平均", sum / (float)allescorecnt);
+}
+
 void escoresstatic()
 {
 	readallescores();
 	sortanddisplayallescores();
 	countbygrades();
+	avehighlowescores();
 }
 
 int main()
