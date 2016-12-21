@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdio.h>
+#include <conio.h>
 #include <time.h>
 #define USE_QUESTIONS_COUNT 3
 
@@ -628,13 +629,40 @@ void escoresstatic()
 
 int main()
 {
-	//int i, no, score;
-	//char name[50] = "";
-
-
-	//inputstudentandexam();
-	escoresstatic();
-
+	int choice = -1;
+	while (choice != 0)
+	{
+		system("CLS");
+		printf("\n\t菜单(如果输入后没立即显示，请重新输入或按回车)");
+		printf("\n\t          +---------------------------------+");
+		printf("\n\t          |        考试系统          |");
+		printf("\n\t          +---------------------------------+");
+		printf("\n\t 1. 输入学生信息并考试\n");
+		printf("\n\t 2. 统计已考试学生成绩\n");
+		printf("\n\t 0. 退出");
+		printf("\n\n 请选择: ");
+		scanf("%1[012]d%*c", &choice);
+		choice = getche();
+		switch (choice)
+		{
+		case '0':
+			exit(0);
+			break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			inputstudentandexam();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			escoresstatic();
+			printf("\n\n要选其他菜单，请按任意键\n");
+			system("pause");
+			break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
+		}
+	}
 	system("pause");
 	return 0;
 }
