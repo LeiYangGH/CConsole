@@ -396,20 +396,8 @@ int random(int min, int max)
 	return rand() % (max - min) + min;
 }
 
-void testoneselq(selq *q)
-{
-	int i, b, r, answer = 0, repeat = -2;
-	char o;
-	printf("--%s--\n\n", q->title);
-	for (i = 0; i < 4; i++)
-	{
-		printf("%d  %s \n", i + 1, q->choices[i]);
-	}
-	printf("请输入你的选项（1～4），并以回车结束:");
 
-	scanf("%d", &answer);
-	q->userchoice = answer;
-}
+
 
 void generateuseids(int allcnt, int usecnt, int useids[])
 {
@@ -432,13 +420,25 @@ void generateuseids(int allcnt, int usecnt, int useids[])
 	}
 }
 
-int main()
+void testoneselq(selq *q)
+{
+	int i, b, r, answer = 0, repeat = -2;
+	char o;
+	printf("--%s--\n\n", q->title);
+	for (i = 0; i < 4; i++)
+	{
+		printf("%d  %s \n", i + 1, q->choices[i]);
+	}
+	printf("请输入你的选项（1～4），并以回车结束:");
+
+	scanf("%d", &answer);
+	q->userchoice = answer;
+}
+
+void testallselqs()
 {
 	int i;
 	int useids[USE_QUESTIONS_COUNT] = { 0 };
-	srand(time(NULL));
-	readallquestions();
-	//displayallquestions();
 	generateuseids(allselqcnt, USE_QUESTIONS_COUNT, useids);
 	for (i = 0; i < USE_QUESTIONS_COUNT; i++)
 	{
@@ -446,6 +446,16 @@ int main()
 		//displayquestion(useselqs[i]);
 		testoneselq(&useselqs[i]);
 	}
+}
+
+int main()
+{
+	int i;
+	srand(time(NULL));
+	readallquestions();
+	//displayallquestions();
+
+	testallselqs();
 
 
 	system("pause");
