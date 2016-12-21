@@ -211,13 +211,13 @@ void sortanddisplayallescores()
 
 void countbygrades()
 {
-	int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt60 = 0;
+	int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt59 = 0;
 	selq q;
 	printf("总分分数段人数统计%d分数如下\r\n", allselqcnt);
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allselqcnt; i++)
+	for (i = 0; i < allescorecnt; i++)
 	{
-		t = 0;//allquestions[i].average;
+		t = allescores[i].score;
 		if (t >= 90)
 			cnt90++;
 		else if (t >= 75 && t <= 89)
@@ -225,10 +225,10 @@ void countbygrades()
 		else if (t >= 60 && t <= 74)
 			cnt6074++;
 		else if (t < 60)
-			cnt60++;
+			cnt59++;
 	}
 	printf("90分以上:%d人, 75~89:%d人, 60~74:%d人, 60分以下:%d人\r\n",
-		cnt90, cnt7589, cnt6074, cnt60);
+		cnt90, cnt7589, cnt6074, cnt59);
 	printf("--------------------------------------------\r\n");
 }
 
@@ -538,14 +538,20 @@ void inputstudentandexam()
 	appendscores(no, name, score);
 }
 
+void escoresstatic()
+{
+	readallescores();
+	sortanddisplayallescores();
+	countbygrades();
+}
+
 int main()
 {
 	//int i, no, score;
 	//char name[50] = "";
 
 
-	readallescores();
-	sortanddisplayallescores();
+	escoresstatic();
 	//inputstudentandexam();
 	system("pause");
 	return 0;
