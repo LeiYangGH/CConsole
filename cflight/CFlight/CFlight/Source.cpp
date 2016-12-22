@@ -27,7 +27,10 @@ void addstudent(char no[], char from[], char to[], int seats)
 	strcpy(stu.no, no);
 	strcpy(stu.from, from);
 	strcpy(stu.to, to);
+	if (seats <= 0 || seats > 400)
+		seats = 100;
 	stu.seats = seats;
+	stu.left = seats;
 	allflights[allflightscount++] = stu;
 }
 
@@ -108,6 +111,18 @@ void promptbookflight()
 	bookflight(no);
 }
 
+int cmpbyleft(const void * a, const void * b)
+{
+	return  ((flight*)a)->left - ((flight*)b)->left;
+}
+
+void sort()
+{
+	qsort(allflights, allflightscount, sizeof(flight), cmpbyleft);
+	int i;
+	for (i = 0; i < allflightscount; i++)
+		displayflight(allflights[i]);
+}
 
 int main()
 {
@@ -131,6 +146,7 @@ int main()
 		{
 		case '0':
 			exit(0);
+			system("pause");
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
@@ -139,14 +155,17 @@ int main()
 		case '2':
 			printf("\n\n你选择了 2\n");
 			promptsearflight();
+			system("pause");
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
 			promptbookflight();
+			system("pause");
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			printf("\n\n正在做！！！2\n");
+			sort();
+			system("pause");
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
