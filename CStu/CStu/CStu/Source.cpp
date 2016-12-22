@@ -534,6 +534,8 @@ int main()
 			break;
 		case 10:
 			calcanddisplaytotalandaverage();
+			calcanddisplayallsubjects();
+
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
