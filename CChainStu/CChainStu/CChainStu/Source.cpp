@@ -24,7 +24,7 @@ int toint(char *s)
 }
 
 //从一行文本拆分出成绩
-void getstudentfromline(char *line, student *adg)
+void getstudentfromline(char *line, student *stu)
 {
 	char * part;
 	int index = 0;
@@ -35,13 +35,13 @@ void getstudentfromline(char *line, student *adg)
 		switch (++index)
 		{
 		case 1:
-			adg->no = toint(part);
+			stu->no = toint(part);
 			break;
 		case 2:
-			strcpy(adg->name, part);
+			strcpy(stu->name, part);
 			break;
 		case 3:
-			adg->score = toint(part);
+			stu->score = toint(part);
 			break;
 		default:
 			break;
@@ -293,7 +293,8 @@ void addstudent(char * name)  //追加学生信息
 		printf("没找到名为%s的学生\r\n", name);
 }
 
-void modifyscorebyname(char * name, int newscore)  //修改学生信息
+//********************其实可以考虑作为一个通用函数，但我懒得改其他函数了
+void searchbyname(char * name, student **f)  //根据名字查找学生
 {
 	int found = 0;
 	student *p = head;
@@ -302,19 +303,17 @@ void modifyscorebyname(char * name, int newscore)  //修改学生信息
 	{
 		if (strcmp(p->name, name) == 0)
 		{
-			found = 1;
-
-			p->score = newscore;
-			printf("修改成功，更改后的学生成绩是：%d。\n", p->score);
-			break;
+			*f = p;
+			return;
 		}
 		p = p->next;
 	}
 	if (!found)
+	{
 		printf("没找到名为%s的学生\r\n", name);
+		*f = NULL;
+	}
 }
-
-
 
 void viewallstudents()  //输出所有学生信息
 {
@@ -366,7 +365,7 @@ void sortandviewall()  //按升序输出
 
 
 
-void cupyallstudents()  //拷贝学生信息
+void copyallstudents()  //拷贝学生信息
 {
 	student *p;
 	FILE *fp = fopen("copy_score.txt", "w");
@@ -423,14 +422,21 @@ void promptdeletebyname()  //按姓名删除
 	deletestudent(name);
 }
 
-void promptmodifyscorebyname()  //按姓名删除
+void promptmodifyscorebyname()  //按姓名更改分数
 {
 	int newscore;
+	student *stu;
 	char name[50] = "";
 	inputname(name);
-	printf("更改学生成绩为：");
-	scanf("%d", &newscore);
-	modifyscorebyname(name, newscore);
+	searchbyname(name, &stu);
+	if (stu != NULL)
+	{
+		printf("更改学生成绩为：");
+		getchar();
+		scanf("%d", &newscore);
+		stu->score = newscore;
+		printf("修改成功，更改后的学生成绩是：%d。\n", stu->score);
+	}
 }
 
 
@@ -499,7 +505,7 @@ int main()
 			break;
 		case '8':
 			printf("\n\n你选择了 8\n");
-			cupyallstudents();
+			copyallstudents();
 			break;
 		case '9':
 			printf("\n\n你选择了 9\n");
