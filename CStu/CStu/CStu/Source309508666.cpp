@@ -82,25 +82,34 @@ void sortanddisplay()
 
 void countbygrades()
 {
-	//int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt60 = 0;
-	//student stu;
-	//printf("总分分数段人数统计%d分数如下\r\n", allstudentscount);
-	//printf("--------------------------------------------\r\n");
-	//for (i = 0; i < allstudentscount; i++)
-	//{
-	//	t = allstudents[i].average;
-	//	if (t >= 90)
-	//		cnt90++;
-	//	else if (t >= 75 && t <= 89)
-	//		cnt7589++;
-	//	else if (t >= 60 && t <= 74)
-	//		cnt6074++;
-	//	else if (t < 60)
-	//		cnt60++;
-	//}
-	//printf("90分以上:%d人, 75~89:%d人, 60~74:%d人, 60分以下:%d人\r\n",
-	//	cnt90, cnt7589, cnt6074, cnt60);
-	//printf("--------------------------------------------\r\n");
+	int i, t, cnt270300 = 0, cnt240269 = 0, cnt210239 = 0, cnt180209 = 0, cnt150179 = 0, cnt149 = 0;
+	student stu;
+	printf("总成绩在各分值段的成绩比例及及格率统计如下：\r\n", allstudentscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].total;
+		if (t >= 270)
+			cnt270300++;
+		else if (t >= 240 && t <= 269)
+			cnt240269++;
+		else if (t >= 210 && t <= 239)
+			cnt210239++;
+		else if (t >= 180 && t <= 209)
+			cnt180209++;
+		else if (t >= 150 && t <= 179)
+			cnt150179++;
+		else if (t < 149)
+			cnt149++;
+	}
+	printf("270~300\t240~269\t210~239\t180~209\t150~179\t149以下\t及格率\r\n");
+	printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
+		cnt270300, cnt240269, cnt210239, cnt180209, cnt150179, cnt149);
+	//因为正好是10个人，所以百分比就是人数*10
+	printf("%%%d\t%%%d\t%%%d\t%%%d\t%%%d\t%%%d\t%%%d\r\n",
+		cnt270300 * 10, cnt240269 * 10, cnt210239 * 10, cnt180209 * 10, cnt150179 * 10, cnt149 * 10,
+		(cnt270300 + cnt240269 + cnt210239 + cnt180209) * 10);
+	printf("--------------------------------------------\r\n");
 }
 
 void calcminmaxave()
@@ -207,16 +216,16 @@ void addstudent(char no[], char name[], int s0, int s1, int s2)
 void createsamplestudents()
 {
 	printf("创建示例成绩数据...");
-	addstudent("16001", "Smile", 13, 83, 63);
-	addstudent("16002", "Shawn", 15, 85, 65);
-	addstudent("16003", "Tony", 12, 82, 62);
-	addstudent("16004", "Flex", 11, 81, 61);
-	addstudent("16005", "Smile5", 13, 83, 63);
-	addstudent("16006", "Smile6", 23, 83, 63);
-	addstudent("16007", "Smile7", 33, 83, 63);
-	addstudent("16008", "Smile8", 13, 83, 63);
-	addstudent("16009", "Smile9", 13, 83, 63);
-	addstudent("16010", "Smile10", 13, 83, 63);
+	addstudent("16001", "Smile", 93, 96, 91);
+	addstudent("16002", "Shawn", 95, 85, 65);
+	addstudent("16003", "Tony", 92, 82, 62);
+	addstudent("16004", "Flex", 91, 81, 61);
+	addstudent("16005", "Smile5", 63, 63, 66);
+	addstudent("16006", "Smile6", 96, 83, 63);
+	addstudent("16007", "Smile7", 93, 83, 56);
+	addstudent("16008", "Smile8", 97, 83, 73);
+	addstudent("16009", "Smile9", 55, 55, 58);
+	addstudent("16010", "Smile10", 13, 13, 43);
 	printf("9条示例成绩数据已保存到。\n");
 }
 
@@ -344,7 +353,7 @@ int main()
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
 
-	//countbygrades();
+	countbygrades();
 	system("pause");
 
 	while (choice != 0)
