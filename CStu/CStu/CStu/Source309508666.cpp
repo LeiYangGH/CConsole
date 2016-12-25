@@ -3,40 +3,28 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define FILE_STU "stu.txt"
-//#define FILE_STU "sample.txt"
-//#define FILE_BEST "best.txt"
-//#define FILE_SCORES "scores.txt"
-//#define FILE_ANALYSIS "analysis.txt"
-#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%.1f\r\n"
-#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\r\n"
+#define FORMAT "%s\t%s\t%d\t%d\t%d\t%d\r\n"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
-#define STU_MEMBERS_FULL stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c, stu.total, stu.average
-#define STU_MEMBERS_NET stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c
+#define STUDENTS_COUNT 10
+#define STU_MEMBERS_FULL stu.no, stu.name,  stu.score[0], stu.score[1], stu.score[2], stu.total
+#define STU_MEMBERS_NET stu.no, stu.name,  stu.score[0], stu.score[1], stu.score[2], stu.total
 typedef struct student
 {
-	int no;
+	char no[50];
 	char name[50];
-	int math;
-	int english;
-	int chinese;
-	int c;
+	int score[3];
 	int total;
-	float average;
 }student;
 
-student allstudents[100];
-student sortstudents[100];
+student allstudents[STUDENTS_COUNT];
+student sortstudents[STUDENTS_COUNT];
 int allstudentscount = 0;
 
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-
-//char *FILE_STU = "stu.txt";
-student *head;
 
 //字符串转整数
 int toint(char *s)
@@ -45,16 +33,10 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-int tofloat(char *s)
-{
-	char *end;
-	return (float)strtol(s, &end, 10);
-}
-
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf(FORMATNET, STU_MEMBERS_NET);
+	printf(FORMAT, STU_MEMBERS_NET);
 }
 
 void displayallstudents()
@@ -67,70 +49,6 @@ void displayallstudents()
 		displaystudent(allstudents[i]);
 	}
 	printf("--------------------------------------------\r\n");
-}
-
-student getstudentfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	student stu;
-	part = strtok(line, "\t");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			stu.no = toint(part);
-			break;
-		case 2:
-			strcpy(stu.name, part);
-			break;
-		case 3:
-			stu.math = toint(part);
-			break;
-		case 4:
-			stu.english = toint(part);
-			break;
-		case 5:
-			stu.chinese = toint(part);
-			break;
-		case 6:
-			stu.c = toint(part);
-			break;
-		case 7:
-			stu.total = toint(part);
-			break;
-		case 8:
-			stu.average = tofloat(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-	return stu;
-}
-
-void readallstudents()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_STU, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_STU);
-		getchar();
-		exit(1);
-	}
-	allstudentscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		allstudents[allstudentscount++] = getstudentfromline(line);
-	}
-	printf("\n已读入文件!", FILE_STU);
-
 }
 
 int cmpfunc(const void * a, const void * b)
@@ -164,28 +82,26 @@ void sortanddisplay()
 
 void countbygrades()
 {
-	int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt60 = 0;
-	student stu;
-	printf("总分分数段人数统计%d分数如下\r\n", allstudentscount);
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		t = allstudents[i].average;
-		if (t >= 90)
-			cnt90++;
-		else if (t >= 75 && t <= 89)
-			cnt7589++;
-		else if (t >= 60 && t <= 74)
-			cnt6074++;
-		else if (t < 60)
-			cnt60++;
-	}
-	printf("90分以上:%d人, 75~89:%d人, 60~74:%d人, 60分以下:%d人\r\n",
-		cnt90, cnt7589, cnt6074, cnt60);
-	printf("--------------------------------------------\r\n");
+	//int i, t, cnt90 = 0, cnt7589 = 0, cnt6074 = 0, cnt60 = 0;
+	//student stu;
+	//printf("总分分数段人数统计%d分数如下\r\n", allstudentscount);
+	//printf("--------------------------------------------\r\n");
+	//for (i = 0; i < allstudentscount; i++)
+	//{
+	//	t = allstudents[i].average;
+	//	if (t >= 90)
+	//		cnt90++;
+	//	else if (t >= 75 && t <= 89)
+	//		cnt7589++;
+	//	else if (t >= 60 && t <= 74)
+	//		cnt6074++;
+	//	else if (t < 60)
+	//		cnt60++;
+	//}
+	//printf("90分以上:%d人, 75~89:%d人, 60~74:%d人, 60分以下:%d人\r\n",
+	//	cnt90, cnt7589, cnt6074, cnt60);
+	//printf("--------------------------------------------\r\n");
 }
-
-
 
 float ave()
 {
@@ -230,9 +146,7 @@ int promptsearchtotalbyname()
 	return strcmp(name, "q");
 }
 
-
-
-void searchtotalbyno(int no)
+void searchtotalbyno(char no[])
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
@@ -246,7 +160,7 @@ void searchtotalbyno(int no)
 
 void promptsearchtotalbyno()
 {
-	int no;
+	char no[MAX_STRLEN];
 	printf("请输入要查询的学号:");
 	scanf("%d", &no);
 	searchtotalbyno(no);
@@ -271,90 +185,44 @@ int inputscore()
 	return n;
 }
 
-void createsamplestudents()
+void addstudent(char no[], char name[], int s0, int s1, int s2)
 {
-	FILE *fp = fopen(FILE_STU, "wb");
-	printf("创建示例成绩数据...");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-	fprintf(fp, FORMATNET, 33, "Smile", 13, 83, 63, 93);
-	fprintf(fp, FORMATNET, 44, "Lukas", 14, 84, 64, 94);
-	fprintf(fp, FORMATNET, 55, "Shawn", 15, 85, 65, 95);
-	fprintf(fp, FORMATNET, 22, "Tony", 12, 82, 62, 92);
-	fprintf(fp, FORMATNET, 11, "Flex", 11, 81, 61, 91);
-	fclose(fp);
-	printf("5条示例成绩数据已保存到student.txt。\n");
+	student stu;
+	strcpy(stu.no, no);
+	strcpy(stu.name, name);
+	stu.score[0] = s0;
+	stu.score[1] = s1;
+	stu.score[2] = s2;
+	stu.total = s0 + s1 + s2;
+	allstudents[allstudentscount++] = stu;
 }
 
-int getstudentidexbyid(int no)
+void createsamplestudents()
+{
+	printf("创建示例成绩数据...");
+	addstudent("16001", "Smile", 13, 83, 63);
+	addstudent("16002", "Shawn", 15, 85, 65);
+	addstudent("16003", "Tony", 12, 82, 62);
+	addstudent("16004", "Flex", 11, 81, 61);
+	addstudent("16005", "Smile5", 13, 83, 63);
+	addstudent("16006", "Smile6", 23, 83, 63);
+	addstudent("16007", "Smile7", 33, 83, 63);
+	addstudent("16008", "Smile8", 13, 83, 63);
+	addstudent("16009", "Smile9", 13, 83, 63);
+	printf("9条示例成绩数据已保存到。\n");
+}
+
+int getstudentidexbyid(char no[])
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 	{
 		student b = allstudents[i];
-		if (b.no == no)
+		if (b.no == no)///
 			return i;
 	}
 }
 
-void removestudent(int no)
-{
-	int i;
-	int index;
-	index = getstudentidexbyid(no);
-	for (i = index; i < allstudentscount - 1; i++)
-		allstudents[i] = allstudents[i + 1];
-	allstudentscount--;
-	printf("删除完毕，剩下%d个。\r\n", allstudentscount);
-
-}
-
-void promptremovestudent()
-{
-	int no;
-	printf("请输入要删除的学号:");
-	scanf("%d", &no);
-	removestudent(no);
-}
-
-
-int login()
-{
-	char name[50] = "";
-	char pwd[50] = "";
-	printf("\n请输入用户名\n");
-	scanf("%s", name);
-	printf("\n请输入密码\n");
-	scanf("%s", pwd);
-	return streq(name, "username")
-		&& streq(pwd, "password");
-}
-
-void writeallstudents()
-{
-	int i;
-	student stu;
-	FILE *fp = fopen(FILE_STU, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_STU);
-		getchar();
-		exit(1);
-	}
-
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		stu = allstudents[i];
-		fprintf(fp, FORMATNET, STU_MEMBERS_NET);
-	}
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
 
 int calctotal(int math, int english, int chinese, int c)
 {
@@ -366,32 +234,22 @@ float calcave(int total)
 	return total / 4.0f;
 }
 
-void addstudent(int no, char name[], int math, int english, int chinese, int c)
-{
-	student stu;
-	stu.no = no;
-	strcpy(stu.name, name);
-	stu.math = math;
-	stu.english = english;
-	stu.chinese = chinese;
-	stu.c = c;
-	allstudents[allstudentscount++] = stu;
-}
+
 
 void calcanddisplaytotalandaverage()
 {
-	int i;
-	student stu;
-	printf("所有各科总分、平均分如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		stu = allstudents[i];
-		allstudents[i].total = stu.total = calctotal(stu.math, stu.english, stu.chinese, stu.c);
-		allstudents[i].average = stu.average = calcave(stu.total);
-		printf("%d\t%s\t%d\t%.1f\r\n", stu.no, stu.name, stu.total, stu.average);
-	}
-	printf("--------------------------------------------\r\n");
+	//int i;
+	//student stu;
+	//printf("所有各科总分、平均分如下\r\n");
+	//printf("--------------------------------------------\r\n");
+	//for (i = 0; i < allstudentscount; i++)
+	//{
+	//	stu = allstudents[i];
+	//	allstudents[i].total = stu.total = calctotal(stu.score[0], stu.score[1], stu.score[2], stu.c);
+	//	allstudents[i].average = stu.average = calcave(stu.total);
+	//	printf("%d\t%s\t%d\t%.1f\r\n", stu.no, stu.name, stu.total, stu.average);
+	//}
+	//printf("--------------------------------------------\r\n");
 }
 
 void calcanddisplaysubject(char *subuject, int scores[])
@@ -420,33 +278,29 @@ void calcanddisplayallsubjects()
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
-		scores[i] = allstudents[i].math;
+		scores[i] = allstudents[i].score[0];
 	}
 	calcanddisplaysubject("数学", scores);
 
 	for (i = 0; i < allstudentscount; i++)
 	{
-		scores[i] = allstudents[i].english;
+		scores[i] = allstudents[i].score[1];
 	}
 	calcanddisplaysubject("英语", scores);
 
 	for (i = 0; i < allstudentscount; i++)
 	{
-		scores[i] = allstudents[i].chinese;
+		scores[i] = allstudents[i].score[2];
 	}
 	calcanddisplaysubject("语文", scores);
 
-	for (i = 0; i < allstudentscount; i++)
-	{
-		scores[i] = allstudents[i].c;
-	}
-	calcanddisplaysubject("C语言", scores);
+
 	printf("--------------------------------------------\r\n");
 }
 
 void promptaddstudent()
 {
-	int no; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
+	/*char no[]; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
 	printf("\n请输入学号\n");
 	scanf("%d", &no);
 	printf("\n请输入用户名\n");
@@ -454,7 +308,7 @@ void promptaddstudent()
 	printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
 	scanf("%d%d%d%d", &math, &english, &chinese, &c);
 	addstudent(no, name, math, english, chinese, c);
-	printf("完成第%d个入库录入!\r\n", allstudentscount);
+	printf("完成第%d个入库录入!\r\n", allstudentscount);*/
 }
 
 
@@ -462,16 +316,10 @@ int main()
 {
 	int choice = -1;
 
-	/*if (login())
-	{
-	printf("login ok\n");
-	}
-	else
-	printf("login fail\n");*/
+
 
 	createsamplestudents();
 
-	readallstudents();
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
 	//writeallstudents();*/
@@ -480,12 +328,13 @@ int main()
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
 
-	////displayallstudents();
+	displayallstudents();
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
 
 	//countbygrades();
+	system("pause");
 
 	while (choice != 0)
 	{
@@ -506,7 +355,6 @@ int main()
 			exit(0);
 			break;
 		case 1:
-			readallstudents();
 			break;
 		case 2:
 			promptsearchtotalbyname();
@@ -518,7 +366,6 @@ int main()
 			promptaddstudent();
 			break;
 		case 5:
-			promptremovestudent();
 			break;
 		case 6:
 			countbygrades();
@@ -527,7 +374,6 @@ int main()
 			sortanddisplay();
 			break;
 		case 8:
-			writeallstudents();
 			break;
 		case 9:
 			sortanddisplay();
