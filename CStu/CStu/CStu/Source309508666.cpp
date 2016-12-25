@@ -209,6 +209,7 @@ void createsamplestudents()
 	addstudent("16007", "Smile7", 33, 83, 63);
 	addstudent("16008", "Smile8", 13, 83, 63);
 	addstudent("16009", "Smile9", 13, 83, 63);
+	addstudent("16010", "Smile10", 13, 83, 63);
 	printf("9条示例成绩数据已保存到。\n");
 }
 
@@ -300,15 +301,17 @@ void calcanddisplayallsubjects()
 
 void promptaddstudent()
 {
-	/*char no[]; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
+	char no[MAX_STRLEN];
+	char name[MAX_STRLEN] = "";
+	int s1, s2, s3;
 	printf("\n请输入学号\n");
-	scanf("%d", &no);
+	scanf("%s", &no);
 	printf("\n请输入用户名\n");
 	scanf("%s", name);
-	printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
-	scanf("%d%d%d%d", &math, &english, &chinese, &c);
-	addstudent(no, name, math, english, chinese, c);
-	printf("完成第%d个入库录入!\r\n", allstudentscount);*/
+	printf("\n请输入三科成绩（整数），空格隔开\n");
+	scanf("%d%d%d", &s1, &s2, &s3);
+	addstudent(no, name, s1, s2, s3);
+	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
 
@@ -319,7 +322,7 @@ int main()
 
 
 	createsamplestudents();
-
+	//promptaddstudent();
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
 	//writeallstudents();*/
