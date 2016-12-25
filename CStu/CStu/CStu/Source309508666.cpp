@@ -18,20 +18,20 @@ typedef struct student
 }student;
 
 student allstudents[STUDENTS_COUNT];
-//student sortstudents[STUDENTS_COUNT];
 int allstudentscount = 0;
 
+//字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
 
-//字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
+////字符串转整数
+//int toint(char *s)
+//{
+//	char *end;
+//	return (int)strtol(s, &end, 10);
+//}
 
 void displaystudent(student stu)
 {
@@ -42,7 +42,6 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	//printf("所有%d名学生成绩分数如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -62,15 +61,8 @@ void sortanddisplay()
 	int i;
 	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
 	printf("按总成绩降序排序后如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		displaystudent(allstudents[i]);
-	}
-	printf("--------------------------------------------\r\n");
+	displayallstudents();
 }
-
-
 
 void countbygrades()
 {
@@ -98,7 +90,7 @@ void countbygrades()
 	printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
 		cnt270300, cnt240269, cnt210239, cnt180209, cnt150179, cnt149);
 	//因为正好是10个人，所以百分比就是人数*10
-	printf("%%%d\t%%%d\t%%%d\t%%%d\t%%%d\t%%%d\t%%%d\r\n",
+	printf("%d%%\t%d%%\t%d%%\t%d%%\t%d%%\t%d%%\t%d%%\r\n",
 		cnt270300 * 10, cnt240269 * 10, cnt210239 * 10, cnt180209 * 10, cnt150179 * 10, cnt149 * 10,
 		(cnt270300 + cnt240269 + cnt210239 + cnt180209) * 10);
 	printf("--------------------------------------------\r\n");
@@ -120,19 +112,19 @@ void calcminmaxave()
 		max, min, ave);
 }
 
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
-}
+//void inputstring(char str[])
+//{
+//	int len = -1;
+//	char input[50] = "";
+//	while (len < 1 || len > MAX_STRLEN)
+//	{
+//		printf("请输入姓名:");
+//		fseek(stdin, 0, SEEK_END);
+//		scanf("%s", input);
+//		len = strlen(input);
+//	}
+//	strcpy(str, input);
+//}
 
 void searchtotalbyname(char *name)
 {
@@ -146,12 +138,12 @@ void searchtotalbyname(char *name)
 	printf("没找到对应学生的信息。\r\n");
 }
 
-int promptsearchtotalbyname()
+void promptsearchtotalbyname()
 {
 	char name[MAX_STRLEN] = "";
-	inputstring(name);
+	printf("请输入要查询的学生姓名:");
+	scanf("%s", &name);
 	searchtotalbyname(name);
-	return strcmp(name, "q");
 }
 
 void searchtotalbyno(char no[])
@@ -199,77 +191,9 @@ void createsamplestudents()
 	addstudent("16008", "Smile8", 97, 83, 73);
 	addstudent("16009", "Smile9", 55, 55, 58);
 	addstudent("16010", "Smile10", 13, 13, 43);
-	printf("9条示例成绩数据已保存到。\n");
-}
+	allstudentscount = 9;
+	printf("9条示例成绩数据已创建。\n");
 
-int getstudentidexbyid(char no[])
-{
-	int i;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		student b = allstudents[i];
-		if (b.no == no)///
-			return i;
-	}
-}
-
-
-int calctotal(int math, int english, int chinese, int c)
-{
-	return math + english + chinese + c;
-}
-
-float calcave(int total)
-{
-	return total / 4.0f;
-}
-
-
-
-void calcanddisplaysubject(char *subuject, int scores[])
-{
-	int i, sum = 0, below60 = 0;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		sum += scores[i];
-		if (scores[i] < 60)
-			below60++;
-	}
-	printf("科目:%s 平均分%.1f、及格率百分之%.1f、不及格率百分之%.1f\r\n", subuject,
-		(sum / (float)allstudentscount),
-		(1 - below60 / (float)allstudentscount)*100.0f,
-		(below60 / (float)allstudentscount)*100.0f
-	);
-}
-
-
-void calcanddisplayallsubjects()
-{
-	int i, sum = 0, below60 = 0;
-	int scores[100];
-	student stu;
-	printf("所有科目成绩统计如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		scores[i] = allstudents[i].score[0];
-	}
-	calcanddisplaysubject("数学", scores);
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		scores[i] = allstudents[i].score[1];
-	}
-	calcanddisplaysubject("英语", scores);
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		scores[i] = allstudents[i].score[2];
-	}
-	calcanddisplaysubject("语文", scores);
-
-
-	printf("--------------------------------------------\r\n");
 }
 
 void promptaddstudent()
@@ -291,75 +215,62 @@ void promptaddstudent()
 int main()
 {
 	int choice = -1;
-
-
-
-	createsamplestudents();
-	//promptaddstudent();
-	////printf("\n%d\n", allstudentscount);
-	///*promptaddstudent();
-	//writeallstudents();*/
-	///*promptremovestudent();
-	//writeallstudents();*/
-
-	displayallstudents();
-	calcminmaxave();
-	//calcanddisplaytotalandaverage();
-	//calcanddisplayallsubjects();
-
-	countbygrades();
-	sortanddisplay();
-	//promptsearchtotalbyname();
-	promptsearchtotalbyno();
-
-	system("pause");
-
+	//createsamplestudents();
+	//displayallstudents();
+	//calcminmaxave();
+	//countbygrades();
+	//sortanddisplay();
+	//system("pause");
 	while (choice != 0)
 	{
-		char *menu = "**********************菜单****************************\n"
-			"按1键：读入学生档案               按6键：学科及格概率\n"
-			"按2键：按照姓名查询               按7键：学生档案排序\n"
-			"按3键：按照学号查询               按8键：保存学生档案\n"
-			"按4键：添加学生档案               按9键 : 查看学生档案\n"
-			"按5键：删除学生档案               按10键：求各科平均分\n"
-			"按0键：退出管理系统";
-		printf("请输入选择数字，并回车\n", menu);
-		printf("%s\n", menu);
-		scanf("%d", &choice);
+		printf("\n\t (如果按键回车后没反应，请再按一次)");
+		printf("\n\t 学生成绩输入查询统计");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 添加学生成绩");
+		printf("\n\t 2. 计算最高最低平均");
+		printf("\n\t 3. 分段比例和及格率");
+		printf("\n\t 4. 按总分倒序排序");
+		printf("\n\t 5. 根据学号查询");
+		printf("\n\t 6. 根据姓名查询");
+		printf("\n\t 7. 创建9条示例数据");
+		printf("\n\n  请选择: ");
+		scanf("%1[01234567]d%*c", &choice);
+		choice = getche();
 		switch (choice)
 		{
-		case 0:
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
 			break;
-		case 1:
-			break;
-		case 2:
-			promptsearchtotalbyname();
-			break;
-		case 3:
-			promptsearchtotalbyno();
-			break;
-		case 4:
+		case '1':
+			printf("\n\n你选择了 1\n");
 			promptaddstudent();
 			break;
-		case 5:
+		case '2':
+			printf("\n\n你选择了 2\n");
+			calcminmaxave();
 			break;
-		case 6:
+		case '3':
+			printf("\n\n你选择了 3\n");
 			countbygrades();
 			break;
-		case 7:
+		case '4':
+			printf("\n\n你选择了 4\n");
 			sortanddisplay();
 			break;
-		case 8:
+		case '5':
+			printf("\n\n你选择了 5\n");
+			promptsearchtotalbyno();
 			break;
-		case 9:
-			sortanddisplay();
+		case '6':
+			printf("\n\n你选择了 6\n");
+			promptsearchtotalbyname();
 			break;
-		case 10:
-			//calcanddisplaytotalandaverage();
-			calcanddisplayallsubjects();
-
+		case '7':
+			printf("\n\n你选择了 7\n");
+			createsamplestudents();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
@@ -368,7 +279,6 @@ int main()
 		getch();
 	}
 	fseek(stdin, 0, SEEK_END);
-	printf("\n\n按任意键退出\n");
 	system("pause");
 	return 0;
 }
