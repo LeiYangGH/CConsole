@@ -5,10 +5,8 @@
 #include <conio.h>
 #define FORMAT "%s\t%s\t%d\t%d\t%d\t%d\r\n"
 #define MAX_STRLEN 20
-#define QUESTIONS_COUNT 35
 #define STUDENTS_COUNT 10
-#define STU_MEMBERS_FULL stu.no, stu.name,  stu.score[0], stu.score[1], stu.score[2], stu.total
-#define STU_MEMBERS_NET stu.no, stu.name,  stu.score[0], stu.score[1], stu.score[2], stu.total
+#define STU_MEMBERS stu.no, stu.name,  stu.score[0], stu.score[1], stu.score[2], stu.total
 typedef struct student
 {
 	char no[50];
@@ -26,17 +24,10 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-////字符串转整数
-//int toint(char *s)
-//{
-//	char *end;
-//	return (int)strtol(s, &end, 10);
-//}
-
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf(FORMAT, STU_MEMBERS_NET);
+	printf(FORMAT, STU_MEMBERS);
 }
 
 void displayallstudents()
@@ -108,23 +99,9 @@ void calcminmaxave()
 		max = t > max ? t : max;
 	}
 	ave = sum / STUDENTS_COUNT;
-	printf("总成绩最高分：%d人, 最低分:%d人, 平均分:%f人\r\n",
+	printf("总成绩最高分：%d, 最低分:%d, 平均分:%.2f\r\n",
 		max, min, ave);
 }
-
-//void inputstring(char str[])
-//{
-//	int len = -1;
-//	char input[50] = "";
-//	while (len < 1 || len > MAX_STRLEN)
-//	{
-//		printf("请输入姓名:");
-//		fseek(stdin, 0, SEEK_END);
-//		scanf("%s", input);
-//		len = strlen(input);
-//	}
-//	strcpy(str, input);
-//}
 
 void searchtotalbyname(char *name)
 {
