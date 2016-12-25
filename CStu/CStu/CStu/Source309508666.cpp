@@ -18,7 +18,7 @@ typedef struct student
 }student;
 
 student allstudents[STUDENTS_COUNT];
-student sortstudents[STUDENTS_COUNT];
+//student sortstudents[STUDENTS_COUNT];
 int allstudentscount = 0;
 
 int streq(char *s1, char *s2)
@@ -42,7 +42,7 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	printf("所有%d分数如下\r\n", allstudentscount);
+	//printf("所有%d名学生成绩分数如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -51,29 +51,21 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
+//快速排序用
 int cmpfunc(const void * a, const void * b)
 {
-	return ((student*)a)->total - ((student*)b)->total;
-}
-void sorttotal()
-{
-	int i;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		sortstudents[i] = allstudents[i];
-	}
-	qsort(sortstudents, allstudentscount, sizeof(student), cmpfunc);
+	return ((student*)b)->total - ((student*)a)->total;
 }
 
 void sortanddisplay()
 {
 	int i;
-	sorttotal();
-	printf("排序后如下\r\n");
+	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+	printf("按总成绩降序排序后如下\r\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
-		displaystudent(sortstudents[i]);
+		displaystudent(allstudents[i]);
 	}
 	printf("--------------------------------------------\r\n");
 }
@@ -166,7 +158,7 @@ void searchtotalbyno(char no[])
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
-		if (allstudents[i].no == no)
+		if (streq(allstudents[i].no, no))
 		{
 			displaystudent(allstudents[i]);
 			return;
@@ -178,27 +170,8 @@ void promptsearchtotalbyno()
 {
 	char no[MAX_STRLEN];
 	printf("请输入要查询的学号:");
-	scanf("%d", &no);
+	scanf("%s", &no);
 	searchtotalbyno(no);
-}
-
-//输入成绩信息
-void inputname(char str[])
-{
-	printf("请输入姓名(2-45个字符)，不能带空格、Tab或回车符:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \r\n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
 }
 
 void addstudent(char no[], char name[], int s0, int s1, int s2)
@@ -252,22 +225,6 @@ float calcave(int total)
 }
 
 
-
-void calcanddisplaytotalandaverage()
-{
-	//int i;
-	//student stu;
-	//printf("所有各科总分、平均分如下\r\n");
-	//printf("--------------------------------------------\r\n");
-	//for (i = 0; i < allstudentscount; i++)
-	//{
-	//	stu = allstudents[i];
-	//	allstudents[i].total = stu.total = calctotal(stu.score[0], stu.score[1], stu.score[2], stu.c);
-	//	allstudents[i].average = stu.average = calcave(stu.total);
-	//	printf("%d\t%s\t%d\t%.1f\r\n", stu.no, stu.name, stu.total, stu.average);
-	//}
-	//printf("--------------------------------------------\r\n");
-}
 
 void calcanddisplaysubject(char *subuject, int scores[])
 {
@@ -344,16 +301,17 @@ int main()
 	//writeallstudents();*/
 	///*promptremovestudent();
 	//writeallstudents();*/
-	////promptsearchtotalbyname();
-	////promptsearchtotalbyno();
 
 	displayallstudents();
 	calcminmaxave();
 	//calcanddisplaytotalandaverage();
-	//sortanddisplay();
 	//calcanddisplayallsubjects();
 
 	countbygrades();
+	sortanddisplay();
+	//promptsearchtotalbyname();
+	promptsearchtotalbyno();
+
 	system("pause");
 
 	while (choice != 0)
@@ -399,7 +357,7 @@ int main()
 			sortanddisplay();
 			break;
 		case 10:
-			calcanddisplaytotalandaverage();
+			//calcanddisplaytotalandaverage();
 			calcanddisplayallsubjects();
 
 			break;
