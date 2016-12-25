@@ -103,13 +103,20 @@ void countbygrades()
 	//printf("--------------------------------------------\r\n");
 }
 
-float ave()
+void calcminmaxave()
 {
-	int i;
-	float sum = 0;
+	int i, min = 300, max = 0, t;
+	float sum = 0, ave;
 	for (i = 0; i < allstudentscount; i++)
-		sum += allstudents[i].total;
-	return sum / (float)allstudentscount;
+	{
+		t = allstudents[i].total;
+		sum += t;
+		min = t < min ? t : min;
+		max = t > max ? t : max;
+	}
+	ave = sum / STUDENTS_COUNT;
+	printf("总成绩最高分：%d人, 最低分:%d人, 平均分:%f人\r\n",
+		max, min, ave);
 }
 
 void inputstring(char str[])
@@ -332,6 +339,7 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
+	calcminmaxave();
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
