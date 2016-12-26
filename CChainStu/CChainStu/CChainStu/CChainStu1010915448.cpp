@@ -38,7 +38,7 @@ void displaystudent(student stu)
 
 
 //新增成绩
-void addstudent(student *head)
+student * addstudent(student *head)
 {
 	int i, score;
 	float sum = 0;
@@ -64,6 +64,7 @@ void addstudent(student *head)
 	p->next = n;
 	n->next = NULL;
 	printf("\n学生%s信息添加成功!\n", name);
+	return n;
 }
 
 
@@ -122,12 +123,6 @@ int cmpfunc(const void * a, const void * b)   //成绩比较
 	return ((student*)a)->score - ((student*)b)->score;
 }
 
-
-
-
-
-
-
 //void promptdeletebyname()  //按姓名删除
 //{
 //	char name[50] = "";
@@ -139,13 +134,14 @@ int cmpfunc(const void * a, const void * b)   //成绩比较
 int main()
 {
 	int choice = -1;
-	student *head;
+	student *n, *head;
 
 	head = (student *)malloc(sizeof(student));
 
 	//createsamplestudents();
 
-	addstudent(head);
+	n = addstudent(head);
+	addstudent(n);
 	displayallstudents(head);
 
 	system("pause");
