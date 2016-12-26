@@ -26,7 +26,11 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-
+//字符串相等
+int streq(char *s1, char *s2)
+{
+	return strcmp(s1, s2) == 0;
+}
 
 //显示一个成绩
 void displaystudent(student stu)
@@ -67,7 +71,49 @@ student * addstudent(student *head)
 	return n;
 }
 
-
+student * inputstudents()
+{
+	student *p1, *p2, *head;
+	p1 = p2 = head = (student *)malloc(sizeof(student));
+	int i, score;
+	float sum = 0;
+	//student *p = head;
+	//student *n;
+	char no[MAX_STRLEN] = "";
+	char name[MAX_STRLEN] = "";
+	while (1)
+	{
+		printf("\n\n请输入学生学号:");
+		scanf("%s", &no);
+		if (streq(no, "q"))
+		{
+			printf("\n您已结束输入！");
+			break;
+		}
+		printf("\n请输入学生姓名:");
+		scanf("%s", name);
+		//n = (student *)malloc(sizeof(student));
+		strcpy(p1->no, no);
+		strcpy(p1->name, name);
+		for (i = 0; i < N; i++)
+		{
+			printf("\n请输入第%d们课程成绩:", i + 1);
+			scanf("%d", &score);
+			p1->score[i] = score;
+			sum += score;
+		}
+		p1->score[N] = sum / N;
+		if (head == NULL)
+			head = p1;
+		else
+			p2->next = p1;
+		p2 = p1;
+		p1 = (student*)malloc(sizeof(student));
+		printf("\n学生%s信息添加成功!\n", name);
+	}
+	p2->next = NULL;
+	return head;
+}
 
 
 //http://blog.csdn.net/iwm_next/article/details/7450734
@@ -105,7 +151,8 @@ void deletestudent(student *head, char * name)  //删除成绩
 
 void displayallstudents(student *head)  //输出所有学生信息
 {
-	student *p = head->next;
+	//student *p = head->next;
+	student *p = head;
 
 	printf("所有学生成绩如下\r\n");
 	printf("序号    姓名    成绩\n");
@@ -134,14 +181,11 @@ int cmpfunc(const void * a, const void * b)   //成绩比较
 int main()
 {
 	int choice = -1;
-	student *n, *head;
 
-	head = (student *)malloc(sizeof(student));
-
+	student *head;
 	//createsamplestudents();
+	head = inputstudents();
 
-	n = addstudent(head);
-	addstudent(n);
 	displayallstudents(head);
 
 	system("pause");
