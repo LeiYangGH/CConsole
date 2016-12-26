@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <conio.h>
 #define MAX_STRLEN 20
-#define FORMAT "%s\t%s\t%.2f\r\n"
-#define MEMBERS stu.no, stu.name, stu.score[N]
-#define N 2
-//#define N 5
+#define N 5
+//下面两个格式，为了方便，利用了N=5，写死了
+//#define FORMAT "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%.2f\r\n"
+#define FORMAT "%s\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
+#define MEMBERS stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4], stu.score[5]
+//#define N 2
 typedef struct student
 {
 	char no[12];
@@ -16,77 +18,30 @@ typedef struct student
 	struct student  *next;
 }student;
 
-char *scoresfile = "scores.txt";
-//student *head;
-
-//字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
-
 //字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
 
-//显示一个成绩
 void displaystudent(student stu)
 {
 	printf(FORMAT, MEMBERS);
-	//printf("---------------------");
 	printf("\r\n");
-}
-
-
-//新增成绩
-student * addstudent(student *head)
-{
-	int i, score;
-	float sum = 0;
-	student *p = head;
-	student *n;
-	char no[MAX_STRLEN];
-	char name[MAX_STRLEN] = "";
-	printf("请输入学生学号:");
-	scanf("%s", &no);
-	printf("\n请输入学生姓名:");
-	scanf("%s", name);
-	n = (student *)malloc(sizeof(student));
-	strcpy(n->no, no);
-	strcpy(n->name, name);
-	for (i = 0; i < N; i++)
-	{
-		printf("\n请输入第%d们课程成绩:", i + 1);
-		scanf("%d", &score);
-		n->score[i] = score;
-		sum += score;
-	}
-	n->score[N] = sum / N;
-	p->next = n;
-	n->next = NULL;
-	printf("\n学生%s信息添加成功!\n", name);
-	return n;
 }
 
 student * inputstudents()
 {
-
+	int i, score;
+	char no[MAX_STRLEN] = "";
+	char name[MAX_STRLEN] = "";
 	student *p1, *p2, *head;
 	head = (student *)malloc(sizeof(student));
 	p1 = p2 = (student *)malloc(sizeof(student));
-	int i, score;
-	float sum = 0;
 	head->next = p1;
-	//student *p = head;
-	//student *n;
-	char no[MAX_STRLEN] = "";
-	char name[MAX_STRLEN] = "";
 	while (1)
 	{
-		printf("\n\n请输入学生学号:");
+		printf("\n\n请输入学生学号(q结束):");
 		scanf("%s", &no);
 		if (streq(no, "q"))
 		{
@@ -95,20 +50,15 @@ student * inputstudents()
 		}
 		printf("\n请输入学生姓名:");
 		scanf("%s", name);
-		//n = (student *)malloc(sizeof(student));
 		strcpy(p1->no, no);
 		strcpy(p1->name, name);
 		for (i = 0; i < N; i++)
 		{
-			printf("\n请输入第%d们课程成绩:", i + 1);
+			printf("\n请输入第%d门课程成绩:", i + 1);
 			scanf("%d", &score);
 			p1->score[i] = score;
-			sum += score;
 		}
-		p1->score[N] = sum / N;
-		//if (head == NULL)
-		//	head = p1;
-		//else
+		p1->score[N] = 0;
 		p2->next = p1;
 		p2 = p1;
 		p1 = (student*)malloc(sizeof(student));
@@ -118,18 +68,13 @@ student * inputstudents()
 	return head;
 }
 
-
-//http://blog.csdn.net/iwm_next/article/details/7450734
-void deletestudentbyno(student *L, char * no)
+int deletestudentbyno(student *L, char * no)
 {
-	//char no[MAX_STRLEN] = "";
-	//printf("\n\n请输入学生学号:");
-	//scanf("%s", &no);
 	student *p1 = L, *p2;
 	if (L == NULL)
 	{
 		printf("\n学生链表为空!\n");
-		return;
+		return 0;
 	}
 	while (!streq(p1->no, no) && p1->next != NULL)
 	{
@@ -138,31 +83,49 @@ void deletestudentbyno(student *L, char * no)
 	}
 	if (streq(p1->no, no))
 	{
-
 		if (p1 == L)
 			L = p1->next;
-		//L->next = p1->next;
 		else
 		{
 			p2->next = p1->next;
 			free(p1);
 			printf("已删除学号为%s的学生的成绩。\r\n", no);
+			return 1;
 		}
 	}
 	else
+	{
 		printf("没找到学号为%s的学生!\r\n", no);
+		return 0;
+	}
 }
 
-
+//新增成绩
+void calcaverage(student *L)
+{
+	int i;
+	float sum;
+	student *n;
+	n = L;
+	while (n != NULL)
+	{
+		sum = 0;
+		for (i = 0; i < N; i++)
+		{
+			sum += n->score[i];
+		}
+		n->score[N] = sum / N;
+		n = n->next;
+	}
+	printf("平均成绩计算完毕\r\n");
+}
 
 
 void displayallstudents(student *head)  //输出所有学生信息
 {
 	student *p = head->next;
-	//student *p = head;
-
 	printf("所有学生成绩如下\r\n");
-	printf("序号    姓名    成绩\n");
+	printf("学号\t姓名\t课程1\t课程2\t课程3\t课程4\t课程5\t平均\r\n");
 	while (p != NULL)
 	{
 		displaystudent(*p);
@@ -170,25 +133,54 @@ void displayallstudents(student *head)  //输出所有学生信息
 	}
 }
 
-
-
-int cmpfunc(const void * a, const void * b)   //成绩比较
-{
-	return ((student*)a)->score - ((student*)b)->score;
-}
-
-
 int main()
 {
 	int choice = -1;
-
-	student *head;
-	head = inputstudents();
-
-	displayallstudents(head);
-	deletestudentbyno(head, "a");
-	displayallstudents(head);
-
+	char no[MAX_STRLEN] = "";
+	student *L;
+	while (choice != 0)
+	{
+		printf("\n\t 学生成绩录入删除计算");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 录入学生成绩");
+		printf("\n\t 2. 计算平均");
+		printf("\n\t 3. 根据学号删除");
+		printf("\n\t 4. 查看所有成绩");
+		printf("\n\n  请选择: ");
+		choice = getche();
+		switch (choice)
+		{
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
+			system("pause");
+			exit(0);
+			break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			L = inputstudents();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			calcaverage(L);
+			break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			printf("\n\n请输入学生学号:");
+			scanf("%s", &no);
+			deletestudentbyno(L, no);
+			break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			displayallstudents(L);
+			break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
+		}
+		getch();
+	}
+	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
 }
