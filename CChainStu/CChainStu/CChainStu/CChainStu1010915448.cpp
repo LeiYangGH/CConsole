@@ -73,10 +73,13 @@ student * addstudent(student *head)
 
 student * inputstudents()
 {
+
 	student *p1, *p2, *head;
-	p1 = p2 = head = (student *)malloc(sizeof(student));
+	head = (student *)malloc(sizeof(student));
+	p1 = p2 = (student *)malloc(sizeof(student));
 	int i, score;
 	float sum = 0;
+	head->next = p1;
 	//student *p = head;
 	//student *n;
 	char no[MAX_STRLEN] = "";
@@ -103,10 +106,10 @@ student * inputstudents()
 			sum += score;
 		}
 		p1->score[N] = sum / N;
-		if (head == NULL)
-			head = p1;
-		else
-			p2->next = p1;
+		//if (head == NULL)
+		//	head = p1;
+		//else
+		p2->next = p1;
 		p2 = p1;
 		p1 = (student*)malloc(sizeof(student));
 		printf("\n学生%s信息添加成功!\n", name);
@@ -117,33 +120,37 @@ student * inputstudents()
 
 
 //http://blog.csdn.net/iwm_next/article/details/7450734
-void deletestudent(student *head, char * name)  //删除成绩
+void deletestudentbyno(student *L, char * no)
 {
-	student *p1 = head, *p2;
-	if (head == NULL)
+	//char no[MAX_STRLEN] = "";
+	//printf("\n\n请输入学生学号:");
+	//scanf("%s", &no);
+	student *p1 = L, *p2;
+	if (L == NULL)
 	{
-		printf("\n成绩为空!\n");
+		printf("\n学生链表为空!\n");
 		return;
 	}
-	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
+	while (!streq(p1->no, no) && p1->next != NULL)
 	{
 		p2 = p1;
 		p1 = p1->next;
 	}
-	if (strcmp(p1->name, name) == 0)
+	if (streq(p1->no, no))
 	{
 
-		if (p1 == head)
-			head = p1->next;
+		if (p1 == L)
+			L = p1->next;
+		//L->next = p1->next;
 		else
 		{
 			p2->next = p1->next;
 			free(p1);
-			printf("已删除姓名为%s的学生的成绩。\r\n", name);
+			printf("已删除学号为%s的学生的成绩。\r\n", no);
 		}
 	}
 	else
-		printf("没找到姓名为%s的学生!\r\n", name);
+		printf("没找到学号为%s的学生!\r\n", no);
 }
 
 
@@ -151,8 +158,8 @@ void deletestudent(student *head, char * name)  //删除成绩
 
 void displayallstudents(student *head)  //输出所有学生信息
 {
-	//student *p = head->next;
-	student *p = head;
+	student *p = head->next;
+	//student *p = head;
 
 	printf("所有学生成绩如下\r\n");
 	printf("序号    姓名    成绩\n");
@@ -170,22 +177,16 @@ int cmpfunc(const void * a, const void * b)   //成绩比较
 	return ((student*)a)->score - ((student*)b)->score;
 }
 
-//void promptdeletebyname()  //按姓名删除
-//{
-//	char name[50] = "";
-//	inputname(name);
-//	deletestudent(name);
-//}
-
 
 int main()
 {
 	int choice = -1;
 
 	student *head;
-	//createsamplestudents();
 	head = inputstudents();
 
+	displayallstudents(head);
+	deletestudentbyno(head, "a");
 	displayallstudents(head);
 
 	system("pause");
