@@ -42,6 +42,9 @@ typedef struct student
 }student;
 student *stuhead;
 
+char curstuname[MAX_STRLEN];
+student * curstu;
+
 //字符串转整数
 int toint(char *s)
 {
@@ -285,6 +288,26 @@ void findcoursebyno(int  no, course **cou)  //根据名字查找学生
 	}
 }
 
+void findstudentbyname(char *name, student **stu)  //根据名字查找学生
+{
+	int found = 0;
+	student *p = stuhead;
+
+	while (p != NULL)
+	{
+		if (streq(p->name, name))
+		{
+			*stu = p;
+			return;
+		}
+		p = p->next;
+	}
+	if (!found)
+	{
+		printf("没找到姓名为%s的学生\r\n", name);
+		*stu = NULL;
+	}
+}
 
 int selectonecourse(student *stu, int couno)
 {
@@ -321,10 +344,18 @@ int main()
 {
 	int choice = -1;
 #if DEV
+	strcpy(curstuname, "ly");
 	readallcourses();
 	displayallcourses();
 	inputstudents();
 	displayallstudents();
+	findstudentbyname(curstuname, &curstu);
+	selectonecourse(curstu, 1);
+	selectonecourse(curstu, 2);
+	selectonecourse(curstu, 3);
+	selectonecourse(curstu, 4);
+	selectonecourse(curstu, 5);
+	selectonecourse(curstu, 6);
 #else
 	char no[MAX_STRLEN] = "";
 	student *L;
