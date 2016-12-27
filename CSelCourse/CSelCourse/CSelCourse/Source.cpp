@@ -33,8 +33,10 @@ typedef struct student
 	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
 	char sex[MAX_STRLEN];
-	int totalpoints;
 	float scores[COU_CNT];
+	int selcourses[COU_CNT];
+	int selcouscnt;
+	int totalpoints;
 	char supplement[MAX_STRLEN];
 	struct student  *next;
 }student;
@@ -100,10 +102,8 @@ void getcoursefromline(char *line, course *cou)
 		}
 		part = strtok(NULL, ",");
 	}
-
 	cou->no = courseno;
 	cou->stucnt = 0;
-
 }
 
 //读取所有成绩到链表
@@ -139,15 +139,18 @@ void readallcourses()
 	p2->next = NULL;
 }
 
-void addstudents(student *p1, student *p2, char *no, char *name, char *sex)
+void addstudents(student **p1, student **p2, char *no, char *name, char *sex)
 {
-	strcpy(p1->no, no);
-	strcpy(p1->name, name);
-	strcpy(p1->sex, sex);
-	strcpy(p1->supplement, "");
-	p1->totalpoints = 0;
-	p2->next = p1;
-	p2 = p1;
+	strcpy((*p1)->no, no);
+	strcpy((*p1)->name, name);
+	strcpy((*p1)->sex, sex);
+	strcpy((*p1)->supplement, "");
+	(*p1)->totalpoints = 0;
+	(*p1)->selcouscnt = 0;
+	(*p2)->next = (*p1);
+	(*p2) = (*p1);
+	(*p1) = (student*)malloc(sizeof(student));
+
 }
 
 void inputstudents()
@@ -185,10 +188,11 @@ void inputstudents()
 		//p2->next = p1;
 		//p2 = p1;
 #if DEV
-		addstudents(p1, p2, "no", "name", "sex");
+		addstudents(&p1, &p2, "01", "name", "sex");
+		addstudents(&p1, &p2, "02", "ly", "b");
+		addstudents(&p1, &p2, "03", "sm", "g");
 #else
 #endif
-		p1 = (student*)malloc(sizeof(student));
 		printf("\n学生%s信息添加成功!\n", name);
 	}
 	p2->next = NULL;
@@ -259,6 +263,60 @@ void displayallstudents()  //输出所有学生信息
 	}
 }
 
+
+void findcoursebyno(int  no, course **cou)  //根据名字查找学生
+{
+	int found = 0;
+	course *p = couhead;
+
+	while (p != NULL)
+	{
+		if (p->no == no)
+		{
+			*cou = p;
+			return;
+		}
+		p = p->next;
+	}
+	if (!found)
+	{
+		printf("没找到编号名为%d的课程\r\n", no);
+		*cou = NULL;
+	}
+}
+
+
+int selectonecourse(student *stu, int couno)
+{
+	course *cou;
+
+	if (stu->selcouscnt >= 5)
+	{
+		printf("选课不能超过5门\r\n");
+		return 0;
+	}
+	findcoursebyno(couno, &cou);
+	if (cou != NULL && cou->stucnt < cou->no)
+	{
+		stu->selcourses[stu->selcouscnt++] = couno;
+		cou->stucnt++;
+		printf("选课成功！\r\n");
+	}
+}
+
+void selectcourses(student *stu)
+{
+	student *p = stuhead->next;
+	printf("所有学生成绩如下\r\n");
+	printf("学号\t姓名\t性别\t总学分\r\n");
+	while (p != NULL)
+	{
+		displaystudent(*p);
+		p = p->next;
+	}
+}
+
+
 int main()
 {
 	int choice = -1;
@@ -311,7 +369,7 @@ int main()
 			break;
 		}
 		getch();
-}
+	}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
