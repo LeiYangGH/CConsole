@@ -3,16 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define DEV 0
+#define DEV 1
 #define COU_CNT 7
 #define MAX_STRLEN 20
-#define N 5
-//下面两个格式，为了方便，利用了N=5，写死了
 #define FORMAT_COU "%d\t%s\t%d\t%d\r\n"
 #define MEMBERS_COU cou.no, cou.name, cou.points, cou.stucnt
-
 #define FORMAT_STU "%s\t%s\t%s\t%d\r\n"
-//#define FORMAT_STU "%s\t%s\t%s\t%d\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
 #define MEMBERS_STU stu.no, stu.name, stu.sex, stu.totalpoints, stu.supplement
 #define LINE  "\n------------------------\n"
 
@@ -344,7 +340,9 @@ int selectonecourse(student *stu, int couno)
 	{
 		if (cou->stucnt < cou->no)
 		{
-			stu->selcourses[stu->selcouscnt++] = couno;
+			stu->selcourses[stu->selcouscnt] = couno;
+			stu->totalpoints += cou->points;
+			stu->selcouscnt++;
 			cou->stucnt++;
 			printf("选课成功！\r\n");
 			return 1;
@@ -385,6 +383,41 @@ void selectcourses(student *stu)
 	} while (stu->selcouscnt <= 5);
 }
 
+int cmpfunc(const void * a, const void * b)   //总学分比较
+{
+	student* stua = (student*)a;
+	student* stub = (student*)b;
+	if (stua->totalpoints == stub->totalpoints)
+		return stua->name - stub->name;
+	else
+		return stua->totalpoints - stub->totalpoints;
+}
+
+void sortanddisplayallstudents()
+{
+	int i, cnt = 0;
+	student all[50];
+	student *p = stuhead;
+
+	printf("所有学生成绩升序排序输出如下\r\n");
+	while (p != NULL)
+	{
+		student stu;
+
+		strcpy(stu.no, p->no);
+		strcpy(stu.name, p->name);
+		stu.totalpoints = p->totalpoints;
+		all[cnt++] = stu;
+		p = p->next;
+	}
+	qsort(all, cnt, sizeof(student), cmpfunc);//快速排序
+
+	printf("学号\t姓名\t总学分\n");
+	for (i = 1; i < cnt; i++)
+	{
+		printf("%s\t%s\t%d\n", all[i].no, all[i].name, all[i].totalpoints);
+	}
+}
 
 int main()
 {
@@ -408,6 +441,7 @@ int main()
 	selectonecourse(stu, 2);
 	selectonecourse(stu, 5);
 	displayallstuselcourses();
+	sortanddisplayallstudents();
 #else
 	while (choice != 0)
 	{
