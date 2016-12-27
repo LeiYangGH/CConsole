@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define DEV 1
+#define DEV 0
 #define COU_CNT 7
 #define MAX_STRLEN 20
 #define FORMAT_COU "%d\t%s\t%d\t%d\r\n"
@@ -94,18 +94,17 @@ void findcoursebyno(int  no, course **cou)  //根据名字查找学生
 		*cou = NULL;
 	}
 }
-/////////////
+
 void displayonestuselcourses(student *stu)
 {
 	int i;
+	course *cou;
 	printf("学生%s选课%d门如下\r\n", stu->name, stu->selcouscnt);
 	for (i = 0; i < stu->selcouscnt; i++)
 	{
-		course *cou;
 		findcoursebyno(stu->selcourses[i], &cou);
 		printf("%s\t", cou->name);
 	}
-	//printf(FORMAT_COU, MEMBERS_COU);
 	printf("\r\n");
 }
 void displayallstuselcourses()
@@ -119,9 +118,42 @@ void displayallstuselcourses()
 		p = p->next;
 	}
 }
+/////////////
 
 
-
+void inputonestuscores(student *stu)
+{
+	int i;
+	float score;
+	char sup[MAX_STRLEN] = "";
+	course *cou;
+	printf("下面请输入学生%s的课程分数\r\n", stu->name);
+	for (i = 0; i < stu->selcouscnt; i++)
+	{
+		findcoursebyno(stu->selcourses[i], &cou);
+		printf("%s的分数：", cou->name);
+		scanf("%lf", &score);
+		stu->scores[i] = score;
+		if (score < 60)
+		{
+			printf("请输入补考信息：");
+			scanf("%s", &sup);
+			strcpy(&stu->supplement[i], sup);
+		}
+	}
+	printf("\r\n");
+}
+void inputallstuscores()
+{
+	student *p = stuhead->next;
+	printf("请输入所有学生的课程分数\r\n");
+	printf(LINE);
+	while (p != NULL)
+	{
+		inputonestuscores(p);
+		p = p->next;
+	}
+}
 
 /////////
 void displaystudent(student stu)
@@ -255,18 +287,6 @@ void inputstudents()
 		printf("\n请输入学生性别:");
 		scanf("%s", sex);
 		addstudents(&p1, &p2, no, name, sex);
-
-		/*strcpy(p1->no, no);
-		strcpy(p1->name, name);
-		for (i = 0; i < N; i++)
-		{
-			printf("\n请输入第%d门课程成绩:", i + 1);
-			scanf("%d", &score);
-			p1->score[i] = score;
-		}
-		p1->score[N] = 0;
-		p2->next = p1;
-		p2 = p1;*/
 #endif
 		printf("\n学生%s信息添加成功!\n", name);
 	}
@@ -453,6 +473,8 @@ int main()
 		printf("\n\t 4. 更改当前学生姓名");
 		printf("\n\t 5. 当前学生选课");
 		printf("\n\t 6. 查看所有学生选课");
+		printf("\n\t 7. 学生按学分总积分排列输出");
+		printf("\n\t 8. 输入所有学生成绩");
 		printf("\n\n  请选择: ");
 		choice = getche();
 		switch (choice)
@@ -490,6 +512,14 @@ int main()
 		case '6':
 			printf("\n\n你选择了 6\n");
 			displayallstuselcourses();
+			break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			sortanddisplayallstudents();
+			break;
+		case '8':
+			printf("\n\n你选择了 8\n");
+			inputallstuscores();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
