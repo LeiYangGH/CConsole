@@ -4,14 +4,16 @@
 #include <stdio.h>
 #include <conio.h>
 #define DEV 1
+#define COU_CNT 7
 #define MAX_STRLEN 20
 #define N 5
 //下面两个格式，为了方便，利用了N=5，写死了
 #define FORMAT_COU "%d\t%s\t%d\t%d\r\n"
 #define MEMBERS_COU cou.no, cou.name, cou.points, cou.stucnt
 
-#define FORMAT "%s\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
-#define MEMBERS stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4], stu.score[5]
+#define FORMAT_STU "%s\t%s\t%s\t%d\r\n"
+//#define FORMAT_STU "%s\t%s\t%s\t%d\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
+#define MEMBERS_STU stu.no, stu.name, stu.sex, stu.totalpoints, stu.supplement
 //#define N 2
 
 typedef struct course
@@ -28,11 +30,15 @@ course *couhead;
 
 typedef struct student
 {
-	char no[12];
-	char name[10];
-	float score[N + 1];  /*  其中最后一个元素用来保存平均成绩  */
+	char no[MAX_STRLEN];
+	char name[MAX_STRLEN];
+	char sex[MAX_STRLEN];
+	int totalpoints;
+	float scores[COU_CNT];
+	char supplement[MAX_STRLEN];
 	struct student  *next;
 }student;
+student *stuhead;
 
 //字符串转整数
 int toint(char *s)
@@ -66,7 +72,7 @@ void displayallcourses()
 
 void displaystudent(student stu)
 {
-	printf(FORMAT, MEMBERS);
+	printf(FORMAT_STU, MEMBERS_STU);
 	printf("\r\n");
 }
 
@@ -133,43 +139,59 @@ void readallcourses()
 	p2->next = NULL;
 }
 
+void addstudents(student *p1, student *p2, char *no, char *name, char *sex)
+{
+	strcpy(p1->no, no);
+	strcpy(p1->name, name);
+	strcpy(p1->sex, sex);
+	strcpy(p1->supplement, "");
+	p1->totalpoints = 0;
+	p2->next = p1;
+	p2 = p1;
+}
 
-student * inputstudents()
+void inputstudents()
 {
 	int i, score;
 	char no[MAX_STRLEN] = "";
 	char name[MAX_STRLEN] = "";
-	student *p1, *p2, *head;
-	head = (student *)malloc(sizeof(student));
+	student *p1, *p2;
+	stuhead = (student *)malloc(sizeof(student));
 	p1 = p2 = (student *)malloc(sizeof(student));
-	head->next = p1;
+	stuhead->next = p1;
+#if DEV
+#else
 	while (1)
+#endif
 	{
-		printf("\n\n请输入学生学号(q结束):");
-		scanf("%s", &no);
-		if (streq(no, "q"))
-		{
-			printf("\n您已结束输入！");
-			break;
-		}
-		printf("\n请输入学生姓名:");
-		scanf("%s", name);
-		strcpy(p1->no, no);
-		strcpy(p1->name, name);
-		for (i = 0; i < N; i++)
-		{
-			printf("\n请输入第%d门课程成绩:", i + 1);
-			scanf("%d", &score);
-			p1->score[i] = score;
-		}
-		p1->score[N] = 0;
-		p2->next = p1;
-		p2 = p1;
+		//printf("\n\n请输入学生学号(q结束):");
+		//scanf("%s", &no);
+		//if (streq(no, "q"))
+		//{
+		//	printf("\n您已结束输入！");
+		//	break;
+		//}
+		//printf("\n请输入学生姓名:");
+		//scanf("%s", name);
+		//strcpy(p1->no, no);
+		//strcpy(p1->name, name);
+		//for (i = 0; i < N; i++)
+		//{
+		//	printf("\n请输入第%d门课程成绩:", i + 1);
+		//	scanf("%d", &score);
+		//	p1->score[i] = score;
+		//}
+		//p1->score[N] = 0;
+		//p2->next = p1;
+		//p2 = p1;
+#if DEV
+		addstudents(p1, p2, "no", "name", "sex");
+#else
+#endif
 		p1 = (student*)malloc(sizeof(student));
 		printf("\n学生%s信息添加成功!\n", name);
 	}
 	p2->next = NULL;
-	return head;
 }
 
 int deletestudentbyno(student *L, char * no)
@@ -207,7 +229,7 @@ int deletestudentbyno(student *L, char * no)
 //新增成绩
 void calcaverage(student *L)
 {
-	int i;
+	/*int i;
 	float sum;
 	student *n;
 	n = L;
@@ -221,15 +243,15 @@ void calcaverage(student *L)
 		n->score[N] = sum / N;
 		n = n->next;
 	}
-	printf("平均成绩计算完毕\r\n");
+	printf("平均成绩计算完毕\r\n");*/
 }
 
 
-void displayallstudents(student *head)  //输出所有学生信息
+void displayallstudents()  //输出所有学生信息
 {
-	student *p = head->next;
+	student *p = stuhead->next;
 	printf("所有学生成绩如下\r\n");
-	printf("学号\t姓名\t课程1\t课程2\t课程3\t课程4\t课程5\t平均\r\n");
+	printf("学号\t姓名\t性别\t总学分\r\n");
 	while (p != NULL)
 	{
 		displaystudent(*p);
@@ -243,6 +265,8 @@ int main()
 #if DEV
 	readallcourses();
 	displayallcourses();
+	inputstudents();
+	displayallstudents();
 #else
 	char no[MAX_STRLEN] = "";
 	student *L;
@@ -287,7 +311,7 @@ int main()
 			break;
 		}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
