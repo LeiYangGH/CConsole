@@ -14,6 +14,8 @@
 #define FORMAT_STU "%s\t%s\t%s\t%d\r\n"
 //#define FORMAT_STU "%s\t%s\t%s\t%d\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
 #define MEMBERS_STU stu.no, stu.name, stu.sex, stu.totalpoints, stu.supplement
+#define LINE  "\n------------------------\n"
+
 //#define N 2
 
 typedef struct course
@@ -66,21 +68,80 @@ void displaycourse(course cou)
 void displayallcourses()
 {
 	course *p = couhead->next;
-	printf("所有课程如下\r\n");
-	printf("序号\t课程\t学分\t人数\r\n");
+	printf("所有课程情况如下\r\n");
+	printf(LINE);
 	while (p != NULL)
 	{
 		displaycourse(*p);
 		p = p->next;
 	}
 }
+void findcoursebyno(int  no, course **cou)  //根据名字查找学生
+{
+	int found = 0;
+	course *p = couhead;
 
+	while (p != NULL)
+	{
+		if (p->no == no)
+		{
+			*cou = p;
+			return;
+		}
+		p = p->next;
+	}
+	if (!found)
+	{
+		printf("没找到编号名为%d的课程\r\n", no);
+		*cou = NULL;
+	}
+}
+/////////////
+void displayonestuselcourses(student *stu)
+{
+	int i;
+	printf("学生%s选课%d门如下\r\n", stu->name, stu->selcouscnt);
+	for (i = 0; i < stu->selcouscnt; i++)
+	{
+		course *cou;
+		findcoursebyno(stu->selcourses[i], &cou);
+		printf("%s\t", cou->name);
+	}
+	//printf(FORMAT_COU, MEMBERS_COU);
+	printf("\r\n");
+}
+void displayallstuselcourses()
+{
+	student *p = stuhead->next;
+	printf("所有学生选课结果如下\r\n");
+	printf(LINE);
+	while (p != NULL)
+	{
+		displayonestuselcourses(p);
+		p = p->next;
+	}
+}
+
+
+
+
+/////////
 void displaystudent(student stu)
 {
 	printf(FORMAT_STU, MEMBERS_STU);
 	printf("\r\n");
 }
-
+void displayallstudents()  //输出所有学生信息
+{
+	student *p = stuhead->next;
+	printf("所有学生成绩如下\r\n");
+	printf("学号\t姓名\t性别\t总学分\r\n");
+	while (p != NULL)
+	{
+		displaystudent(*p);
+		p = p->next;
+	}
+}
 //从一行文本拆分出成绩
 void getcoursefromline(char *line, course *cou)
 {
@@ -254,39 +315,9 @@ void calcaverage(student *L)
 }
 
 
-void displayallstudents()  //输出所有学生信息
-{
-	student *p = stuhead->next;
-	printf("所有学生成绩如下\r\n");
-	printf("学号\t姓名\t性别\t总学分\r\n");
-	while (p != NULL)
-	{
-		displaystudent(*p);
-		p = p->next;
-	}
-}
 
 
-void findcoursebyno(int  no, course **cou)  //根据名字查找学生
-{
-	int found = 0;
-	course *p = couhead;
 
-	while (p != NULL)
-	{
-		if (p->no == no)
-		{
-			*cou = p;
-			return;
-		}
-		p = p->next;
-	}
-	if (!found)
-	{
-		printf("没找到编号名为%d的课程\r\n", no);
-		*cou = NULL;
-	}
-}
 
 void findstudentbyname(char *name, student **stu)  //根据名字查找学生
 {
@@ -319,11 +350,20 @@ int selectonecourse(student *stu, int couno)
 		return 0;
 	}
 	findcoursebyno(couno, &cou);
-	if (cou != NULL && cou->stucnt < cou->no)
+	if (cou != NULL)
 	{
-		stu->selcourses[stu->selcouscnt++] = couno;
-		cou->stucnt++;
-		printf("选课成功！\r\n");
+		if (cou->stucnt < cou->no)
+		{
+			stu->selcourses[stu->selcouscnt++] = couno;
+			cou->stucnt++;
+			printf("选课成功！\r\n");
+			return 1;
+		}
+		else
+		{
+			printf("课程%s已经选满！\r\n", cou->name);
+			return 0;
+		}
 	}
 }
 
@@ -343,6 +383,7 @@ void selectcourses(student *stu)
 int main()
 {
 	int choice = -1;
+	student *stu;
 #if DEV
 	strcpy(curstuname, "ly");
 	readallcourses();
@@ -356,6 +397,11 @@ int main()
 	selectonecourse(curstu, 4);
 	selectonecourse(curstu, 5);
 	selectonecourse(curstu, 6);
+	findstudentbyname("sm", &stu);
+	selectonecourse(stu, 1);
+	selectonecourse(stu, 2);
+	selectonecourse(stu, 5);
+	displayallstuselcourses();
 #else
 	char no[MAX_STRLEN] = "";
 	student *L;
@@ -398,9 +444,9 @@ int main()
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-		}
+}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
