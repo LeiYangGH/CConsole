@@ -31,7 +31,8 @@ typedef struct student
 	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
 	char sex[MAX_STRLEN];
-	float scores[COU_CNT];
+	//float scores[COU_CNT];
+	int scores[COU_CNT];
 	int selcourses[COU_CNT];
 	int selcouscnt;
 	int totalpoints;
@@ -118,13 +119,11 @@ void displayallstuselcourses()
 		p = p->next;
 	}
 }
-/////////////
-
 
 void inputonestuscores(student *stu)
 {
 	int i;
-	float score;
+	int score;
 	char sup[MAX_STRLEN] = "";
 	course *cou;
 	printf("下面请输入学生%s的课程分数\r\n", stu->name);
@@ -132,7 +131,7 @@ void inputonestuscores(student *stu)
 	{
 		findcoursebyno(stu->selcourses[i], &cou);
 		printf("%s的分数：", cou->name);
-		scanf("%lf", &score);
+		scanf("%d", &score);
 		stu->scores[i] = score;
 		if (score < 60)
 		{
@@ -153,15 +152,43 @@ void inputallstuscores()
 		inputonestuscores(p);
 		p = p->next;
 	}
+	printf("所有学生的课程输入完毕。\r\n");
 }
 
-/////////
+
+int isbelow60forcou(student *stu, int no)
+{
+	int i;
+	for (i = 0; i < stu->selcouscnt; i++)
+	{
+		if (stu->selcourses[i] == no && stu->scores[i] < 60)
+			return 1;
+		return 0;
+	}
+}
+
+void listallnamesbelow60forcou(int no)
+{
+	int i;
+	student *p = stuhead->next;
+	printf("\n第%d门功课不及格的学生：\r\n", no);
+	while (p != NULL)
+	{
+		if (isbelow60forcou(p, no))
+		{
+			printf("%s\t", p->name);
+		}
+		printf(LINE);
+		p = p->next;
+	}
+}
+
 void displaystudent(student stu)
 {
 	printf(FORMAT_STU, MEMBERS_STU);
 	printf("\r\n");
 }
-void displayallstudents()  //输出所有学生信息
+void displayallstudents()
 {
 	if (stuhead == NULL)
 	{
@@ -380,7 +407,7 @@ void selectcourses(student *stu)
 	int no;
 	if (stu == NULL)
 	{
-		printf("请先输入姓名再选课！");
+		printf("请先输入姓名再选课！\n");
 		return;
 	}
 	do
@@ -392,15 +419,17 @@ void selectcourses(student *stu)
 		{
 			if (stu->selcouscnt >= 3)
 			{
+				printf("你已退出了课程选择。\n");
 				break;
 			}
 			else
 			{
-				printf("必须选满至少3门课程！");
+				printf("必须选满至少3门课程！\n");
 			}
 		}
 		selectonecourse(stu, no);
 	} while (stu->selcouscnt <= 5);
+	printf("选课结束。\n");
 }
 
 int cmpfunc(const void * a, const void * b)   //总学分比较
@@ -417,7 +446,7 @@ void sortanddisplayallstudents()
 {
 	int i, cnt = 0;
 	student all[50];
-	student *p = stuhead;
+	student *p = stuhead->next;
 
 	printf("所有学生成绩升序排序输出如下\r\n");
 	while (p != NULL)
@@ -426,6 +455,8 @@ void sortanddisplayallstudents()
 
 		strcpy(stu.no, p->no);
 		strcpy(stu.name, p->name);
+		strcpy(stu.sex, p->sex);
+
 		stu.totalpoints = p->totalpoints;
 		all[cnt++] = stu;
 		p = p->next;
@@ -433,11 +464,13 @@ void sortanddisplayallstudents()
 	qsort(all, cnt, sizeof(student), cmpfunc);//快速排序
 
 	printf("学号\t姓名\t总学分\n");
-	for (i = 1; i < cnt; i++)
+	for (i = 0; i < cnt; i++)
 	{
 		printf("%s\t%s\t%d\n", all[i].no, all[i].name, all[i].totalpoints);
 	}
 }
+
+
 
 int main()
 {
@@ -475,6 +508,7 @@ int main()
 		printf("\n\t 6. 查看所有学生选课");
 		printf("\n\t 7. 学生按学分总积分排列输出");
 		printf("\n\t 8. 输入所有学生成绩");
+		printf("\n\t 9. 一门和三门功课不及格的学生");
 		printf("\n\n  请选择: ");
 		choice = getche();
 		switch (choice)
@@ -503,7 +537,6 @@ int main()
 			scanf("%s", curstuname);
 			findstudentbyname(curstuname, &curstu);
 			printf("当前学生姓名：%s\n", curstuname);
-
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
@@ -520,6 +553,11 @@ int main()
 		case '8':
 			printf("\n\n你选择了 8\n");
 			inputallstuscores();
+			break;
+		case '9':
+			printf("\n\n你选择了 9\n");
+			listallnamesbelow60forcou(1);
+			listallnamesbelow60forcou(3);
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
