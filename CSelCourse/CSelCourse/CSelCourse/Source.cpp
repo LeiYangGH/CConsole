@@ -3,13 +3,29 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
+#define DEV 1
 #define MAX_STRLEN 20
 #define N 5
 //下面两个格式，为了方便，利用了N=5，写死了
-//#define FORMAT "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%.2f\r\n"
+#define FORMAT_COU "%d\t%s\t%d\t%d\r\n"
+#define MEMBERS_COU cou.no, cou.name, cou.points, cou.stucnt
+
 #define FORMAT "%s\t%s\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.2f\r\n"
 #define MEMBERS stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4], stu.score[5]
 //#define N 2
+
+typedef struct course
+{
+	int no;
+	char name[10];
+	int points;
+	//int maxstucnt;
+	int stucnt;
+	struct course  *next;
+}course;
+char *coursefile = "courses.txt";
+course *couhead;
+
 typedef struct student
 {
 	char no[12];
@@ -18,10 +34,34 @@ typedef struct student
 	struct student  *next;
 }student;
 
+//字符串转整数
+int toint(char *s)
+{
+	char *end;
+	return (int)strtol(s, &end, 10);
+}
+
 //字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
+}
+
+void displaycourse(course cou)
+{
+	printf(FORMAT_COU, MEMBERS_COU);
+	printf("\r\n");
+}
+void displayallcourses()
+{
+	course *p = couhead->next;
+	printf("所有课程如下\r\n");
+	printf("序号\t课程\t学分\t人数\r\n");
+	while (p != NULL)
+	{
+		displaycourse(*p);
+		p = p->next;
+	}
 }
 
 void displaystudent(student stu)
@@ -29,6 +69,70 @@ void displaystudent(student stu)
 	printf(FORMAT, MEMBERS);
 	printf("\r\n");
 }
+
+//从一行文本拆分出成绩
+void getcoursefromline(char *line, course *cou)
+{
+	char * part;
+	int index = 0, courseno;
+	part = strtok(line, ",");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			courseno = toint(part);
+			break;
+		case 2:
+			strcpy(cou->name, part);
+			break;
+		case 3:
+			cou->points = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, ",");
+	}
+
+	cou->no = courseno;
+	cou->stucnt = 0;
+
+}
+
+//读取所有成绩到链表
+void readallcourses()
+{
+	char line[200];
+	course *p1, *p2;
+	FILE *fp = fopen(coursefile, "r");
+	if (fp == NULL)
+	{
+		printf("\nerror on open file!");
+		fp = fopen(coursefile, "a+");
+		getchar();
+	}
+
+	p1 = p2 = (course *)malloc(sizeof(course));
+	couhead = p1;
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			break;
+		//读进来的行去掉末尾换行符，重要
+		//http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input
+		strtok(line, "\n");
+		getcoursefromline(line, p1);
+		if (couhead == NULL)
+			couhead = p1;
+		else
+			p2->next = p1;
+		p2 = p1;
+		p1 = (course*)malloc(sizeof(course));
+	}
+	p2->next = NULL;
+}
+
 
 student * inputstudents()
 {
@@ -136,6 +240,10 @@ void displayallstudents(student *head)  //输出所有学生信息
 int main()
 {
 	int choice = -1;
+#if DEV
+	readallcourses();
+	displayallcourses();
+#else
 	char no[MAX_STRLEN] = "";
 	student *L;
 	while (choice != 0)
@@ -181,6 +289,7 @@ int main()
 		getch();
 	}
 	fseek(stdin, 0, SEEK_END);
+#endif
 	system("pause");
 	return 0;
 }
