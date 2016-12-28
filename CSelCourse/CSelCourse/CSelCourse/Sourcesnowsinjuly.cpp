@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <conio.h>
 #define DEV 0
-#define COU_CNT 7
 #define MAX_STRLEN 20
-#define MAX_COUNT 50
+#define MAX_COUNT 20
 #define FORMAT_COU "%d\t%s\r\n"
 #define MEMBERS_COU cou.no, cou.name
 #define FORMAT_STU "%s\t%s\r\n"
@@ -28,8 +27,8 @@ typedef struct student
 {
 	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
-	int scores[COU_CNT];
-	int selcourses[COU_CNT];
+	int scores[MAX_COUNT];
+	int selcourses[MAX_COUNT];
 	int selcouscnt;
 }student;
 student allstudents[MAX_COUNT];
@@ -112,43 +111,6 @@ void displayallstuselcourses()
 	printf(LINE);
 }
 
-//void inputonestuscores(student *stu)
-//{
-//	int i;
-//	int score;
-//	char sup[MAX_STRLEN] = "";
-//	course *cou;
-//	printf("下面请输入学生%s的课程分数\r\n", stu->name);
-//	for (i = 0; i < stu->selcouscnt; i++)
-//	{
-//		findcoursebyno(stu->selcourses[i], &cou);
-//		printf("%s的分数：", cou->name);
-//		scanf("%d", &score);
-//		stu->scores[i] = score;
-//		if (score < 60)
-//		{
-//			printf("请输入补考信息：");
-//			scanf("%s", &sup);
-//			strcpy(&stu->supplement[i], sup);
-//		}
-//	}
-//	printf("\r\n");
-//}
-//void inputallstuscores()
-//{
-//	student *p = stuhead->next;
-//	printf("请输入所有学生的课程分数\r\n");
-//	printf(LINE);
-//	while (p != NULL)
-//	{
-//		inputonestuscores(p);
-//		p = p->next;
-//	}
-//	printf("所有学生的课程输入完毕。\r\n");
-//}
-
-
-
 void addscourse(int no, char *name)
 {
 	course cou;
@@ -156,7 +118,6 @@ void addscourse(int no, char *name)
 	strcpy(cou.name, name);
 	allcourses[allcoursescount++] = cou;
 }
-
 
 void displaystudent(student stu)
 {
@@ -175,7 +136,7 @@ void displayallstudents()
 	}
 	printf(LINE);
 }
-/////////////
+
 void addcourse(int no, char *name)
 {
 	course cou;
@@ -205,8 +166,6 @@ void inputcourses()
 	}
 }
 
-/////////////
-
 void addstudent(char *no, char *name)
 {
 	int i;
@@ -217,6 +176,7 @@ void addstudent(char *no, char *name)
 	for (i = 0; i < MAX_COUNT; i++)
 	{
 		stu.scores[i] = 0;
+		stu.selcourses[i] = 0;
 	}
 	allstudents[allstudentscount++] = stu;
 }
