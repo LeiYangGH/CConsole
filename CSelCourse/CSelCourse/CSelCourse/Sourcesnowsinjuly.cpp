@@ -175,7 +175,37 @@ void displayallstudents()
 	}
 	printf(LINE);
 }
+/////////////
+void addcourse(int no, char *name)
+{
+	course cou;
+	cou.no = no;
+	strcpy(cou.name, name);
+	allcourses[allcoursescount++] = cou;
+}
 
+void inputcourses()
+{
+	int i, score;
+	int no;
+	char name[MAX_STRLEN] = "";
+	while (1)
+	{
+		printf("\n\n请输入课程编号(整数，0结束):");
+		scanf("%d", &no);
+		if (no == 0)
+		{
+			printf("\n您已结束输入！");
+			break;
+		}
+		printf("\n请输入课程名称:");
+		scanf("%s", name);
+		addcourse(no, name);
+		printf("\n课程%s信息添加成功!\n", name);
+	}
+}
+
+/////////////
 
 void addstudent(char *no, char *name)
 {
@@ -300,6 +330,7 @@ int main()
 		printf("\n\t 4. 更改当前学生姓名");
 		printf("\n\t 5. 当前学生选课");
 		printf("\n\t 6. 查看所有学生选课");
+		printf("\n\t 7. 录入课程信息");
 		printf("\n\n  请选择: ");
 		choice = getche();
 		switch (choice)
@@ -336,6 +367,10 @@ int main()
 		case '6':
 			printf("\n\n你选择了 6\n");
 			displayallstuselcourses();
+			break;
+		case '7':
+			printf("\n\n你选择了 6\n");
+			inputcourses();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
