@@ -68,7 +68,7 @@ void displayallcourses()
 	}
 	printf(LINE);
 }
-void findcoursebyno(int no, course *cou)
+void findcoursebyno(int no, course **cou)
 {
 	int i;
 	int found = 0;
@@ -76,7 +76,7 @@ void findcoursebyno(int no, course *cou)
 	{
 		if (allcourses[i].no == no)
 		{
-			*cou = allcourses[i];
+			*cou = &allcourses[i];
 			found = 1;
 			break;
 		}
@@ -84,19 +84,19 @@ void findcoursebyno(int no, course *cou)
 	if (!found)
 	{
 		printf("没找到编号名为%d的课程\r\n", no);
-		cou = NULL;
+		*cou = NULL;
 	}
 }
 
 void displayonestuselcourses(student *stu)
 {
 	int i;
-	course cou;
+	course *cou;
 	printf("学生%s选课%d门如下\r\n", stu->name, stu->selcouscnt);
 	for (i = 0; i < stu->selcouscnt; i++)
 	{
 		findcoursebyno(stu->selcourses[i], &cou);
-		printf("%s\t", cou.name);
+		printf("%s\t", cou->name);
 	}
 	printf("\r\n");
 }
@@ -230,48 +230,38 @@ void findstudentbyname(char *name, student **stu)
 
 void selectonecourse(student *stu, int couno)
 {
-	course cou;
+	course *cou;
 	findcoursebyno(couno, &cou);
-	if (&cou != NULL)
+	if (cou != NULL)
 	{
 		stu->selcourses[stu->selcouscnt] = couno;
 		stu->selcouscnt++;
 		printf("选课成功！\r\n");
 	}
 }
-//
-//void selectcourses(student *stu)
-//{
-//	int no;
-//	if (stu == NULL)
-//	{
-//		printf("请先输入姓名再选课！\n");
-//		return;
-//	}
-//	do
-//	{
-//		printf("请输入要选择的课程号（1～7），0结束选择：");
-//		scanf("%d", &no);
-//		fseek(stdin, 0, SEEK_END);
-//		if (no == 0)
-//		{
-//			if (stu->selcouscnt >= 3)
-//			{
-//				printf("你已退出了课程选择。\n");
-//				break;
-//			}
-//			else
-//			{
-//				printf("必须选满至少3门课程！\n");
-//			}
-//		}
-//		selectonecourse(stu, no);
-//	} while (stu->selcouscnt <= 5);
-//	printf("选课结束。\n");
-//}
-//
 
-
+void selectcourses(student *stu)
+{
+	int no;
+	if (stu == NULL)
+	{
+		printf("请先输入姓名再选课！\n");
+		return;
+	}
+	do
+	{
+		printf("请输入要选择的课程号，0结束选择：");
+		scanf("%d", &no);
+		fseek(stdin, 0, SEEK_END);
+		if (no == 0)
+		{
+			printf("你已退出了课程选择。\n");
+			break;
+		}
+		selectonecourse(stu, no);
+	} while (1);
+	printf("选课结束。\n");
+}
 
 int main()
 {
@@ -341,7 +331,7 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			//selectcourses(curstu);
+			selectcourses(curstu);
 			break;
 		case '6':
 			printf("\n\n你选择了 6\n");
