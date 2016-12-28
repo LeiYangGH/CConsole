@@ -17,7 +17,7 @@
 
 typedef struct course
 {
-	int no;
+	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
 }course;
 course allcourses[MAX_COUNT];
@@ -57,9 +57,15 @@ void displaycourse(course cou)
 }
 void displayallcourses()
 {
+	int i;
 	printf("所有课程情况如下\r\n");
+	printf("编号\t名称\r\n");
 	printf(LINE);
-	printf("编号\t名称\t学分\t人数\r\n");
+	for (i = 0; i < allcoursescount; i++)
+	{
+		displaycourse(allcourses[i]);
+	}
+	printf(LINE);
 }
 //void findcoursebyno(int  no, course **cou)  //根据名字查找学生
 //{
@@ -143,7 +149,13 @@ void displayallcourses()
 
 
 
-
+void addscourse(char *no, char *name)
+{
+	course cou;
+	strcpy(cou.no, no);
+	strcpy(cou.name, name);
+	allcourses[allcoursescount++] = cou;
+}
 
 
 void displaystudent(student stu)
@@ -154,14 +166,14 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	printf("所有学生成绩如下\r\n");
-	printf("学号\t姓名\t性别\t总学分\r\n");
-	printf("--------------------------------------------\r\n");
+	printf("所有学生如下\r\n");
+	printf("学号\t姓名\r\n");
+	printf(LINE);
 	for (i = 0; i < allstudentscount; i++)
 	{
 		displaystudent(allstudents[i]);
 	}
-	printf("--------------------------------------------\r\n");
+	printf(LINE);
 }
 
 
@@ -304,10 +316,14 @@ int main()
 	addstudent("001", "n1");
 	addstudent("002", "ly");
 	addstudent("003", "n3");
-	strcpy(curstuname, "ly");
-	//displayallcourses();
-	//inputstudents();
 	displayallstudents();
+
+	strcpy(curstuname, "ly");
+
+	addscourse("01", "c1");
+	addscourse("02", "c2");
+	displayallcourses();
+	//inputstudents();
 	//findstudentbyname(curstuname, &curstu);
 	/*selectonecourse(curstu, 1);
 	selectonecourse(curstu, 2);
@@ -388,7 +404,7 @@ int main()
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-		}
+}
 		getch();
 	}
 	fseek(stdin, 0, SEEK_END);
