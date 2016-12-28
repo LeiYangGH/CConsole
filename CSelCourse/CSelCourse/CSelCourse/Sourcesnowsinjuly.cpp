@@ -96,7 +96,7 @@ void displayonestuselcourses(student *stu)
 	for (i = 0; i < stu->selcouscnt; i++)
 	{
 		findcoursebyno(stu->selcourses[i], &cou);
-		printf("%s\t", cou->name);
+		printf("%s(%d分)\t", cou->name, stu->scores[i]);
 	}
 	printf("\r\n");
 }
@@ -209,10 +209,15 @@ void inputcourses()
 
 void addstudent(char *no, char *name)
 {
+	int i;
 	student stu;
 	strcpy(stu.no, no);
 	strcpy(stu.name, name);
 	stu.selcouscnt = 0;
+	for (i = 0; i < MAX_COUNT; i++)
+	{
+		stu.scores[i] = 0;
+	}
 	allstudents[allstudentscount++] = stu;
 }
 
@@ -260,13 +265,17 @@ void findstudentbyname(char *name, student **stu)
 
 void selectonecourse(student *stu, int couno)
 {
+	int score;
 	course *cou;
 	findcoursebyno(couno, &cou);
 	if (cou != NULL)
 	{
 		stu->selcourses[stu->selcouscnt] = couno;
-		stu->selcouscnt++;
 		printf("选课成功！\r\n");
+		printf("请输入分数:");
+		scanf("%d", &score);
+		stu->scores[stu->selcouscnt] = score;
+		stu->selcouscnt++;
 	}
 }
 
@@ -296,25 +305,26 @@ void selectcourses(student *stu)
 int main()
 {
 	int choice = -1;
-	addstudent("001", "n1");
-	addstudent("002", "ly");
-	addstudent("003", "n3");
+	addstudent("001", "name1");
+	addstudent("002", "name2");
+	addstudent("003", "name3");
 	displayallstudents();
-	strcpy(curstuname, "ly");
+	strcpy(curstuname, "name1");
 	findstudentbyname(curstuname, &curstu);
 
 
-	addscourse(1, "c1");
-	addscourse(2, "c2");
+	addscourse(1, "course1");
+	addscourse(2, "course2");
+	addscourse(3, "course3");
 	displayallcourses();
 	//inputstudents();
-	selectonecourse(curstu, 1);
-	selectonecourse(curstu, 2);
+	//selectonecourse(curstu, 1);
+	//selectonecourse(curstu, 2);
 	//findstudentbyname("sm", &stu);
 	/*selectonecourse(stu, 1);
 	selectonecourse(stu, 2);
 	selectonecourse(stu, 5);*/
-	displayallstuselcourses();
+	//displayallstuselcourses();
 #if DEV
 
 
@@ -327,7 +337,7 @@ int main()
 		printf("\n\t 1. 录入学生信息");
 		printf("\n\t 2. 查看所有课程");
 		printf("\n\t 3. 查看所有学生");
-		printf("\n\t 4. 更改当前学生姓名");
+		printf("\n\t 4. 学生登录（登录后才能选课）");
 		printf("\n\t 5. 当前学生选课");
 		printf("\n\t 6. 查看所有学生选课");
 		printf("\n\t 7. 录入课程信息");
@@ -369,7 +379,7 @@ int main()
 			displayallstuselcourses();
 			break;
 		case '7':
-			printf("\n\n你选择了 6\n");
+			printf("\n\n你选择了 7\n");
 			inputcourses();
 			break;
 		default:
