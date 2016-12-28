@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define DEV 1
+#define DEV 0
 #define COU_CNT 7
 #define MAX_STRLEN 20
 #define MAX_COUNT 50
@@ -186,44 +186,26 @@ void addstudent(char *no, char *name)
 	allstudents[allstudentscount++] = stu;
 }
 
-//void inputstudents()
-//{
-//	int i, score;
-//	char no[MAX_STRLEN] = "";
-//	char name[MAX_STRLEN] = "";
-//	char sex[MAX_STRLEN] = "";
-//	student *p1, *p2;
-//	stuhead = (student *)malloc(sizeof(student));
-//	p1 = p2 = (student *)malloc(sizeof(student));
-//	stuhead->next = p1;
-//#if DEV
-//#else
-//	while (1)
-//#endif
-//	{
-//
-//#if DEV
-//		addstudents(&p1, &p2, "01", "name", "sex");
-//		addstudents(&p1, &p2, "02", "ly", "b");
-//		addstudents(&p1, &p2, "03", "sm", "g");
-//#else
-//		printf("\n\n请输入学生学号(q结束):");
-//		scanf("%s", &no);
-//		if (streq(no, "q"))
-//		{
-//			printf("\n您已结束输入！");
-//			break;
-//	}
-//		printf("\n请输入学生姓名:");
-//		scanf("%s", name);
-//		printf("\n请输入学生性别:");
-//		scanf("%s", sex);
-//		addstudents(&p1, &p2, no, name, sex);
-//#endif
-//		printf("\n学生%s信息添加成功!\n", name);
-//}
-//	p2->next = NULL;
-//}
+void inputstudents()
+{
+	int i, score;
+	char no[MAX_STRLEN] = "";
+	char name[MAX_STRLEN] = "";
+	while (1)
+	{
+		printf("\n\n请输入学生学号(q结束):");
+		scanf("%s", &no);
+		if (streq(no, "q"))
+		{
+			printf("\n您已结束输入！");
+			break;
+		}
+		printf("\n请输入学生姓名:");
+		scanf("%s", name);
+		addstudent(no, name);
+		printf("\n学生%s信息添加成功!\n", name);
+	}
+}
 
 
 void findstudentbyname(char *name, student **stu)
@@ -294,12 +276,10 @@ void selectonecourse(student *stu, int couno)
 int main()
 {
 	int choice = -1;
-#if DEV
 	addstudent("001", "n1");
 	addstudent("002", "ly");
 	addstudent("003", "n3");
 	displayallstudents();
-
 	strcpy(curstuname, "ly");
 	findstudentbyname(curstuname, &curstu);
 
@@ -315,7 +295,10 @@ int main()
 	selectonecourse(stu, 2);
 	selectonecourse(stu, 5);*/
 	displayallstuselcourses();
-	//sortanddisplayallstudents();
+#if DEV
+
+
+
 #else
 	while (choice != 0)
 	{
@@ -327,9 +310,6 @@ int main()
 		printf("\n\t 4. 更改当前学生姓名");
 		printf("\n\t 5. 当前学生选课");
 		printf("\n\t 6. 查看所有学生选课");
-		printf("\n\t 7. 学生按学分总积分排列输出");
-		printf("\n\t 8. 输入所有学生成绩");
-		printf("\n\t 9. 一门和三门功课不及格的学生");
 		printf("\n\n  请选择: ");
 		choice = getche();
 		switch (choice)
@@ -361,24 +341,11 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			selectcourses(curstu);
+			//selectcourses(curstu);
 			break;
 		case '6':
 			printf("\n\n你选择了 6\n");
 			displayallstuselcourses();
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			sortanddisplayallstudents();
-			break;
-		case '8':
-			printf("\n\n你选择了 8\n");
-			inputallstuscores();
-			break;
-		case '9':
-			printf("\n\n你选择了 9\n");
-			listallnamesbelow60forcou(1);
-			listallnamesbelow60forcou(3);
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
