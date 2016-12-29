@@ -54,8 +54,10 @@ int sellfoods[CANTEEN_COUNT][MEAL_COUNT][MAX_COUNT] = { 0 };
 //各个食堂各顿的菜肴种类数量
 int sellfoodscount[CANTEEN_COUNT][MEAL_COUNT] = { 0 };
 
-//char meals[] = { '早','中', '晚' };
 char *meals[] = { "早","中","晚" };
+
+//当前用户
+char currentuser[MAX_STRLEN] = "";
 //字符串转整数
 int toint(char *s)
 {
@@ -158,7 +160,7 @@ void createsamplestudents()
 	fprintf(fp, FORMAT_STU, "07", "stu7", "M");
 	fprintf(fp, FORMAT_STU, "08", "stu8", "F");
 	fprintf(fp, FORMAT_STU, "09", "stu9", "M");
-	fprintf(fp, FORMAT_STU, "10", "stu10", "F");
+	fprintf(fp, FORMAT_STU, "10", "admin", "F");//管理员帐号，不能删
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
 }
@@ -542,10 +544,8 @@ void writeallsellfoods()
 int main()
 {
 	int choice = -1;
-	char *s = "2";
-	int f = atoi(s);
+	student *curstu = NULL;
 	//下面这些是测试时方便测试的，可以删除
-	//createsamplestudents();
 	readallstudents();
 	displayallstudents();
 
@@ -566,7 +566,7 @@ int main()
 		printf("\n\t 2. 查看所有学生");
 		printf("\n\t 3. 增加菜肴信息");
 		printf("\n\t 4. 查看所有菜肴");
-		//printf("\n\t 5. 出租学生");
+		printf("\n\t 5. admin或学生登录");
 		//printf("\n\t 6. 查看所有学生出租情况");
 		//printf("\n\t 7. 查看某位菜肴学生出租情况");
 		//printf("\n\t 8. 归还学生");
@@ -596,10 +596,15 @@ int main()
 			printf("\n\n你选择了 4\n");
 			displayallfoods();
 			break;
-			//case '5':
-			//	printf("\n\n你选择了 5\n");
-			//	inputrent();
-			//	break;
+		case '5':
+			while (curstu == NULL)
+			{
+				printf("请输入您的姓名，回车结束:");
+				scanf("%s", currentuser);
+				findstudentbyname(currentuser, &curstu);
+			}
+			printf("当前学生姓名：%s\n", currentuser);
+			break;
 			//case '6':
 			//	printf("\n\n你选择了 6\n");
 			//	displayallrentcds();
@@ -617,7 +622,7 @@ int main()
 			break;
 		}
 		fseek(stdin, 0, SEEK_END);
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
