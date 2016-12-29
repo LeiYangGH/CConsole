@@ -4,20 +4,20 @@
 #define DEV 0 //调试时候1， 发布时候0
 #define MAX_COUNT 20 //暂定最多20条数据，随便改
 #define MAX_STRLEN 20 //字符串最长长度
-#define FORMAT_CD "%d\t%s\n"
-#define MEMBERS_CD cd.no, cd.name
+#define FORMAT_STU "%d\t%s\t%s\n"
+#define MEMBERS_STU stu.no, stu.name, stu.sex
 #define FORMAT_RCD "%s\t%s\t\%d\n"
 #define MEMBERS_RCD rcd.cdname,rcd.cuname,rcd.days
 #define FORMAT_CU "%d\t%s\n"
 #define MEMBERS_CU cu.no, cu.name
 #define LINE  "\n------------------------\n"
 
-typedef struct vcd
+typedef struct student
 {
 	int no;
 	char name[MAX_STRLEN];
-	int isrent;
-}vcd;
+	char sex[MAX_STRLEN];
+}student;
 typedef struct rentcd
 {
 	int cdno;
@@ -33,8 +33,8 @@ typedef struct customer
 	char name[MAX_STRLEN];
 }customer;
 //所有数据都存储在下面这3个结构体数组里面
-vcd allvcds[MAX_COUNT];
-int allvcdscount = 0;
+student allstudents[MAX_COUNT];
+int allstudentscount = 0;
 
 rentcd allrentcds[MAX_COUNT];
 int allrentcdscount = 0;
@@ -55,20 +55,20 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-void displayvcd(vcd cd)
+void displaystudent(student stu)
 {
-	printf(FORMAT_CD, MEMBERS_CD);
+	printf(FORMAT_STU, MEMBERS_STU);
 }
-//display all显示全部，调用displayvcd显示单行，下同
-void displayallvcds()
+//display all显示全部，调用displaystudent显示单行，下同
+void displayallstudents()
 {
 	int i;
-	printf("所有CD情况如下\n");
+	printf("所有学生情况如下\n");
 	printf("编号\t名称\n");
 	printf(LINE);
-	for (i = 0; i < allvcdscount; i++)
+	for (i = 0; i < allstudentscount; i++)
 	{
-		displayvcd(allvcds[i]);
+		displaystudent(allstudents[i]);
 	}
 	printf(LINE);
 }
@@ -80,8 +80,8 @@ void displayrentcd(rentcd rcd)
 void displayallrentcds()
 {
 	int i;
-	printf("所有CD租借情况如下\n");
-	printf("CD\t客户\t天数\n");
+	printf("所有学生租借情况如下\n");
+	printf("学生\t客户\t天数\n");
 	printf(LINE);
 	for (i = 0; i < allrentcdscount; i++)
 	{
@@ -90,33 +90,34 @@ void displayallrentcds()
 	}
 }
 //添加单个
-void addvcd(int no, char *name)
+void addstudent(int no, char *name, char *sex)
 {
-	vcd cd;
-	cd.no = no;
-	strcpy(cd.name, name);
-	cd.isrent = 0;
-	allvcds[allvcdscount++] = cd;
+	student stu;
+	stu.no = no;
+	strcpy(stu.name, name);
+	strcpy(stu.sex, sex);
+	allstudents[allstudentscount++] = stu;
 }
 
-//要求用户输入，输入后调用addvcd，下同，分开两个函数是为了测试方便
-void inputvcds()
+//要求用户输入，输入后调用addstudent，下同，分开两个函数是为了测试方便
+void inputstudents()
 {
-	int i, score;
+	//int i, score;
 	int no;
 	char name[MAX_STRLEN] = "";
+	char sex[MAX_STRLEN] = "";
 	while (1)
 	{
-		printf("\n\n请输入CD编号(整数，0结束):");
+		printf("\n\n请输入学生编号(整数，0结束):");
 		scanf("%d", &no);
 		if (no == 0)
 		{
 			printf("\n您已结束输入！");
 			break;
 		}
-		printf("\n请输入CD名称:");
-		scanf("%s", name);
-		addvcd(no, name);
+		printf("\n请输入学生名称、性别，逗号分隔，回车结束:");
+		scanf("%s%s", name, sex);
+		addstudent(no, name, sex);
 		printf("\nCD%s信息添加成功!\n", name);
 	}
 }
@@ -168,24 +169,24 @@ void inputcustomers()
 	}
 }
 
-//通过名称查找cd，传进来的是vcd的指针，下同
-void findvcdbyname(char *cdname, vcd **cd)
+//通过名称查找stu，传进来的是student的指针，下同
+void findstudentbyname(char *cdname, student **stu)
 {
 	int i;
 	int found = 0;
-	for (i = 0; i < allvcdscount; i++)
+	for (i = 0; i < allstudentscount; i++)
 	{
-		if (streq(allvcds[i].name, cdname))
+		if (streq(allstudents[i].name, cdname))
 		{
-			*cd = &allvcds[i];
+			*stu = &allstudents[i];
 			found = 1;
 			break;
 		}
 	}
 	if (!found)
 	{
-		printf("没找到名称为%s的CD\n", cdname);
-		*cd = NULL;
+		printf("没找到名称为%s的学生\n", cdname);
+		*stu = NULL;
 	}
 }
 
@@ -223,161 +224,32 @@ void findcunamebycdname(char *cdname, char *cuname)
 	}
 }
 
-//出租
-void addrent(char *cdname, char *cuname, int days)
-{
-	vcd *cd;
-	customer *cu;
-	rentcd rcd;
-	findvcdbyname(cdname, &cd);
-	findcustomerbyname(cuname, &cu);
-	if (cd != NULL && cu != NULL)
-	{
-		if (cd->isrent)
-		{
-			printf("CD %s 已经出租，不能再出租！\n", cdname);
-		}
-		else
-		{
-			rcd.cdno = cd->no;
-			strcpy(rcd.cdname, cdname);
-			rcd.cuno = cu->no;
-			strcpy(rcd.cuname, cuname);
-			rcd.days = days;
-			rcd.isreturned = 0;
-			allrentcds[allrentcdscount++] = rcd;
-			cd->isrent = 1;
-			printf("租借成功！\n");
-		}
-	}
-}
 
-//输入并出租
-void inputrent()
-{
-	char  cdname[MAX_STRLEN] = "";
-	char  cuname[MAX_STRLEN] = "";
-	int days;
-	/*printf("请输入租借要出租的CD名称:");
-	scanf("%s", &cdname);
-	printf("请输入要租借给客户的姓名:");
-	scanf("%s", &cuname);
-	printf("请输入租借天数(暂时是输入天数，后面可以改成自动按日期计算):");
-	scanf("%d", &days);*/
-	//两种输入哪个更好？
-	printf("请输入租借要出租的CD名称、客户名称、出租天数(暂时是输入天数，后面可以改成自动按日期计算)，中间空格分隔，回车结束:");
-	scanf("%s%s%d", &cdname, &cuname, &days);
-	addrent(cdname, cuname, days);
-}
 
-//归还
-void addreturn(char *cdname)
-{
-	int i;
-	vcd *cd;
-	customer *cu;
-	rentcd rcd;
-	//也可以做根据cd编号来归还，模拟现实扫条码，但从作业测试容易程度还是通过cd name好些
-	findvcdbyname(cdname, &cd);
-	if (cd != NULL)
-	{
-		if (cd->isrent)
-		{
-			for (i = 0; i < allrentcdscount; i++)
-			{
-				rcd = allrentcds[i];
-				if (streq(rcd.cdname, cdname))
-				{
-					//findcustomerbyname(allrentcds[i].cuname, &cu);
-					strcpy(allrentcds[i].cuname, "");
-					allrentcds[i].cuno = 0;
-					printf("租金为：%d元 \n", allrentcds[i].days);//简单租金计算
-					allrentcds[i].days = 0;
-					//理论上只需要设置下面这个值也可以
-					allrentcds[i].isreturned = 1;
-					break;
-				}
-			}
-			cd->isrent = 0;
-			printf("归还成功！\n");
-		}
-		else
-		{
-			printf("CD %s 还没出租，不能归还！\n", cdname);//不应该发生，不可能走到这一步
-		}
-	}
-}
 
-//输入并归还
-void inputreturn()
-{
-	char  cdname[MAX_STRLEN] = "";
-	printf("请输入归还的CD名称（根据编号归还的功能你可以自己仿照加）:");
-	scanf("%s", &cdname);
-	addreturn(cdname);
-}
 
-//输出某客户的出租
-void displayonecustomerrentcds(char *name)
-{
-	int i, pay = 0;
-	rentcd rcd;
-	customer *cu;
-	findcustomerbyname(name, &cu);
-	if (cu != NULL)
-	{
-		printf("客户 %s 所有CD租借情况如下\n", name);
-		printf("CD\t客户\t天数\n");
-		printf(LINE);
-		for (i = 0; i < allrentcdscount; i++)
-		{
-			rcd = allrentcds[i];
-			if (streq(rcd.cuname, name))
-			{
-				displayrentcd(rcd);
-				pay += rcd.days;
-			}
-		}
-		printf("总租金：%d\n", pay);
-	}
-}
-
-//输入客户并显示其出租
-void inputanddisplayonecustomerrentcds()
-{
-	char name[MAX_STRLEN] = "";
-	printf("\n请输入要查询租借情况的客户姓名:");
-	scanf("%s", name);
-	displayonecustomerrentcds(name);
-}
 
 int main()
 {
 	int choice = -1;
 
 	//下面这些是测试时方便测试的，可以删除
-	addvcd(1, "cd1");
-	addvcd(2, "cd2");
-	addvcd(3, "cd3");
+	addstudent(1, "cd1", "F");
+	addstudent(2, "cd2", "F");
+	addstudent(3, "cd3", "M");
 
 	addcustomer(1, "cust1");
 	addcustomer(2, "cust2");
 
-	addrent("cd1", "cust1", 2);
-	addrent("cd2", "cust1", 3);
-	//addrent("cd3", "cust2", 7);
-	//addrent("cd1", "cust2", 7);//dup 
 
-	displayallrentcds();
-	displayonecustomerrentcds("cust1");
 	//addreturn("cd3");
 	//displayonecustomerrentcds("cust1");
 
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
-	addvcd(1, "cd1");
-	addvcd(2, "cd2");
-	addvcd(3, "cd3");
+	addstudent(1, "cd1");
+	addstudent(2, "cd2");
+	addstudent(3, "cd3");
 
 	addcustomer(1, "cust1", 1);
 	addcustomer(2, "cust2", 2);
@@ -394,16 +266,16 @@ int main()
 #else
 	while (choice != 0)
 	{
-		printf("\n\t CD选课");
+		printf("\n\t 学生选课");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 录入CD信息");
-		printf("\n\t 2. 查看所有CD");
+		printf("\n\t 1. 录入学生信息");
+		printf("\n\t 2. 查看所有学生");
 		printf("\n\t 3. 录入客户信息");
 		printf("\n\t 4. 查看所有客户");
-		printf("\n\t 5. 出租CD");
-		printf("\n\t 6. 查看所有CD出租情况");
-		printf("\n\t 7. 查看某位客户CD出租情况");
-		printf("\n\t 8. 归还CD");
+		printf("\n\t 5. 出租学生");
+		printf("\n\t 6. 查看所有学生出租情况");
+		printf("\n\t 7. 查看某位客户学生出租情况");
+		printf("\n\t 8. 归还学生");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -416,11 +288,11 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			inputvcds();
+			inputstudents();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			displayallvcds();
+			displayallstudents();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
@@ -430,26 +302,27 @@ int main()
 			printf("\n\n你选择了 4\n");
 			displayallcustomers();
 			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			inputrent();
+			//case '5':
+			//	printf("\n\n你选择了 5\n");
+			//	inputrent();
+			//	break;
+			//case '6':
+			//	printf("\n\n你选择了 6\n");
+			//	displayallrentcds();
 			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
-			displayallrentcds();
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			inputanddisplayonecustomerrentcds();
-			break;
-		case '8':
-			printf("\n\n你选择了 8\n");
-			inputreturn();
-			break;
+			//case '7':
+			//	printf("\n\n你选择了 7\n");
+			//	inputanddisplayonecustomerrentcds();
+			//	break;
+			//case '8':
+			//	printf("\n\n你选择了 8\n");
+			//	inputreturn();
+			//	break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
+		fseek(stdin, 0, SEEK_END);
 	}
 	fseek(stdin, 0, SEEK_END);
 #endif
