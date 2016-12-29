@@ -122,6 +122,111 @@ void inputstudents()
 	}
 }
 
+student getstudentfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	student stu;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			stu.no = toint(part);
+			break;
+		case 2:
+			strcpy(stu.name, part);
+			break;
+		case 3:
+			stu.math = toint(part);
+			break;
+		case 4:
+			stu.english = toint(part);
+			break;
+		case 5:
+			stu.chinese = toint(part);
+			break;
+		case 6:
+			stu.c = toint(part);
+			break;
+		case 7:
+			stu.total = toint(part);
+			break;
+		case 8:
+			stu.average = tofloat(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	return stu;
+}
+
+void readallstudents()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_STU, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+	allstudentscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allstudents[allstudentscount++] = getstudentfromline(line);
+	}
+	printf("\n已读入文件!", FILE_STU);
+
+}
+
+void createsamplestudents()
+{
+	FILE *fp = fopen(FILE_STU, "wb");
+	printf("创建示例成绩数据...");
+	if (fp == NULL)
+	{
+		printf("\nerror on open file!");
+		getchar();
+		exit(1);
+	}
+	fprintf(fp, FORMATNET, 33, "Smile", 13, 83, 63, 93);
+	fprintf(fp, FORMATNET, 44, "Lukas", 14, 84, 64, 94);
+	fprintf(fp, FORMATNET, 55, "Shawn", 15, 85, 65, 95);
+	fprintf(fp, FORMATNET, 22, "Tony", 12, 82, 62, 92);
+	fprintf(fp, FORMATNET, 11, "Flex", 11, 81, 61, 91);
+	fclose(fp);
+	printf("5条示例成绩数据已保存到student.txt。\n");
+}
+
+void writeallstudents()
+{
+	int i;
+	student stu;
+	FILE *fp = fopen(FILE_STU, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		stu = allstudents[i];
+		fprintf(fp, FORMATNET, STU_MEMBERS_NET);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
 void displaycustomer(customer cu)
 {
 	printf(FORMAT_CU, MEMBERS_CU);
