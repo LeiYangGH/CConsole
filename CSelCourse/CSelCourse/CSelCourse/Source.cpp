@@ -386,7 +386,7 @@ int selectonecourse(student *stu, int couno)
 	findcoursebyno(couno, &cou);
 	if (cou != NULL)
 	{
-		if (cou->stucnt < cou->no)
+		if (cou->stucnt < cou->no * 10)
 		{
 			stu->selcourses[stu->selcouscnt] = couno;
 			stu->totalpoints += cou->points;

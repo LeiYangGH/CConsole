@@ -3,13 +3,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define DEV 0
-#define COU_CNT 7
+#define DEV 1
+#define MAX_COUNT 20
 #define MAX_STRLEN 20
-#define FORMAT_CD "%d\t%s\r\n"
+#define FORMAT_CD "%d\t%s\n"
 #define MEMBERS_CD cd.no, cd.name
-//#define FORMAT_STU "%s\t%s\t%s\t%d\r\n"
-//#define MEMBERS_STU stu.no, stu.name, stu.sex, stu.totalpoints, stu.supplement
 #define LINE  "\n------------------------\n"
 
 
@@ -33,7 +31,8 @@ typedef struct customer
 	struct customer *next;
 }customer;
 
-vcd *cdhead;
+vcd allvcds[MAX_COUNT];
+int allvcdscount = 0;
 
 //字符串转整数
 int toint(char *s)
@@ -48,55 +47,47 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-void displaycd(vcd cd)
+void displayvcd(vcd cd)
 {
 	printf(FORMAT_CD, MEMBERS_CD);
-	printf("\n");
 }
 void displayallvcds()
 {
-	vcd *p = cdhead->next;
-	if (cdhead == NULL)
-	{
-		printf("还没有输入任何CD信息！\r\n");
-	}
+	int i;
 	printf("所有CD情况如下\r\n");
-	printf(LINE);
 	printf("编号\t名称\r\n");
-	while (p != NULL)
+	printf(LINE);
+	for (i = 0; i < allvcdscount; i++)
 	{
-		displaycd(*p);
-		p = p->next;
+		displayvcd(allvcds[i]);
 	}
+	printf(LINE);
 }
 void findcdbyno(int  no, vcd **cd)  //根据名字查找CD
 {
-	int found = 0;
-	vcd *p = cdhead;
-
-	while (p != NULL)
-	{
-		if (p->no == no)
-		{
-			*cd = p;
-			return;
-		}
-		p = p->next;
-	}
-	if (!found)
-	{
-		printf("没找到编号名为%d的课程\r\n", no);
-		*cd = NULL;
-	}
+	//int i;
+	//int found = 0;
+	//for (i = 0; i < allvcdscount; i++)
+	//{
+	//	if (allvcds[i].no == no)
+	//	{
+	//		*cd = &allvcds[i];
+	//		found = 1;
+	//		break;
+	//	}
+	//}
+	//if (!found)
+	//{
+	//	printf("没找到编号名为%d的CD\r\n", no);
+	//	*cd = NULL;
+	//}
 }
-
-void addvcds(vcd **p1, vcd **p2, int no, char *name)
+void addvcd(int no, char *name)
 {
-	(*p1)->no = no;
-	strcpy((*p1)->name, name);
-	(*p2)->next = (*p1);
-	(*p2) = (*p1);
-	(*p1) = (vcd*)malloc(sizeof(vcd));
+	vcd cd;
+	cd.no = no;
+	strcpy(cd.name, name);
+	allvcds[allvcdscount++] = cd;
 }
 
 void inputvcds()
@@ -104,35 +95,20 @@ void inputvcds()
 	int i, score;
 	int no;
 	char name[MAX_STRLEN] = "";
-	vcd *p1, *p2;
-	cdhead = (vcd *)malloc(sizeof(vcd));
-	p1 = p2 = (vcd *)malloc(sizeof(vcd));
-	cdhead->next = p1;
-#if DEV
-#else
 	while (1)
-#endif
 	{
-
-#if DEV
-		addvcds(&p1, &p2, 1, "cd1");
-		addvcds(&p1, &p2, 2, "cd2");
-		addvcds(&p1, &p2, 3, "cd3");
-#else
-		printf("\n\n请输入CD编号，不重复整数(0结束):");
+		printf("\n\n请输入CD编号(整数，0结束):");
 		scanf("%d", &no);
 		if (no == 0)
 		{
 			printf("\n您已结束输入！");
 			break;
 		}
-		printf("\n请输入CD名:");
+		printf("\n请输入CD名称:");
 		scanf("%s", name);
-		addvcds(&p1, &p2, no, name);
-#endif
-		printf("\nCD %s信息添加成功!\n", name);
+		addvcd(no, name);
+		printf("\nCD%s信息添加成功!\n", name);
 	}
-	p2->next = NULL;
 }
 
 //int deletevcdbyno(vcd *L, char * no)
@@ -211,7 +187,7 @@ void inputvcds()
 //		}
 //		else
 //		{
-//			printf("课程%s已经选满！\r\n", cd->name);
+//			printf("CD%s已经选满！\r\n", cd->name);
 //			return 0;
 //		}
 //	}
@@ -227,19 +203,19 @@ void inputvcds()
 //	}
 //	do
 //	{
-//		printf("请输入要选择的课程号（1～7），0结束选择：");
+//		printf("请输入要选择的CD号（1～7），0结束选择：");
 //		scanf("%d", &no);
 //		fseek(stdin, 0, SEEK_END);
 //		if (no == 0)
 //		{
 //			if (stu->selcouscnt >= 3)
 //			{
-//				printf("你已退出了课程选择。\n");
+//				printf("你已退出了CD选择。\n");
 //				break;
 //			}
 //			else
 //			{
-//				printf("必须选满至少3门课程！\n");
+//				printf("必须选满至少3门CD！\n");
 //			}
 //		}
 //		selectonecd(stu, no);
@@ -251,12 +227,15 @@ void inputvcds()
 int main()
 {
 	int choice = -1;
-	inputvcds();
-	displayallvcds();
+	//inputvcds();
+	//displayallvcds();
 #if DEV
+	addvcd(1, "cd1");
+	addvcd(2, "cd2");
+	addvcd(3, "cd3");
 	//vcd *stu;
 	//strcpy(curstuname, "ly");
-	//displayallcds();
+	displayallvcds();
 
 	//findvcdbyname(curstuname, &curstu);
 	//selectonecd(curstu, 1);
@@ -277,7 +256,7 @@ int main()
 		printf("\n\t CD选课");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 录入CD信息");
-		//printf("\n\t 2. 查看所有课程");
+		//printf("\n\t 2. 查看所有CD");
 		printf("\n\t 3. 查看所有CD");
 		//printf("\n\t 4. CD登录（登录后才能选课）");
 		//printf("\n\t 5. 当前CD选课");
@@ -340,7 +319,7 @@ int main()
 			break;
 		}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
