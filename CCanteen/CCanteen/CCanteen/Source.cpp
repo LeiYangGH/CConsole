@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #define DEV 0 //调试时候1， 发布时候0
+#define CANTEEN_COUNT 5 //5个食堂
+#define MEAL_COUNT 3 //早中晚3顿
 #define MAX_COUNT 20 //暂定最多20条数据，随便改
 #define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
@@ -13,6 +15,7 @@
 #define LINE  "\n------------------------\n"
 #define FILE_STU "stu.txt"
 #define FILE_FD "fd.txt"
+#define FILE_SELL "sl.txt"
 typedef struct student
 {
 	char no[MAX_STRLEN];
@@ -44,6 +47,14 @@ int allrentcdscount = 0;
 food allfoods[MAX_COUNT];
 int allfoodscount = 0;
 
+//每天各个食堂的菜肴(下标)
+//3个下标依次代表食堂、早中晚、菜肴编号，都从0开始
+int sellfoods[CANTEEN_COUNT][MEAL_COUNT][MAX_COUNT] = { 0 };
+//各个食堂各顿的菜肴种类数量
+int sellfoodscount[CANTEEN_COUNT][MEAL_COUNT] = { 0 };
+
+//char meals[] = { '早','中', '晚' };
+char *meals[] = { "早","中","晚" };
 //字符串转整数
 int toint(char *s)
 {
@@ -141,7 +152,12 @@ void createsamplestudents()
 	fprintf(fp, FORMAT_STU, "02", "lukas", "M");
 	fprintf(fp, FORMAT_STU, "03", "shawn", "F");
 	fprintf(fp, FORMAT_STU, "04", "tony", "M");
-	fprintf(fp, FORMAT_STU, "05", "flex", "F");
+	fprintf(fp, FORMAT_STU, "05", "stu5", "F");
+	fprintf(fp, FORMAT_STU, "06", "stu6", "F");
+	fprintf(fp, FORMAT_STU, "07", "stu7", "M");
+	fprintf(fp, FORMAT_STU, "08", "stu8", "F");
+	fprintf(fp, FORMAT_STU, "09", "stu9", "M");
+	fprintf(fp, FORMAT_STU, "10", "stu10", "F");
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
 }
@@ -337,7 +353,14 @@ void createsamplefoods()
 	}
 	fprintf(fp, FORMAT_FD, "fish", "fry", 9.0f);
 	fprintf(fp, FORMAT_FD, "beaf", "bake", 30.0f);
-	fprintf(fp, FORMAT_FD, "bone", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food3", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food4", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food5", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food6", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food7", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food8", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food9", "stew", 15.0f);
+	fprintf(fp, FORMAT_FD, "food10", "stew", 15.0f);
 	fclose(fp);
 	printf("5条示例成绩数据已保存到food.txt。\n");
 }
@@ -418,8 +441,92 @@ void findcunamebycdname(char *cdname, char *cuname)
 			strcpy(cuname, allrentcds[i].cuname);
 			break;
 		}
+	}
 }
+
+/////////////sell start//////////////
+int random(int min, int max)
+{
+	return rand() % (max - min) + min;
 }
+
+void generaterandomfoodids(int ids[], int cnt)
+{
+	int i;
+	int r, ri, ucnt = 0, top;
+	int allids[MAX_COUNT];
+	for (i = 0; i < allfoodscount; i++)
+	{
+		allids[i] = i;
+	}
+	while (ucnt < cnt)
+	{
+		ri = random(0, allfoodscount - ucnt);
+		ids[ucnt++] = r = allids[ri];
+		top = allfoodscount - ucnt - 1;
+		if (r < top)
+		{
+			allids[r] = allids[top];
+		}
+	}
+}
+
+void generatesellfoodsforonecateenonemeal()
+{
+	int i, j, k, fdcnt;
+	int ids[MAX_COUNT] = { 0 };
+	for (i = 0; i < CANTEEN_COUNT; i++)
+	{
+		for (j = 0; j < MEAL_COUNT; j++)
+		{
+			//每个食堂每顿的菜肴种类，最少2，最多为全部菜肴的一半
+			//具体数量随机
+			//目前价格是同一的，理论上更好的做法是让各个食堂价格在标准价格上下浮动
+			fdcnt = random(2, allfoodscount / 2);
+			generaterandomfoodids(ids, fdcnt);
+			for (k = 0; k < fdcnt; k++)
+			{
+				sellfoods[i][j][k] = ids[k];
+			}
+			sellfoodscount[i][j] = fdcnt;
+		}
+	}
+	printf("已生成每日菜单。");
+}
+//参数分别为食堂、早中晚、菜肴编号（0开始）
+void writeonesellfoods(FILE *fp, int i, int j, int id)
+{
+	char cat[MAX_STRLEN] = "";
+	food fd = allfoods[id];
+	fprintf(fp, "食堂%d\t%s\t%s\t%s\t%.1f\r\n%", i + 1, meals[j],
+		fd.name, fd.taste, fd.price);
+}
+
+void writeallsellfoods()
+{
+	int i, j, k, fdcnt;
+	int ids[MAX_COUNT] = { 0 };
+	FILE *fp = fopen(FILE_SELL, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_SELL);
+		return;
+	}
+	for (i = 0; i < CANTEEN_COUNT; i++)
+	{
+		for (j = 0; j < MEAL_COUNT; j++)
+		{
+			for (k = 0; k < sellfoodscount[i][j]; k++)
+			{
+				writeonesellfoods(fp, i, j, sellfoods[i][j][k]);
+			}
+		}
+	}
+	fclose(fp);
+	printf("已保存每日菜单到文件。");
+}
+/////////////sell end//////////////
+
 
 int main()
 {
@@ -433,6 +540,9 @@ int main()
 
 	readallfoods();
 	displayallfoods();
+
+	generatesellfoodsforonecateenonemeal();
+	writeallsellfoods();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
