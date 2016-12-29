@@ -8,10 +8,11 @@
 #define MEMBERS_STU stu.no, stu.name, stu.sex
 #define FORMAT_RCD "%s\t%s\t\%d\n"
 #define MEMBERS_RCD rcd.cdname,rcd.cuname,rcd.days
-#define FORMAT_CU "%d\t%s\n"
-#define MEMBERS_CU cu.no, cu.name
+#define FORMAT_FD "%s\t%s\t%.1f\r\n"
+#define MEMBERS_FD fd.name, fd.taste, fd.price
 #define LINE  "\n------------------------\n"
 #define FILE_STU "stu.txt"
+#define FILE_FD "fd.txt"
 typedef struct student
 {
 	char no[MAX_STRLEN];
@@ -27,11 +28,12 @@ typedef struct rentcd
 	int days;
 	int isreturned;
 }rentcd;
-typedef struct customer
+typedef struct food
 {
-	int no;
 	char name[MAX_STRLEN];
-}customer;
+	char taste[MAX_STRLEN];
+	float price;
+}food;
 //所有数据都存储在下面这3个结构体数组里面
 student allstudents[MAX_COUNT];
 int allstudentscount = 0;
@@ -39,14 +41,20 @@ int allstudentscount = 0;
 rentcd allrentcds[MAX_COUNT];
 int allrentcdscount = 0;
 
-customer allcustomers[MAX_COUNT];
-int allcustomerscount = 0;
+food allfoods[MAX_COUNT];
+int allfoodscount = 0;
 
 //字符串转整数
 int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
+}
+
+float tofloat(char *s)
+{
+	char *end;
+	return (float)strtol(s, &end, 10);
 }
 
 //字符串相等
@@ -81,7 +89,7 @@ void displayallrentcds()
 {
 	int i;
 	printf("所有学生租借情况如下\n");
-	printf("学生\t客户\t天数\n");
+	printf("学生\t菜肴\t天数\n");
 	printf(LINE);
 	for (i = 0; i < allrentcdscount; i++)
 	{
@@ -89,38 +97,7 @@ void displayallrentcds()
 			displayrentcd(allrentcds[i]);
 	}
 }
-//添加单个
-void addstudent(char * no, char *name, char *sex)
-{
-	student stu;
-	strcpy(stu.no, no);
-	strcpy(stu.name, name);
-	strcpy(stu.sex, sex);
-	allstudents[allstudentscount++] = stu;
-}
 
-//要求用户输入，输入后调用addstudent，下同，分开两个函数是为了测试方便
-void inputstudents()
-{
-	//int i, score;
-	char no[MAX_STRLEN] = "";
-	char name[MAX_STRLEN] = "";
-	char sex[MAX_STRLEN] = "";
-	while (1)
-	{
-		printf("\n\n请输入学生编号(整数，q结束):");
-		scanf("%s", no);
-		if (streq(no, "q"))
-		{
-			printf("\n您已结束输入！");
-			break;
-		}
-		printf("\n请输入学生名称、性别，逗号分隔，回车结束:");
-		scanf("%s%s", name, sex);
-		addstudent(no, name, sex);
-		printf("\nCD%s信息添加成功!\n", name);
-	}
-}
 
 student getstudentfromline(char *line)
 {
@@ -149,6 +126,8 @@ student getstudentfromline(char *line)
 	return stu;
 }
 
+
+
 void createsamplestudents()
 {
 	FILE *fp = fopen(FILE_STU, "wb");
@@ -156,8 +135,7 @@ void createsamplestudents()
 	if (fp == NULL)
 	{
 		printf("\nerror on open file!");
-		getchar();
-		exit(1);
+		return;
 	}
 	fprintf(fp, FORMAT_STU, "01", "smile", "F");
 	fprintf(fp, FORMAT_STU, "02", "lukas", "M");
@@ -212,53 +190,182 @@ void writeallstudents()
 	printf("已保存记录到文件。");
 }
 
-void displaycustomer(customer cu)
+//添加单个
+void addstudent(char * no, char *name, char *sex)
 {
-	printf(FORMAT_CU, MEMBERS_CU);
-	printf("\n");
-}
-void displayallcustomers()
-{
-	int i;
-	printf("所有客户如下\n");
-	printf("学号\t姓名\n");
-	printf(LINE);
-	for (i = 0; i < allcustomerscount; i++)
-	{
-		displaycustomer(allcustomers[i]);
-	}
-	printf(LINE);
+	student stu;
+	strcpy(stu.no, no);
+	strcpy(stu.name, name);
+	strcpy(stu.sex, sex);
+	allstudents[allstudentscount++] = stu;
+	writeallstudents();
 }
 
-void addcustomer(int no, char *name)
+//要求用户输入，输入后调用addstudent，下同，分开两个函数是为了测试方便
+void inputstudents()
 {
-	int i;
-	customer cu;
-	cu.no = no;
-	strcpy(cu.name, name);
-	allcustomers[allcustomerscount++] = cu;
-}
-
-void inputcustomers()
-{
-	int i, no;
+	//int i, score;
+	char no[MAX_STRLEN] = "";
 	char name[MAX_STRLEN] = "";
+	char sex[MAX_STRLEN] = "";
 	while (1)
 	{
-		printf("\n\n请输入客户编号，不重复自然数(0结束):");
-		scanf("%d", &no);
-		if (no == 0)
+		printf("\n\n请输入学生编号(整数，q结束):");
+		scanf("%s", no);
+		if (streq(no, "q"))
 		{
 			printf("\n您已结束输入！");
 			break;
 		}
-		printf("\n请输入客户姓名:");
+		printf("\n请输入学生名称、性别，逗号分隔，回车结束:");
+		scanf("%s%s", name, sex);
+		addstudent(no, name, sex);
+		printf("\nCD%s信息添加成功!\n", name);
+	}
+}
+/////////////food start//////////////
+void displayfood(food fd)
+{
+	printf(FORMAT_FD, MEMBERS_FD);
+	printf("\n");
+}
+void displayallfoods()
+{
+	int i;
+	printf("所有菜肴如下\n");
+	printf("菜名\t风味\t价格\n");
+	printf(LINE);
+	for (i = 0; i < allfoodscount; i++)
+	{
+		displayfood(allfoods[i]);
+	}
+	printf(LINE);
+}
+
+void writeallfoods()
+{
+	int i;
+	food fd;
+	FILE *fp = fopen(FILE_FD, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_FD);
+		getchar();
+		exit(1);
+	}
+
+
+	for (i = 0; i < allfoodscount; i++)
+	{
+		fd = allfoods[i];
+		fprintf(fp, FORMAT_FD, MEMBERS_FD);
+	}
+	fclose(fp);
+	printf("已保存菜肴到文件。");
+}
+
+void addfood(char *name, char *taste, float price)
+{
+	int i;
+	food fd;
+	strcpy(fd.name, name);
+	strcpy(fd.taste, taste);
+	fd.price = price;
+	allfoods[allfoodscount++] = fd;
+	writeallfoods();
+}
+
+void inputfoods()
+{
+	int i;
+	float price;
+	char name[MAX_STRLEN] = "";
+	char taste[MAX_STRLEN] = "";
+	char pstr[MAX_STRLEN] = "";
+	while (1)
+	{
+		printf("\n\n请输入菜肴名称(q结束):");
 		scanf("%s", name);
-		addcustomer(no, name);
-		printf("\n客户%s信息添加成功!\n", name);
+		if (streq(name, "q"))
+		{
+			printf("\n您已结束输入！");
+			break;
+		}
+		printf("\n请输入菜肴姓名、价格，中间空格分隔，回车结束:");
+		scanf("%s%s", taste, pstr);
+		price = atof(pstr);
+		addfood(name, taste, price);
+		printf("\n菜肴%s信息添加成功!\n", name);
 	}
 }
 
+food getfoodfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	food fd;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(fd.name, part);
+			break;
+		case 2:
+			strcpy(fd.taste, part);
+			break;
+		case 3:
+			fd.price = tofloat(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	return fd;
+}
+
+void createsamplefoods()
+{
+	FILE *fp = fopen(FILE_FD, "wb");
+	printf("创建示例成绩数据...");
+	if (fp == NULL)
+	{
+		printf("\nerror on open file!");
+		return;
+	}
+	fprintf(fp, FORMAT_FD, "fish", "fry", 9.0f);
+	fprintf(fp, FORMAT_FD, "beaf", "bake", 30.0f);
+	fprintf(fp, FORMAT_FD, "bone", "stew", 15.0f);
+	fclose(fp);
+	printf("5条示例成绩数据已保存到food.txt。\n");
+}
+
+void readallfoods()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_FD, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!\n", FILE_FD);
+		createsamplefoods();
+		fp = fopen(FILE_FD, "r");
+	}
+	allfoodscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allfoods[allfoodscount++] = getfoodfromline(line);
+	}
+	printf("\n已读入文件!", FILE_FD);
+
+}
+
+
+//////////////////////food end///////////////
 //通过名称查找stu，传进来的是student的指针，下同
 void findstudentbyname(char *cdname, student **stu)
 {
@@ -280,23 +387,23 @@ void findstudentbyname(char *cdname, student **stu)
 	}
 }
 
-void findcustomerbyname(char *cuname, customer **cu)
+void findfoodbyname(char *cuname, food **fd)
 {
 	int i;
 	int found = 0;
-	for (i = 0; i < allcustomerscount; i++)
+	for (i = 0; i < allfoodscount; i++)
 	{
-		if (streq(allcustomers[i].name, cuname))
+		if (streq(allfoods[i].name, cuname))
 		{
-			*cu = &allcustomers[i];
+			*fd = &allfoods[i];
 			found = 1;
 			break;
 		}
 	}
 	if (!found)
 	{
-		printf("没找到姓名为%s的客户\n", cuname);
-		*cu = NULL;
+		printf("没找到姓名为%s的菜肴\n", cuname);
+		*fd = NULL;
 	}
 }
 
@@ -311,23 +418,21 @@ void findcunamebycdname(char *cdname, char *cuname)
 			strcpy(cuname, allrentcds[i].cuname);
 			break;
 		}
-	}
 }
-
-
-
-
-
+}
 
 int main()
 {
 	int choice = -1;
-
+	char *s = "2";
+	int f = atoi(s);
 	//下面这些是测试时方便测试的，可以删除
 	//createsamplestudents();
 	readallstudents();
 	displayallstudents();
 
+	readallfoods();
+	displayallfoods();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
@@ -338,12 +443,12 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 增加学生信息");
 		printf("\n\t 2. 查看所有学生");
-		/*printf("\n\t 3. 录入客户信息");
-		printf("\n\t 4. 查看所有客户");
-		printf("\n\t 5. 出租学生");
-		printf("\n\t 6. 查看所有学生出租情况");
-		printf("\n\t 7. 查看某位客户学生出租情况");
-		printf("\n\t 8. 归还学生");*/
+		printf("\n\t 3. 增加菜肴信息");
+		printf("\n\t 4. 查看所有菜肴");
+		//printf("\n\t 5. 出租学生");
+		//printf("\n\t 6. 查看所有学生出租情况");
+		//printf("\n\t 7. 查看某位菜肴学生出租情况");
+		//printf("\n\t 8. 归还学生");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -362,30 +467,30 @@ int main()
 			printf("\n\n你选择了 2\n");
 			displayallstudents();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	inputcustomers();
+		case '3':
+			printf("\n\n你选择了 3\n");
+			inputfoods();
+			break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			displayallfoods();
+			break;
+			//case '5':
+			//	printf("\n\n你选择了 5\n");
+			//	inputrent();
 			//	break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			//	displayallcustomers();
+			//case '6':
+			//	printf("\n\n你选择了 6\n");
+			//	displayallrentcds();
+			//break;
+			//case '7':
+			//	printf("\n\n你选择了 7\n");
+			//	inputanddisplayonefoodrentcds();
 			//	break;
-				//case '5':
-				//	printf("\n\n你选择了 5\n");
-				//	inputrent();
-				//	break;
-				//case '6':
-				//	printf("\n\n你选择了 6\n");
-				//	displayallrentcds();
-				//break;
-				//case '7':
-				//	printf("\n\n你选择了 7\n");
-				//	inputanddisplayonecustomerrentcds();
-				//	break;
-				//case '8':
-				//	printf("\n\n你选择了 8\n");
-				//	inputreturn();
-				//	break;
+			//case '8':
+			//	printf("\n\n你选择了 8\n");
+			//	inputreturn();
+			//	break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
