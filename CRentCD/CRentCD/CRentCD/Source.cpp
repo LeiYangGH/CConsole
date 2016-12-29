@@ -65,8 +65,8 @@ void displayvcd(vcd cd)
 void displayallvcds()
 {
 	int i;
-	printf("所有CD情况如下\r\n");
-	printf("编号\t名称\r\n");
+	printf("所有CD情况如下\n");
+	printf("编号\t名称\n");
 	printf(LINE);
 	for (i = 0; i < allvcdscount; i++)
 	{
@@ -79,17 +79,19 @@ void displayrentcd(rentcd rcd)
 {
 	printf(FORMAT_RCD, MEMBERS_RCD);
 }
+
+
+
 void displayallrentcds()
 {
 	int i;
-	printf("所有CD租借情况如下\r\n");
-	printf("CD\t客户\t天数\r\n");
+	printf("所有CD租借情况如下\n");
+	printf("CD\t客户\t天数\n");
 	printf(LINE);
 	for (i = 0; i < allrentcdscount; i++)
 	{
 		displayrentcd(allrentcds[i]);
 	}
-	//printf(LINE);
 }
 ///////////1
 void addvcd(int no, char *name)
@@ -134,8 +136,8 @@ void displaycustomer(customer cu)
 void displayallcustomers()
 {
 	int i;
-	printf("所有客户如下\r\n");
-	printf("学号\t姓名\r\n");
+	printf("所有客户如下\n");
+	printf("学号\t姓名\n");
 	printf(LINE);
 	for (i = 0; i < allcustomerscount; i++)
 	{
@@ -191,7 +193,7 @@ void findvcdbyname(char *cdname, vcd **cd)
 	}
 	if (!found)
 	{
-		printf("没找到名称为%s的CD\r\n", cdname);
+		printf("没找到名称为%s的CD\n", cdname);
 		*cd = NULL;
 	}
 }
@@ -211,7 +213,7 @@ void findcustomerbyname(char *cuname, customer **cu)
 	}
 	if (!found)
 	{
-		printf("没找到姓名为%s的客户\r\n", cuname);
+		printf("没找到姓名为%s的客户\n", cuname);
 		*cu = NULL;
 	}
 }
@@ -238,7 +240,7 @@ void addrent(char *cdname, char *cuname, int days)
 			rcd.days = days;
 			allrentcds[allrentcdscount++] = rcd;
 			cd->isrent = 1;
-			printf("租借成功！\r\n");
+			printf("租借成功！\n");
 		}
 	}
 }
@@ -254,9 +256,42 @@ void inputrent()
 	scanf("%s", &cuname);
 	printf("请输入租借天数(暂时是输入天数，后面可以改成自动按日期计算):");
 	scanf("%d", &days);*/
+	//两种输入哪个更好？
 	printf("请输入租借要出租的CD名称、客户名称、出租天数(暂时是输入天数，后面可以改成自动按日期计算)，中间空格分隔，回车结束:");
 	scanf("%s%s%d", &cdname, &cuname, &days);
 	addrent(cdname, cuname, days);
+}
+
+void displayonecustomerrentcds(char *name)
+{
+	int i, pay = 0;
+	rentcd rcd;
+	customer *cu;
+	findcustomerbyname(name, &cu);
+	if (cu != NULL)
+	{
+		printf("客户 %s 所有CD租借情况如下\n", name);
+		printf("CD\t客户\t天数\n");
+		printf(LINE);
+		for (i = 0; i < allrentcdscount; i++)
+		{
+			rcd = allrentcds[i];
+			if (streq(rcd.cuname, name))
+			{
+				displayrentcd(rcd);
+				pay += rcd.days;
+			}
+		}
+		printf("总租金：%d\n", pay);
+	}
+}
+
+void inputanddisplayonecustomerrentcds()
+{
+	char name[MAX_STRLEN] = "";
+	printf("\n请输入要查询租借情况的客户姓名:");
+	scanf("%s", name);
+	displayonecustomerrentcds(name);
 }
 
 //////add cus end/////
@@ -271,10 +306,12 @@ int main()
 	addcustomer(2, "cust2", 2);
 
 	addrent("cd1", "cust1", 2);
+	addrent("cd2", "cust1", 3);
 	addrent("cd3", "cust2", 7);
 	//addrent("cd1", "cust2", 7);//dup 
 
 	displayallrentcds();
+	displayonecustomerrentcds("cust1");
 #if DEV
 
 	//strcpy(curstuname, "ly");
@@ -306,7 +343,7 @@ int main()
 		printf("\n\t 4. 查看所有客户");
 		printf("\n\t 5. 出租CD");
 		printf("\n\t 6. 查看所有CD出租情况");
-		//printf("\n\t 7. CD按学分总积分排列输出");
+		printf("\n\t 7. 查看某位客户CD出租情况");
 		//printf("\n\t 8. 输入所有CD成绩");
 		//printf("\n\t 9. 一门和三门功课不及格的CD");
 		printf("\n\n  请选择: ");
@@ -347,10 +384,10 @@ int main()
 			printf("\n\n你选择了 6\n");
 			displayallrentcds();
 			break;
-			//case '7':
-			//	printf("\n\n你选择了 7\n");
-			//	sortanddisplayallvcds();
-			//	break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			inputanddisplayonecustomerrentcds();
+			break;
 			//case '8':
 			//	printf("\n\n你选择了 8\n");
 			//	inputallstuscores();
