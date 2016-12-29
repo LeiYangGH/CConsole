@@ -411,7 +411,7 @@ void selectcourses(student *stu)
 		printf("请先输入姓名再选课！\n");
 		return;
 	}
-	do
+	while (stu->selcouscnt < 5)
 	{
 		printf("请输入要选择的课程号（1～7），0结束选择：");
 		scanf("%d", &no);
@@ -429,7 +429,7 @@ void selectcourses(student *stu)
 			}
 		}
 		selectonecourse(stu, no);
-	} while (stu->selcouscnt <= 5);
+	};
 	printf("选课结束。\n");
 }
 
