@@ -4,17 +4,17 @@
 #define DEV 0 //调试时候1， 发布时候0
 #define MAX_COUNT 20 //暂定最多20条数据，随便改
 #define MAX_STRLEN 20 //字符串最长长度
-#define FORMAT_STU "%d\t%s\t%s\n"
+#define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
 #define MEMBERS_STU stu.no, stu.name, stu.sex
 #define FORMAT_RCD "%s\t%s\t\%d\n"
 #define MEMBERS_RCD rcd.cdname,rcd.cuname,rcd.days
 #define FORMAT_CU "%d\t%s\n"
 #define MEMBERS_CU cu.no, cu.name
 #define LINE  "\n------------------------\n"
-
+#define FILE_STU "stu.txt"
 typedef struct student
 {
-	int no;
+	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
 	char sex[MAX_STRLEN];
 }student;
@@ -90,10 +90,10 @@ void displayallrentcds()
 	}
 }
 //添加单个
-void addstudent(int no, char *name, char *sex)
+void addstudent(char * no, char *name, char *sex)
 {
 	student stu;
-	stu.no = no;
+	strcpy(stu.no, no);
 	strcpy(stu.name, name);
 	strcpy(stu.sex, sex);
 	allstudents[allstudentscount++] = stu;
@@ -103,14 +103,14 @@ void addstudent(int no, char *name, char *sex)
 void inputstudents()
 {
 	//int i, score;
-	int no;
+	char no[MAX_STRLEN] = "";
 	char name[MAX_STRLEN] = "";
 	char sex[MAX_STRLEN] = "";
 	while (1)
 	{
-		printf("\n\n请输入学生编号(整数，0结束):");
-		scanf("%d", &no);
-		if (no == 0)
+		printf("\n\n请输入学生编号(整数，q结束):");
+		scanf("%s", no);
+		if (streq(no, "q"))
 		{
 			printf("\n您已结束输入！");
 			break;
@@ -133,28 +133,13 @@ student getstudentfromline(char *line)
 		switch (++index)
 		{
 		case 1:
-			stu.no = toint(part);
+			strcpy(stu.no, part);
 			break;
 		case 2:
 			strcpy(stu.name, part);
 			break;
 		case 3:
-			stu.math = toint(part);
-			break;
-		case 4:
-			stu.english = toint(part);
-			break;
-		case 5:
-			stu.chinese = toint(part);
-			break;
-		case 6:
-			stu.c = toint(part);
-			break;
-		case 7:
-			stu.total = toint(part);
-			break;
-		case 8:
-			stu.average = tofloat(part);
+			strcpy(stu.sex, part);
 			break;
 		default:
 			break;
@@ -162,28 +147,6 @@ student getstudentfromline(char *line)
 		part = strtok(NULL, "\t");
 	}
 	return stu;
-}
-
-void readallstudents()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_STU, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_STU);
-		getchar();
-		exit(1);
-	}
-	allstudentscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		allstudents[allstudentscount++] = getstudentfromline(line);
-	}
-	printf("\n已读入文件!", FILE_STU);
-
 }
 
 void createsamplestudents()
@@ -196,13 +159,35 @@ void createsamplestudents()
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, FORMATNET, 33, "Smile", 13, 83, 63, 93);
-	fprintf(fp, FORMATNET, 44, "Lukas", 14, 84, 64, 94);
-	fprintf(fp, FORMATNET, 55, "Shawn", 15, 85, 65, 95);
-	fprintf(fp, FORMATNET, 22, "Tony", 12, 82, 62, 92);
-	fprintf(fp, FORMATNET, 11, "Flex", 11, 81, 61, 91);
+	fprintf(fp, FORMAT_STU, "01", "smile", "F");
+	fprintf(fp, FORMAT_STU, "02", "lukas", "M");
+	fprintf(fp, FORMAT_STU, "03", "shawn", "F");
+	fprintf(fp, FORMAT_STU, "04", "tony", "M");
+	fprintf(fp, FORMAT_STU, "05", "flex", "F");
 	fclose(fp);
 	printf("5条示例成绩数据已保存到student.txt。\n");
+}
+
+void readallstudents()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_STU, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!\n", FILE_STU);
+		createsamplestudents();
+		fp = fopen(FILE_STU, "r");
+	}
+	allstudentscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allstudents[allstudentscount++] = getstudentfromline(line);
+	}
+	printf("\n已读入文件!", FILE_STU);
+
 }
 
 void writeallstudents()
@@ -221,7 +206,7 @@ void writeallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		fprintf(fp, FORMATNET, STU_MEMBERS_NET);
+		fprintf(fp, FORMAT_STU, MEMBERS_STU);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -339,48 +324,26 @@ int main()
 	int choice = -1;
 
 	//下面这些是测试时方便测试的，可以删除
-	addstudent(1, "cd1", "F");
-	addstudent(2, "cd2", "F");
-	addstudent(3, "cd3", "M");
-
-	addcustomer(1, "cust1");
-	addcustomer(2, "cust2");
-
-
-	//addreturn("cd3");
-	//displayonecustomerrentcds("cust1");
+	//createsamplestudents();
+	readallstudents();
+	displayallstudents();
 
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
-	addstudent(1, "cd1");
-	addstudent(2, "cd2");
-	addstudent(3, "cd3");
 
-	addcustomer(1, "cust1", 1);
-	addcustomer(2, "cust2", 2);
-
-	addrent("cd1", "cust1", 2);
-	addrent("cd2", "cust1", 3);
-	//addrent("cd3", "cust2", 7);
-	//addrent("cd1", "cust2", 7);//dup 
-
-	displayallrentcds();
-	displayonecustomerrentcds("cust1");
-	//addreturn("cd3");
-	//displayonecustomerrentcds("cust1");
 #else
 	while (choice != 0)
 	{
 		printf("\n\t 学生选课");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 录入学生信息");
+		printf("\n\t 1. 增加学生信息");
 		printf("\n\t 2. 查看所有学生");
-		printf("\n\t 3. 录入客户信息");
+		/*printf("\n\t 3. 录入客户信息");
 		printf("\n\t 4. 查看所有客户");
 		printf("\n\t 5. 出租学生");
 		printf("\n\t 6. 查看所有学生出租情况");
 		printf("\n\t 7. 查看某位客户学生出租情况");
-		printf("\n\t 8. 归还学生");
+		printf("\n\t 8. 归还学生");*/
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -399,30 +362,30 @@ int main()
 			printf("\n\n你选择了 2\n");
 			displayallstudents();
 			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			inputcustomers();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			displayallcustomers();
-			break;
-			//case '5':
-			//	printf("\n\n你选择了 5\n");
-			//	inputrent();
+			//case '3':
+			//	printf("\n\n你选择了 3\n");
+			//	inputcustomers();
 			//	break;
-			//case '6':
-			//	printf("\n\n你选择了 6\n");
-			//	displayallrentcds();
-			break;
-			//case '7':
-			//	printf("\n\n你选择了 7\n");
-			//	inputanddisplayonecustomerrentcds();
+			//case '4':
+			//	printf("\n\n你选择了 4\n");
+			//	displayallcustomers();
 			//	break;
-			//case '8':
-			//	printf("\n\n你选择了 8\n");
-			//	inputreturn();
-			//	break;
+				//case '5':
+				//	printf("\n\n你选择了 5\n");
+				//	inputrent();
+				//	break;
+				//case '6':
+				//	printf("\n\n你选择了 6\n");
+				//	displayallrentcds();
+				//break;
+				//case '7':
+				//	printf("\n\n你选择了 7\n");
+				//	inputanddisplayonecustomerrentcds();
+				//	break;
+				//case '8':
+				//	printf("\n\n你选择了 8\n");
+				//	inputreturn();
+				//	break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
