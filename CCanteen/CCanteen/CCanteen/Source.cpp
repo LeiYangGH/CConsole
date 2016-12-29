@@ -4,7 +4,7 @@
 #define DEV 0 //调试时候1， 发布时候0
 #define CANTEEN_COUNT 5 //5个食堂
 #define MEAL_COUNT 3 //早中晚3顿
-#define MAX_COUNT 20 //暂定最多20条数据，随便改
+#define MAX_COUNT 50 //暂定最多20条数据，随便改
 #define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
 #define MEMBERS_STU stu.no, stu.name, stu.sex
@@ -17,6 +17,7 @@
 #define FILE_FD "fd.txt"
 #define FILE_SELL "sl.txt"
 #define FILE_SELL_ID "slid.txt"
+#define FILE_BUY "buy.txt"
 typedef struct student
 {
 	char no[MAX_STRLEN];
@@ -55,9 +56,10 @@ int sellfoods[CANTEEN_COUNT][MEAL_COUNT][MAX_COUNT] = { 0 };
 int sellfoodscount[CANTEEN_COUNT][MEAL_COUNT] = { 0 };
 
 char *meals[] = { "早","中","晚" };
+char currentmeal[MAX_STRLEN] = "中";//当前默认为中午
 
 //当前用户
-char currentuser[MAX_STRLEN] = "";
+char currentuname[MAX_STRLEN] = "";
 //字符串转整数
 int toint(char *s)
 {
@@ -538,9 +540,180 @@ void writeallsellfoods()
 	fclose(fpid);
 	printf("已保存每日菜单到文件。");
 }
+
+void addsellfood(int i, int j, int id)
+{
+	sellfoods[i][j][sellfoodscount[i][j]++] = id;
+}
+
+void getsellidsfromline(char *line)
+{
+	int i, j, id;
+	char *part;
+	int index = 0;
+	food fd;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			i = toint(part);
+			break;
+		case 2:
+			j = toint(part);
+			break;
+		case 3:
+			id = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	addsellfood(i, j, id);
+}
+
+void initsellfoodscount()
+{
+	int i, j, k;
+	for (i = 0; i < CANTEEN_COUNT; i++)
+	{
+		for (j = 0; j < MEAL_COUNT; j++)
+		{
+			sellfoodscount[i][j] = 0;
+		}
+	}
+}
+
+void readsellfoods()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_SELL_ID, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!\n", FILE_SELL_ID);
+		generatesellfoodsforonecateenonemeal();
+		writeallsellfoods();
+		fp = fopen(FILE_SELL_ID, "r");
+	}
+
+	initsellfoodscount();
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 3)
+			continue;
+		getsellidsfromline(line);
+	}
+	printf("\n已读入菜肴销售文件!");
+}
 /////////////sell end//////////////
 
+/////////////select start//////////////
+//假定都在有效范围内
+//应该还有日期参数？但目前没做
+void buyfood(char *stuname, int i, int j, int fdid)
+{
+	food fd;
+	FILE *fp = fopen(FILE_BUY, "a");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_BUY);
+		return;
+	}
+	fd = allfoods[fdid];
+	fprintf(fp, "%s\t食堂%d\t%s\t%s\t%s\t%.1f\r\n%", stuname, i + 1, meals[j],
+		fd.name, fd.taste, fd.price);
+	fclose(fp);
+	printf("\n消费已经追加文件。", FILE_BUY);
+}
 
+int iscurrentuserstudent()
+{
+	return (streq(currentuname, "") || streq(currentuname, "admin")) ? 0 : 1;
+}
+
+//打招呼，也是为了提醒用户注意选择菜单修改餐别
+int getcurrentmeal()
+{
+	int j;
+	char msg[MAX_STRLEN] = "";
+	if (streq(currentmeal, "早"))
+	{
+		j = 0;
+		strcpy(msg, "早上好！");
+	}
+	else if (streq(currentmeal, "中"))
+	{
+		j = 1;
+		strcpy(msg, "中午好！");
+	}
+	else
+	{
+		j = 2;
+		strcpy(msg, "晚上好！");
+	}
+	printf("%s\n", msg);
+	return j;
+}
+
+int isidinlist(int i, int j, int id)
+{
+	int k, found = 0;
+	for (k = 0; k < sellfoodscount[i][j]; k++)
+	{
+		if (sellfoods[i][j][k] == id)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int selectfoodfromlist(int i, int j)
+{
+	int k, fdid, choice = -1;
+	food fd;
+	printf("菜单如下：\n");
+	printf(LINE);
+	printf("序号\t菜名\t风味\t价格\n");
+	for (k = 0; k < sellfoodscount[i][j]; k++)
+	{
+		fdid = sellfoods[i][j][k];
+		fd = allfoods[fdid];
+		printf("%d\t%s\t%s\t%.1f\n", fdid, fd.name, fd.taste, fd.price);
+	}
+	printf(LINE);
+	while (!isidinlist(i, j, choice))
+	{
+		printf("请选择您要点的菜前面的序号，回车结束：");
+		scanf("%d", &choice);
+	}
+	return choice;
+}
+
+void inputbuyfood()
+{
+	int i, j, id;
+	food fd;
+	if (iscurrentuserstudent())
+	{
+		j = getcurrentmeal();
+		printf("请输入您想在哪个食堂就餐（数字1～5），回车结束:");
+		scanf("%d", &i);
+		printf("您选择了食堂%d\n", i);
+		id = selectfoodfromlist(i - 1, j);
+		fd = allfoods[id];
+		printf("您点的菜是%d\t%s\t%s\t%.1f\n", id, fd.name, fd.taste, fd.price);
+		buyfood(currentuname, i, j, id);
+	}
+	else
+	{
+		printf("\n只有以学生姓名登录才能用餐消费！");
+	}
+}
+/////////////select end//////////////
 int main()
 {
 	int choice = -1;
@@ -554,6 +727,11 @@ int main()
 
 	generatesellfoodsforonecateenonemeal();
 	writeallsellfoods();
+
+	readsellfoods();
+
+	strcpy(currentuname, "smile");
+	findstudentbyname(currentuname, &curstu);
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
@@ -567,8 +745,8 @@ int main()
 		printf("\n\t 3. 增加菜肴信息");
 		printf("\n\t 4. 查看所有菜肴");
 		printf("\n\t 5. admin或学生登录");
-		//printf("\n\t 6. 查看所有学生出租情况");
-		//printf("\n\t 7. 查看某位菜肴学生出租情况");
+		//printf("\n\t 6. 设置当前餐别（早中晚）");
+		printf("\n\t 7. 当前学生就餐选择菜肴消费");
 		//printf("\n\t 8. 归还学生");
 		printf("\n\n  请选择: ");
 		choice = getchar();
@@ -597,22 +775,22 @@ int main()
 			displayallfoods();
 			break;
 		case '5':
-			while (curstu == NULL)
+			do
 			{
 				printf("请输入您的姓名，回车结束:");
-				scanf("%s", currentuser);
-				findstudentbyname(currentuser, &curstu);
-			}
-			printf("当前学生姓名：%s\n", currentuser);
+				scanf("%s", currentuname);
+				findstudentbyname(currentuname, &curstu);
+			} while (curstu == NULL);
+			printf("当前学生姓名：%s\n", currentuname);
 			break;
 			//case '6':
 			//	printf("\n\n你选择了 6\n");
 			//	displayallrentcds();
-			//break;
-			//case '7':
-			//	printf("\n\n你选择了 7\n");
-			//	inputanddisplayonefoodrentcds();
 			//	break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			inputbuyfood();
+			break;
 			//case '8':
 			//	printf("\n\n你选择了 8\n");
 			//	inputreturn();
@@ -622,7 +800,7 @@ int main()
 			break;
 		}
 		fseek(stdin, 0, SEEK_END);
-}
+	}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
