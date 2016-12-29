@@ -1,11 +1,11 @@
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
+//conio.h仅仅是主菜单里用，主菜单输入数字选择时，不回显，方便一点，如果你不要这个头文件，主菜单改成scanf也可以
+#include <conio.h> 
 #define DEV 0 //调试时候1， 发布时候0
 #define MAX_COUNT 20 //暂定最多20条数据，随便改
-#define MAX_STRLEN 20
+#define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_CD "%d\t%s\n"
 #define MEMBERS_CD cd.no, cd.name
 #define FORMAT_RCD "%s\t%s\t\%d\n"
@@ -35,7 +35,7 @@ typedef struct customer
 	char name[MAX_STRLEN];
 	int vip;
 }customer;
-
+//所有数据都存储在下面这3个结构体数组里面
 vcd allvcds[MAX_COUNT];
 int allvcdscount = 0;
 
