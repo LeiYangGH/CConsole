@@ -3,32 +3,32 @@
 #include <string.h>
 #include <stdio.h>
 #include <conio.h>
-#define DEV 1
+#define DEV 0
 #define MAX_COUNT 20
 #define MAX_STRLEN 20
 #define FORMAT_CD "%d\t%s\n"
 #define MEMBERS_CD cd.no, cd.name
+#define FORMAT_CU "%d\t%s\t%d\n"
+#define MEMBERS_CU cu.no, cu.name, cu.vip
 #define LINE  "\n------------------------\n"
 
 
 typedef struct vcd
 {
 	int no;
-	char name[20];
-	struct vcd *next;
+	char name[MAX_STRLEN];
 }cd;
 typedef struct rentcd
 {
 	int no;
-	char name[20];
+	char name[MAX_STRLEN];
 	int date;
-	struct rentcd *next;
 }rentcd;
 typedef struct customer
 {
-	char name[20];
+	int no;
+	char name[MAX_STRLEN];
 	int vip;
-	struct customer *next;
 }customer;
 
 vcd allvcds[MAX_COUNT];
@@ -143,7 +143,7 @@ void inputvcds()
 //	}
 //}
 //
-//void findvcdbyname(char *name, vcd **stu)
+//void findvcdbyname(char *name, vcd **cu)
 //{
 //	int found = 0;
 //	vcd *p = stuhead;
@@ -152,7 +152,7 @@ void inputvcds()
 //	{
 //		if (streq(p->name, name))
 //		{
-//			*stu = p;
+//			*cu = p;
 //			return;
 //		}
 //		p = p->next;
@@ -160,15 +160,15 @@ void inputvcds()
 //	if (!found)
 //	{
 //		printf("没找到姓名为%s的CD\r\n", name);
-//		*stu = NULL;
+//		*cu = NULL;
 //	}
 //}
 
-//int selectonecd(vcd *stu, int couno)
+//int selectonecd(vcd *cu, int couno)
 //{
 //	cd *cd;
 //
-//	if (stu->selcouscnt >= 5)
+//	if (cu->selcouscnt >= 5)
 //	{
 //		printf("选课不能超过5门\r\n");
 //		return 0;
@@ -178,9 +178,9 @@ void inputvcds()
 //	{
 //		if (cd->stucnt < cd->no)
 //		{
-//			stu->selcds[stu->selcouscnt] = couno;
-//			stu->totalpoints += cd->points;
-//			stu->selcouscnt++;
+//			cu->selcds[cu->selcouscnt] = couno;
+//			cu->totalpoints += cd->points;
+//			cu->selcouscnt++;
 //			cd->stucnt++;
 //			printf("选课成功！\r\n");
 //			return 1;
@@ -193,10 +193,10 @@ void inputvcds()
 //	}
 //}
 //
-//void selectcds(vcd *stu)
+//void selectcds(vcd *cu)
 //{
 //	int no;
-//	if (stu == NULL)
+//	if (cu == NULL)
 //	{
 //		printf("请先输入姓名再选课！\n");
 //		return;
@@ -208,7 +208,7 @@ void inputvcds()
 //		fseek(stdin, 0, SEEK_END);
 //		if (no == 0)
 //		{
-//			if (stu->selcouscnt >= 3)
+//			if (cu->selcouscnt >= 3)
 //			{
 //				printf("你已退出了CD选择。\n");
 //				break;
@@ -218,25 +218,82 @@ void inputvcds()
 //				printf("必须选满至少3门CD！\n");
 //			}
 //		}
-//		selectonecd(stu, no);
-//	} while (stu->selcouscnt <= 5);
+//		selectonecd(cu, no);
+//	} while (cu->selcouscnt <= 5);
 //	printf("选课结束。\n");
 //}
 
+//////add cus start/////
+customer allcustomers[MAX_COUNT];
+int allcustomerscount = 0;
 
+void displaycustomer(customer cu)
+{
+	printf(FORMAT_CU, MEMBERS_CU);
+	printf("\n");
+}
+void displayallcustomers()
+{
+	int i;
+	printf("所有客户如下\r\n");
+	printf("学号\t姓名\r\n");
+	printf(LINE);
+	for (i = 0; i < allcustomerscount; i++)
+	{
+		displaycustomer(allcustomers[i]);
+	}
+	printf(LINE);
+}
+
+void addcustomer(int no, char *name, int vip)
+{
+	int i;
+	customer cu;
+	cu.no = no;
+	strcpy(cu.name, name);
+	cu.vip = vip;//默认vip
+	allcustomers[allcustomerscount++] = cu;
+}
+
+void inputcustomers()
+{
+	int i, no, vip;
+	char name[MAX_STRLEN] = "";
+	while (1)
+	{
+		printf("\n\n请输入客户编号，不重复自然数(0结束):");
+		scanf("%d", &no);
+		if (no == 0)
+		{
+			printf("\n您已结束输入！");
+			break;
+		}
+		printf("\n请输入客户姓名:");
+		scanf("%s", name);
+		printf("\n\n请输入客户vip，自然数(暂时只记录个数字，还没实现其功能):");
+		scanf("%d", &vip);
+		addcustomer(no, name, vip);
+		printf("\n客户%s信息添加成功!\n", name);
+	}
+}
+
+//////add cus end/////
 int main()
 {
 	int choice = -1;
-	//inputvcds();
-	//displayallvcds();
-#if DEV
 	addvcd(1, "cd1");
 	addvcd(2, "cd2");
 	addvcd(3, "cd3");
-	//vcd *stu;
+	addcustomer(1, "cust1", 1);
+	addcustomer(2, "cust2", 2);
+	//displayallvcds();
+#if DEV
+
 	//strcpy(curstuname, "ly");
 	displayallvcds();
 
+
+	displayallcustomers();
 	//findvcdbyname(curstuname, &curstu);
 	//selectonecd(curstu, 1);
 	//selectonecd(curstu, 2);
@@ -244,10 +301,10 @@ int main()
 	//selectonecd(curstu, 4);
 	//selectonecd(curstu, 5);
 	//selectonecd(curstu, 6);
-	//findvcdbyname("sm", &stu);
-	//selectonecd(stu, 1);
-	//selectonecd(stu, 2);
-	//selectonecd(stu, 5);
+	//findvcdbyname("sm", &cu);
+	//selectonecd(cu, 1);
+	//selectonecd(cu, 2);
+	//selectonecd(cu, 5);
 	//displayallstuselcds();
 	//sortanddisplayallvcds();
 #else
@@ -256,8 +313,9 @@ int main()
 		printf("\n\t CD选课");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 录入CD信息");
-		//printf("\n\t 2. 查看所有CD");
-		printf("\n\t 3. 查看所有CD");
+		printf("\n\t 2. 查看所有CD");
+		printf("\n\t 3. 录入客户信息");
+		printf("\n\t 4. 查看所有客户");
 		//printf("\n\t 4. CD登录（登录后才能选课）");
 		//printf("\n\t 5. 当前CD选课");
 		//printf("\n\t 6. 查看所有CD选课");
@@ -278,21 +336,22 @@ int main()
 			printf("\n\n你选择了 1\n");
 			inputvcds();
 			break;
-			//case '2':
-			//	printf("\n\n你选择了 2\n");
-			//	displayallcds();
-			//	break;
-		case '3':
-			printf("\n\n你选择了 3\n");
+		case '2':
+			printf("\n\n你选择了 2\n");
 			displayallvcds();
 			break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			//	printf("请输入您的姓名，回车结束:");
-			//	scanf("%s", curstuname);
-			//	findvcdbyname(curstuname, &curstu);
-			//	printf("当前CD姓名：%s\n", curstuname);
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			inputcustomers();
+			break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			displayallcustomers();
+			/*printf("请输入您的姓名，回车结束:");
+			scanf("%s", curstuname);
+			findvcdbyname(curstuname, &curstu);
+			printf("当前CD姓名：%s\n", curstuname);*/
+			break;
 			//case '5':
 			//	printf("\n\n你选择了 5\n");
 			//	selectcds(curstu);
@@ -319,7 +378,7 @@ int main()
 			break;
 		}
 		getch();
-}
+	}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
