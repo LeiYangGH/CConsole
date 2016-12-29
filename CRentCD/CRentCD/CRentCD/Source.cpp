@@ -62,6 +62,7 @@ void displayvcd(vcd cd)
 {
 	printf(FORMAT_CD, MEMBERS_CD);
 }
+//display all显示全部，调用displayvcd显示单行，下同
 void displayallvcds()
 {
 	int i;
@@ -79,8 +80,6 @@ void displayrentcd(rentcd rcd)
 	printf(FORMAT_RCD, MEMBERS_RCD);
 }
 
-
-
 void displayallrentcds()
 {
 	int i;
@@ -93,6 +92,7 @@ void displayallrentcds()
 			displayrentcd(allrentcds[i]);
 	}
 }
+//添加单个
 void addvcd(int no, char *name)
 {
 	vcd cd;
@@ -102,6 +102,7 @@ void addvcd(int no, char *name)
 	allvcds[allvcdscount++] = cd;
 }
 
+//要求用户输入，输入后调用addvcd，下同，分开两个函数是为了测试方便
 void inputvcds()
 {
 	int i, score;
@@ -166,6 +167,7 @@ void inputcustomers()
 		}
 		printf("\n请输入客户姓名:");
 		scanf("%s", name);
+		//这里vip可以有个默认值，当用户归还的时候自动计算vip，比如+1等，实现真正的vip动态计算
 		printf("\n\n请输入客户vip，自然数(暂时只记录个数字，还没实现其功能):");
 		scanf("%d", &vip);
 		addcustomer(no, name, vip);
@@ -173,6 +175,7 @@ void inputcustomers()
 	}
 }
 
+//通过名称查找cd，传进来的是vcd的指针，下同
 void findvcdbyname(char *cdname, vcd **cd)
 {
 	int i;
@@ -227,6 +230,7 @@ void findcunamebycdname(char *cdname, char *cuname)
 	}
 }
 
+//出租
 void addrent(char *cdname, char *cuname, int days)
 {
 	vcd *cd;
@@ -255,6 +259,7 @@ void addrent(char *cdname, char *cuname, int days)
 	}
 }
 
+//输入并出租
 void inputrent()
 {
 	char  cdname[MAX_STRLEN] = "";
@@ -272,6 +277,7 @@ void inputrent()
 	addrent(cdname, cuname, days);
 }
 
+//归还
 void addreturn(char *cdname)
 {
 	int i;
@@ -309,6 +315,7 @@ void addreturn(char *cdname)
 	}
 }
 
+//输入并归还
 void inputreturn()
 {
 	char  cdname[MAX_STRLEN] = "";
@@ -317,6 +324,7 @@ void inputreturn()
 	addreturn(cdname);
 }
 
+//输出某客户的出租
 void displayonecustomerrentcds(char *name)
 {
 	int i, pay = 0;
@@ -341,6 +349,7 @@ void displayonecustomerrentcds(char *name)
 	}
 }
 
+//输入客户并显示其出租
 void inputanddisplayonecustomerrentcds()
 {
 	char name[MAX_STRLEN] = "";
@@ -372,25 +381,23 @@ int main()
 	//displayonecustomerrentcds("cust1");
 
 #if DEV
+	//下面这些是测试时方便测试的，可以删除
+	addvcd(1, "cd1");
+	addvcd(2, "cd2");
+	addvcd(3, "cd3");
 
-	//strcpy(curstuname, "ly");
-	displayallvcds();
+	addcustomer(1, "cust1", 1);
+	addcustomer(2, "cust2", 2);
 
+	addrent("cd1", "cust1", 2);
+	addrent("cd2", "cust1", 3);
+	//addrent("cd3", "cust2", 7);
+	//addrent("cd1", "cust2", 7);//dup 
 
-	displayallcustomers();
-	//findvcdbyname(curstuname, &curstu);
-	//selectonecd(curstu, 1);
-	//selectonecd(curstu, 2);
-	//selectonecd(curstu, 3);
-	//selectonecd(curstu, 4);
-	//selectonecd(curstu, 5);
-	//selectonecd(curstu, 6);
-	//findvcdbyname("sm", &cu);
-	//selectonecd(cu, 1);
-	//selectonecd(cu, 2);
-	//selectonecd(cu, 5);
-	//displayallstuselcds();
-	//sortanddisplayallvcds();
+	displayallrentcds();
+	displayonecustomerrentcds("cust1");
+	//addreturn("cd3");
+	//displayonecustomerrentcds("cust1");
 #else
 	while (choice != 0)
 	{
