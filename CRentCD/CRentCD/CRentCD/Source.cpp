@@ -10,8 +10,8 @@
 #define MEMBERS_CD cd.no, cd.name
 #define FORMAT_RCD "%s\t%s\t\%d\n"
 #define MEMBERS_RCD rcd.cdname,rcd.cuname,rcd.days
-#define FORMAT_CU "%d\t%s\t%d\n"
-#define MEMBERS_CU cu.no, cu.name, cu.vip
+#define FORMAT_CU "%d\t%s\n"
+#define MEMBERS_CU cu.no, cu.name
 #define LINE  "\n------------------------\n"
 
 typedef struct vcd
@@ -33,7 +33,6 @@ typedef struct customer
 {
 	int no;
 	char name[MAX_STRLEN];
-	int vip;
 }customer;
 //所有数据都存储在下面这3个结构体数组里面
 vcd allvcds[MAX_COUNT];
@@ -142,19 +141,18 @@ void displayallcustomers()
 	printf(LINE);
 }
 
-void addcustomer(int no, char *name, int vip)
+void addcustomer(int no, char *name)
 {
 	int i;
 	customer cu;
 	cu.no = no;
 	strcpy(cu.name, name);
-	cu.vip = vip;//默认vip
 	allcustomers[allcustomerscount++] = cu;
 }
 
 void inputcustomers()
 {
-	int i, no, vip;
+	int i, no;
 	char name[MAX_STRLEN] = "";
 	while (1)
 	{
@@ -167,10 +165,7 @@ void inputcustomers()
 		}
 		printf("\n请输入客户姓名:");
 		scanf("%s", name);
-		//这里vip可以有个默认值，当用户归还的时候自动计算vip，比如+1等，实现真正的vip动态计算
-		printf("\n\n请输入客户vip，自然数(暂时只记录个数字，还没实现其功能):");
-		scanf("%d", &vip);
-		addcustomer(no, name, vip);
+		addcustomer(no, name);
 		printf("\n客户%s信息添加成功!\n", name);
 	}
 }
@@ -295,10 +290,10 @@ void addreturn(char *cdname)
 				rcd = allrentcds[i];
 				if (streq(rcd.cdname, cdname))
 				{
-					findcustomerbyname(allrentcds[i].cuname, &cu);
+					//findcustomerbyname(allrentcds[i].cuname, &cu);
 					strcpy(allrentcds[i].cuname, "");
 					allrentcds[i].cuno = 0;
-					printf("租金为：%d，您为VIP贵宾，根据政策您可以减免费用： %d元 \n", allrentcds[i].days, cu->vip);//简单租金计算
+					printf("租金为：%d元 \n", allrentcds[i].days);//简单租金计算
 					allrentcds[i].days = 0;
 					//理论上只需要设置下面这个值也可以
 					allrentcds[i].isreturned = 1;
@@ -367,8 +362,8 @@ int main()
 	addvcd(2, "cd2");
 	addvcd(3, "cd3");
 
-	addcustomer(1, "cust1", 1);
-	addcustomer(2, "cust2", 2);
+	addcustomer(1, "cust1");
+	addcustomer(2, "cust2");
 
 	addrent("cd1", "cust1", 2);
 	addrent("cd2", "cust1", 3);
@@ -458,7 +453,7 @@ int main()
 			break;
 		}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
