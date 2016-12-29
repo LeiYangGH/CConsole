@@ -16,6 +16,7 @@
 #define FILE_STU "stu.txt"
 #define FILE_FD "fd.txt"
 #define FILE_SELL "sl.txt"
+#define FILE_SELL_ID "slid.txt"
 typedef struct student
 {
 	char no[MAX_STRLEN];
@@ -494,6 +495,13 @@ void generatesellfoodsforonecateenonemeal()
 	printf("已生成每日菜单。");
 }
 //参数分别为食堂、早中晚、菜肴编号（0开始）
+void writeonesellfoodids(FILE *fp, int i, int j, int id)
+{
+	char cat[MAX_STRLEN] = "";
+	food fd = allfoods[id];
+	fprintf(fp, "%d\t%d\t%d\r\n%", i, j, id);
+}
+
 void writeonesellfoods(FILE *fp, int i, int j, int id)
 {
 	char cat[MAX_STRLEN] = "";
@@ -507,6 +515,7 @@ void writeallsellfoods()
 	int i, j, k, fdcnt;
 	int ids[MAX_COUNT] = { 0 };
 	FILE *fp = fopen(FILE_SELL, "w+");
+	FILE *fpid = fopen(FILE_SELL_ID, "w+");
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!", FILE_SELL);
@@ -519,10 +528,12 @@ void writeallsellfoods()
 			for (k = 0; k < sellfoodscount[i][j]; k++)
 			{
 				writeonesellfoods(fp, i, j, sellfoods[i][j][k]);
+				writeonesellfoodids(fpid, i, j, sellfoods[i][j][k]);
 			}
 		}
 	}
 	fclose(fp);
+	fclose(fpid);
 	printf("已保存每日菜单到文件。");
 }
 /////////////sell end//////////////
