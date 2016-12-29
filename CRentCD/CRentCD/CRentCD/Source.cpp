@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-//conio.h仅仅是主菜单里用，主菜单输入数字选择时，不回显，方便一点，如果你不要这个头文件，主菜单改成scanf也可以
-#include <conio.h> 
 #define DEV 0 //调试时候1， 发布时候0
 #define MAX_COUNT 20 //暂定最多20条数据，随便改
 #define MAX_STRLEN 20 //字符串最长长度
@@ -407,7 +405,7 @@ int main()
 		printf("\n\t 7. 查看某位客户CD出租情况");
 		printf("\n\t 8. 归还CD");
 		printf("\n\n  请选择: ");
-		choice = getche();
+		choice = getchar();
 		switch (choice)
 		{
 		case '0':
@@ -452,8 +450,7 @@ int main()
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-		getch();
-}
+	}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	system("pause");
