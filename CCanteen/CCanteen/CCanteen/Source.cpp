@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define DEV 1 //调试时候1， 发布时候0
+#define DEV 0 //调试时候1， 发布时候0
 #define CANTEEN_COUNT 5 //5个食堂
 #define MEAL_COUNT 3 //早中晚3顿
 #define MAX_COUNT 50 //暂定最多20条数据，随便改
@@ -37,6 +37,13 @@ typedef struct buydetail
 	int fdid;
 	// 可以加食堂、日期、餐别等，但由于需求没提到需要处理相关数据，所以没加
 }buydetail;
+
+//求消费总额（贫困生）时候用
+typedef struct buytotal
+{
+	int stuid;
+	float total;
+}buytotal;
 //所有数据都存储在下面这3个结构体数组里面
 student allstudents[MAX_COUNT];
 int allstudentscount = 0;
@@ -62,6 +69,9 @@ int currentstuid = -1;
 
 buydetail allbuydetails[200];//由于可以不断增加的，限制放开一些
 int allbuydetailscount = 0;
+
+buytotal allbuytotals[MAX_COUNT];
+int allbuytotalscount = 0;
 
 //字符串转整数
 int toint(char *s)
@@ -766,7 +776,6 @@ void readallbuydetails()
 		return;
 	}
 	allbuydetailscount = 0;
-
 	while (fgets(line, 1024, fp) != NULL)
 	{
 		if (strlen(line) < 2)
@@ -795,6 +804,47 @@ void calcanddisplaypopularfood()
 	}
 	printf("\n最受欢迎的菜品是%s，销量是%d!\n", allfoods[fdid].name, max);
 	printf("\n所有销量总量是%.1f元!\n", sum);
+}
+
+int cmpfunc(const void * a, const void * b)
+{
+	return ((buytotal*)a)->total - ((buytotal*)b)->total;
+}
+void calcanddisplaypoorstudents()
+{
+	int i, j, found;
+	float sum = 0;
+	int buyfreq[MAX_COUNT] = { 0 };//每种菜肴被消费的次数
+	buydetail buy;
+	readallbuydetails();
+	allbuytotalscount = 0;
+	for (i = 0; i < allbuydetailscount; i++)
+	{
+		buy = allbuydetails[i];
+		found = 0;
+		for (j = 0; j < allbuytotalscount; j++)
+		{
+			if (allbuytotals[j].stuid == buy.stuid)
+			{
+				allbuytotals[j].total += allfoods[buy.fdid].price;
+				found = 1;
+				break;
+			}
+		}
+		if (found == 0)
+		{
+			allbuytotals[allbuytotalscount].stuid = buy.stuid;
+			allbuytotals[allbuytotalscount].total += allfoods[buy.fdid].price;
+			allbuytotalscount++;
+		}
+	}
+	qsort(allbuytotals, allbuytotalscount, sizeof(buytotal), cmpfunc);
+	printf("\n所有学生消费总量如下（题意不清，不清楚哪些算贫困生，所以把全部数据输出来）:\n", sum);
+	for (i = 0; i < allbuytotalscount; i++)
+	{
+		buytotal buyto = allbuytotals[i];
+		printf("%s\t%.1f元\n", allstudents[buyto.stuid].name, allbuytotals[i].total);
+	}
 }
 
 /////////////statics end//////////////
@@ -826,7 +876,8 @@ int main()
 	//buyfood(2, 2, 1, 5);
 
 
-	calcanddisplaypopularfood();
+	//calcanddisplaypopularfood();
+	calcanddisplaypoorstudents();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
@@ -842,7 +893,8 @@ int main()
 		printf("\n\t 5. admin或学生登录");
 		printf("\n\t 6. 设置当前餐别（早中晚）");
 		printf("\n\t 7. 当前学生就餐选择菜肴消费");
-		printf("\n\t 8. 抽取最受欢迎的菜品");
+		printf("\n\t 8. 抽取最受欢迎的菜品、计算总销售额");
+		printf("\n\t 9. 通过总消费排序查看贫困生");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -897,6 +949,10 @@ int main()
 		case '8':
 			printf("\n\n你选择了 8\n");
 			calcanddisplaypopularfood();
+			break;
+		case '9':
+			printf("\n\n你选择了 9\n");
+			calcanddisplaypoorstudents();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
