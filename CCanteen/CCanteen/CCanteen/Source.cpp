@@ -9,8 +9,6 @@
 #define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
 #define MEMBERS_STU stu.no, stu.name, stu.sex
-//#define FORMAT_BUY "%s\t%s\t\%d\n"
-//#define MEMBERS_BUY rcd.cdname,rcd.cuname,rcd.days
 #define FORMAT_FD "%s\t%s\t%.1f\r\n"
 #define MEMBERS_FD fd.name, fd.taste, fd.price
 #define FORMAT_DK "%s\t%d\t%d\t%d\r\n"
