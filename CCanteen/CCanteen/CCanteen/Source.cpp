@@ -420,7 +420,7 @@ void displayalldrinks()
 {
 	int i;
 	printf("所有饮料如下\n");
-	printf("名称\t新鲜\t退回\n");
+	printf("名称\t新鲜\t可退\t退回\n");
 	printf(LINE);
 	for (i = 0; i < DK_COUNT; i++)
 	{
@@ -456,29 +456,55 @@ void adddrink(int dkid, int count)
 	writealldrinks();
 }
 
-//void inputdrinks()
-//{
-//	int i;
-//	float price;
-//	char name[MAX_STRLEN] = "";
-//	char taste[MAX_STRLEN] = "";
-//	char pstr[MAX_STRLEN] = "";
-//	while (1)
-//	{
-//		printf("\n\n请输入菜肴名称(q结束):");
-//		scanf("%s", name);
-//		if (streq(name, "q"))
-//		{
-//			printf("\n您已结束输入！");
-//			break;
-//		}
-//		printf("\n请输入菜肴姓名、价格，中间空格分隔，回车结束:");
-//		scanf("%s%s", taste, pstr);
-//		price = atof(pstr);
-//		adddrink(name, taste, price);
-//		printf("\n菜肴%s信息添加成功!\n", name);
-//	}
-//}
+void buydrink(int dkid, int fcnt, int rcnt)
+{
+	drink dk = alldrinks[dkid];
+	//如果要买的数量多于当前剩余数量，就以实际剩余数量售卖
+	if (dk.fresh == 0 && fcnt > 0
+		|| dk.returned == 0 && rcnt > 0)
+	{
+		printf("饮料没了！");
+		return;
+	}
+	fcnt = fcnt > dk.fresh ? dk.fresh : fcnt;
+	rcnt = rcnt > dk.returned ? dk.returned : rcnt;
+	alldrinks[dkid].fresh -= fcnt;
+	alldrinks[dkid].canreturn -= rcnt;
+	printf("购买饮料成功！%s新鲜%d 存货%d\n", dk.name, fcnt, rcnt);
+	writealldrinks();
+}
+
+void warndrinklack(int dkid)
+{
+	drink dk = alldrinks[dkid];
+	if (dk.fresh + dk.returned <= 3)
+		printf("饮料%s该进货了！\n", dk.name);
+}
+
+void inputbuydrinks()
+{
+	int id1, fcnt, rcnt;
+	float price;
+	char name[MAX_STRLEN] = "";
+	char taste[MAX_STRLEN] = "";
+	char pstr[MAX_STRLEN] = "";
+	displayalldrinks();
+
+	printf("\n请输入要购买的序号（从上到下依次1～3）:");
+	scanf("%d", &id1);
+	if (id1 < 1 || id1 > 3)
+	{
+		printf("\n您输入的序号不合法！");
+		return;
+	}
+	printf("您选择了购买%s.\n", alldrinks[id1 - 1].name);
+	printf("\n请依次输入需要购买新鲜的数量、以前退过货的数量（不能超过现有库存），中间空格分隔，回车结束:");
+	scanf("%d%d", &fcnt, &rcnt);
+	buydrink(id1 - 1, fcnt, rcnt);
+	printf("\n菜肴%s信息添加成功!\n", name);
+	warndrinklack(id1 - 1);
+	fseek(stdin, 0, SEEK_END);
+}
 
 drink getdrinkfromline(char *line)
 {
@@ -999,6 +1025,8 @@ int main()
 	//calcanddisplaypopularfood();
 	//calcanddisplaypoorstudents();
 	readalldrinks();
+	//inputbuydrinks();
+	//displayalldrinks();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
@@ -1016,6 +1044,8 @@ int main()
 		printf("\n\t 7. 当前学生就餐选择菜肴消费");
 		printf("\n\t 8. 抽取最受欢迎的菜品、计算总销售额");
 		printf("\n\t 9. 通过总消费排序查看贫困生");
+		printf("\n\t a. 查看所有饮料");
+		printf("\n\t b. 购买饮料");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -1074,6 +1104,14 @@ int main()
 		case '9':
 			printf("\n\n你选择了 9\n");
 			calcanddisplaypoorstudents();
+			break;
+		case 'a':
+			printf("\n\n你选择了 a\n");
+			displayalldrinks();
+			break;
+		case 'b':
+			printf("\n\n你选择了 a\n");
+			inputbuydrinks();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
