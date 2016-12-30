@@ -5,6 +5,7 @@
 #define CANTEEN_COUNT 5 //5个食堂
 #define MEAL_COUNT 3 //早中晚3顿
 #define MAX_COUNT 50 //暂定最多20条数据，随便改
+#define DK_COUNT 3 //饮料种类，由于需求没说增加种类，限制3类示例
 #define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
 #define MEMBERS_STU stu.no, stu.name, stu.sex
@@ -12,9 +13,12 @@
 //#define MEMBERS_BUY rcd.cdname,rcd.cuname,rcd.days
 #define FORMAT_FD "%s\t%s\t%.1f\r\n"
 #define MEMBERS_FD fd.name, fd.taste, fd.price
+#define FORMAT_DK "%s\t%d\t%d\t%d\r\n"
+#define MEMBERS_DK dk.name, dk.fresh, dk.canreturn, dk.returned
 #define LINE  "\n------------------------\n"
 #define FILE_STU "stu.txt"
 #define FILE_FD "fd.txt"
+#define FILE_DK "dk.txt"
 #define FILE_SELL "sl.txt"
 #define FILE_SELL_ID "slid.txt"
 #define FILE_BUY "buy.txt"
@@ -31,6 +35,18 @@ typedef struct food
 	char taste[MAX_STRLEN];
 	float price;
 }food;
+
+typedef struct drink
+{
+	char name[MAX_STRLEN];
+	//新鲜的
+	int fresh;
+	//可以退，也就是上次买的数量，限制退的数量为上次购买的数量
+	int canreturn;
+	//退还的
+	int returned;
+}drink;
+
 typedef struct buydetail
 {
 	int stuid;
@@ -53,6 +69,8 @@ int allrentcdscount = 0;
 
 food allfoods[MAX_COUNT];
 int allfoodscount = 0;
+
+drink alldrinks[DK_COUNT];
 
 //每天各个食堂的菜肴(下标)
 //3个下标依次代表食堂、早中晚、菜肴编号，都从0开始
@@ -109,24 +127,6 @@ void displayallstudents()
 	}
 	printf(LINE);
 }
-//void displayrentcd(buydetail rcd)
-//{
-//	printf(FORMAT_RCD, MEMBERS_RCD);
-//}
-//
-//void displayallrentcds()
-//{
-//	int i;
-//	printf("所有学生租借情况如下\n");
-//	printf("学生\t菜肴\t天数\n");
-//	printf(LINE);
-//	for (i = 0; i < allrentcdscount; i++)
-//	{
-//		if (allrentcds[i].isreturned == 0)
-//			displayrentcd(allrentcds[i]);
-//	}
-//}
-
 
 student getstudentfromline(char *line)
 {
@@ -239,7 +239,6 @@ void addstudent(char * no, char *name, char *sex)
 //要求用户输入，输入后调用addstudent，下同，分开两个函数是为了测试方便
 void inputstudents()
 {
-	//int i, score;
 	char no[MAX_STRLEN] = "";
 	char name[MAX_STRLEN] = "";
 	char sex[MAX_STRLEN] = "";
@@ -409,6 +408,148 @@ void readallfoods()
 
 
 //////////////////////food end///////////////
+
+
+//////////////////////drink start///////////////
+void displaydrink(drink dk)
+{
+	printf(FORMAT_DK, MEMBERS_DK);
+	printf("\n");
+}
+void displayalldrinks()
+{
+	int i;
+	printf("所有饮料如下\n");
+	printf("名称\t新鲜\t退回\n");
+	printf(LINE);
+	for (i = 0; i < DK_COUNT; i++)
+	{
+		displaydrink(alldrinks[i]);
+	}
+	printf(LINE);
+}
+
+void writealldrinks()
+{
+	int i;
+	drink dk;
+	FILE *fp = fopen(FILE_DK, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_DK);
+		getchar();
+		exit(1);
+	}
+	for (i = 0; i < DK_COUNT; i++)
+	{
+		dk = alldrinks[i];
+		fprintf(fp, FORMAT_DK, MEMBERS_DK);
+	}
+	fclose(fp);
+	printf("已保存饮料到文件。");
+}
+
+void adddrink(int dkid, int count)
+{
+	int i;
+	alldrinks[dkid].fresh += count;
+	writealldrinks();
+}
+
+//void inputdrinks()
+//{
+//	int i;
+//	float price;
+//	char name[MAX_STRLEN] = "";
+//	char taste[MAX_STRLEN] = "";
+//	char pstr[MAX_STRLEN] = "";
+//	while (1)
+//	{
+//		printf("\n\n请输入菜肴名称(q结束):");
+//		scanf("%s", name);
+//		if (streq(name, "q"))
+//		{
+//			printf("\n您已结束输入！");
+//			break;
+//		}
+//		printf("\n请输入菜肴姓名、价格，中间空格分隔，回车结束:");
+//		scanf("%s%s", taste, pstr);
+//		price = atof(pstr);
+//		adddrink(name, taste, price);
+//		printf("\n菜肴%s信息添加成功!\n", name);
+//	}
+//}
+
+drink getdrinkfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	drink dk;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(dk.name, part);
+			break;
+		case 2:
+			dk.fresh = toint(part);
+			break;
+		case 3:
+			dk.canreturn = toint(part);
+			break;
+		case 4:
+			dk.returned = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	return dk;
+}
+
+void createsampledrinks()
+{
+	FILE *fp = fopen(FILE_DK, "wb");
+	printf("创建示例成绩数据...");
+	if (fp == NULL)
+	{
+		printf("\nerror on open file!");
+		return;
+	}
+	fprintf(fp, FORMAT_DK, "cola", 5, 0, 0);
+	fprintf(fp, FORMAT_DK, "walter", 5, 0, 0);
+	fprintf(fp, FORMAT_DK, "mill", 5, 0, 0);
+	fclose(fp);
+	printf("3条示例成绩数据已保存到drink.txt。\n");
+}
+
+void readalldrinks()
+{
+	char line[200];
+	int alldrinkscount = 0;
+	FILE *fp = fopen(FILE_DK, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!\n", FILE_DK);
+		createsampledrinks();
+		fp = fopen(FILE_DK, "r");
+	}
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 3)
+			continue;
+		alldrinks[alldrinkscount++] = getdrinkfromline(line);
+	}
+	fclose(fp);
+	printf("\n已读入文件!", FILE_DK);
+
+}
+//////////////////////drink end///////////////
+
+
 //通过名称查找stu，传进来的是student的指针，下同
 void findstudentbyname(char *cdname, student **stu)
 {
@@ -430,27 +571,6 @@ void findstudentbyname(char *cdname, student **stu)
 		*stu = NULL;
 	}
 }
-
-void findfoodbyname(char *cuname, food **fd)
-{
-	int i;
-	int found = 0;
-	for (i = 0; i < allfoodscount; i++)
-	{
-		if (streq(allfoods[i].name, cuname))
-		{
-			*fd = &allfoods[i];
-			found = 1;
-			break;
-		}
-	}
-	if (!found)
-	{
-		printf("没找到姓名为%s的菜肴\n", cuname);
-		*fd = NULL;
-	}
-}
-
 
 
 /////////////sell start//////////////
@@ -877,7 +997,8 @@ int main()
 
 
 	//calcanddisplaypopularfood();
-	calcanddisplaypoorstudents();
+	//calcanddisplaypoorstudents();
+	readalldrinks();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
