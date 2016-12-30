@@ -779,6 +779,8 @@ void readallbuydetails()
 
 void calcanddisplaypopularfood()
 {
+	int buyfreq[MAX_COUNT] = { 0 };
+	readallbuydetails();
 
 }
 /////////////calc popular end//////////////
