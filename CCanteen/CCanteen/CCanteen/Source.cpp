@@ -779,9 +779,19 @@ void readallbuydetails()
 
 void calcanddisplaypopularfood()
 {
-	int buyfreq[MAX_COUNT] = { 0 };
+	int i, fdid, max = 0, maxid = -1;
+	int buyfreq[MAX_COUNT] = { 0 };//每种菜肴被消费的次数
 	readallbuydetails();
-
+	for (i = 0; i < allbuydetailscount; i++)
+	{
+		fdid = allbuydetails[i].fdid;
+		if (max < ++buyfreq[fdid])
+		{
+			max = buyfreq[fdid];
+			maxid = fdid;
+		}
+	}
+	printf("\n最受欢迎的菜品是%s，销量是%d!\n", allfoods[fdid].name, max);
 }
 /////////////calc popular end//////////////
 
@@ -811,7 +821,8 @@ int main()
 	//buyfood(1, 2, 1, 5);
 	//buyfood(2, 2, 1, 5);
 
-	readallbuydetails();
+
+	calcanddisplaypopularfood();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
@@ -825,9 +836,9 @@ int main()
 		printf("\n\t 3. 增加菜肴信息");
 		printf("\n\t 4. 查看所有菜肴");
 		printf("\n\t 5. admin或学生登录");
-		//printf("\n\t 6. 设置当前餐别（早中晚）");
+		printf("\n\t 6. 设置当前餐别（早中晚）");
 		printf("\n\t 7. 当前学生就餐选择菜肴消费");
-		//printf("\n\t 8. 归还学生");
+		printf("\n\t 8. 抽取最受欢迎的菜品");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -863,18 +874,26 @@ int main()
 			} while (curstu == NULL);
 			printf("当前学生姓名：%s\n", currentuname);
 			break;
-			//case '6':
-			//	printf("\n\n你选择了 6\n");
-			//	displayallrentcds();
-			//	break;
+		case '6':
+			printf("\n\n你选择了 6\n");
+			do
+			{
+				printf("请输入当前餐别(早/中/晚，一个中文字符)，回车结束:");
+				scanf("%s", currentmeal);
+				findstudentbyname(currentuname, &curstu);
+			} while (!streq(currentmeal, "早")
+				&& !streq(currentmeal, "中")
+				&& !streq(currentmeal, "晚"));
+			printf("当前餐别：%s\n", currentmeal);
+			break;
 		case '7':
 			printf("\n\n你选择了 7\n");
 			inputbuyfood();
 			break;
-			//case '8':
-			//	printf("\n\n你选择了 8\n");
-			//	inputreturn();
-			//	break;
+		case '8':
+			printf("\n\n你选择了 8\n");
+			calcanddisplaypopularfood();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
