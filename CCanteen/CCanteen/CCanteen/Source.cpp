@@ -679,11 +679,11 @@ int selectfoodfromlist(int i, int j)
 	return choice;
 }
 
-void appendonebuyfood(FILE *fp, FILE *fpid, char *stuname, int i, int j, int fdid)
+void appendonebuyfood(FILE *fp, FILE *fpid, int stuid, int i, int j, int fdid)
 {
 	char cat[MAX_STRLEN] = "";
 	food fd = allfoods[fdid];
-	fprintf(fp, "%s\t食堂%d\t%s\t%s\t%s\t%.1f\r\n%", stuname, i + 1, meals[j],
+	fprintf(fp, "%s\t食堂%d\t%s\t%s\t%s\t%.1f\r\n%", allstudents[stuid].name, i + 1, meals[j],
 		fd.name, fd.taste, fd.price);
 	//分别为学生id和fdid
 	fprintf(fpid, "%d\t%d\r\n%", currentstuid, fdid);
@@ -691,7 +691,7 @@ void appendonebuyfood(FILE *fp, FILE *fpid, char *stuname, int i, int j, int fdi
 
 //假定都在有效范围内
 //应该还有日期参数？但目前没做
-void buyfood(char *stuname, int i, int j, int fdid)
+void buyfood(int stuid, int i, int j, int fdid)
 {
 	food fd;
 	FILE *fp, *fpid;
@@ -707,7 +707,7 @@ void buyfood(char *stuname, int i, int j, int fdid)
 		printf("\n打开文件%s失败!", FILE_BUY_ID);
 		return;
 	}
-	appendonebuyfood(fp, fpid, stuname, i, j, fdid);
+	appendonebuyfood(fp, fpid, stuid, i, j, fdid);
 	fclose(fp);
 	fclose(fpid);
 	printf("\n消费已经追加文件。");
@@ -727,7 +727,7 @@ void inputbuyfood()
 		id = selectfoodfromlist(i - 1, j);
 		fd = allfoods[id];
 		printf("您点的菜是%d\t%s\t%s\t%.1f\n", id, fd.name, fd.taste, fd.price);
-		buyfood(currentuname, i, j, id);
+		buyfood(currentstuid, i, j, id);
 	}
 	else
 	{
@@ -755,14 +755,11 @@ int main()
 	strcpy(currentuname, "tony");
 	findstudentbyname(currentuname, &curstu);
 
-	//buyfood(currentuname, 0, 0, 4);
-	//buyfood(currentuname, 0, 0, 8);
-	//buyfood(currentuname, 4, 1, 6);
-	//buyfood(currentuname, 4, 1, 5);
-	buyfood(currentuname, 3, 1, 2);
-	buyfood(currentuname, 3, 1, 3);
-	buyfood(currentuname, 2, 1, 2);
-	buyfood(currentuname, 2, 1, 5);
+
+	//buyfood(2, 3, 1, 2);
+	//buyfood(2, 3, 1, 3);
+	//buyfood(1, 2, 1, 5);
+	//buyfood(2, 2, 1, 5);
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
