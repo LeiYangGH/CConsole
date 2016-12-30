@@ -8,8 +8,8 @@
 #define MAX_STRLEN 20 //字符串最长长度
 #define FORMAT_STU "%s\t%s\t%s\r\n" //\r is for write
 #define MEMBERS_STU stu.no, stu.name, stu.sex
-#define FORMAT_RCD "%s\t%s\t\%d\n"
-#define MEMBERS_RCD rcd.cdname,rcd.cuname,rcd.days
+//#define FORMAT_BUY "%s\t%s\t\%d\n"
+//#define MEMBERS_BUY rcd.cdname,rcd.cuname,rcd.days
 #define FORMAT_FD "%s\t%s\t%.1f\r\n"
 #define MEMBERS_FD fd.name, fd.taste, fd.price
 #define LINE  "\n------------------------\n"
@@ -25,26 +25,23 @@ typedef struct student
 	char name[MAX_STRLEN];
 	char sex[MAX_STRLEN];
 }student;
-typedef struct rentcd
-{
-	int cdno;
-	char cdname[MAX_STRLEN];
-	int cuno;
-	char cuname[MAX_STRLEN];
-	int days;
-	int isreturned;
-}rentcd;
 typedef struct food
 {
 	char name[MAX_STRLEN];
 	char taste[MAX_STRLEN];
 	float price;
 }food;
+typedef struct buydetail
+{
+	int stuid;
+	int fdid;
+	// 可以加食堂、日期、餐别等，但由于需求没提到需要处理相关数据，所以没加
+}buydetail;
 //所有数据都存储在下面这3个结构体数组里面
 student allstudents[MAX_COUNT];
 int allstudentscount = 0;
 
-rentcd allrentcds[MAX_COUNT];
+buydetail allrentcds[MAX_COUNT];
 int allrentcdscount = 0;
 
 food allfoods[MAX_COUNT];
@@ -62,6 +59,10 @@ char currentmeal[MAX_STRLEN] = "中";//当前默认为中午
 //当前用户
 char currentuname[MAX_STRLEN] = "";
 int currentstuid = -1;
+
+buydetail allbuydetails[200];//由于可以不断增加的，限制放开一些
+int allbuydetailscount = 0;
+
 //字符串转整数
 int toint(char *s)
 {
@@ -98,23 +99,23 @@ void displayallstudents()
 	}
 	printf(LINE);
 }
-void displayrentcd(rentcd rcd)
-{
-	printf(FORMAT_RCD, MEMBERS_RCD);
-}
-
-void displayallrentcds()
-{
-	int i;
-	printf("所有学生租借情况如下\n");
-	printf("学生\t菜肴\t天数\n");
-	printf(LINE);
-	for (i = 0; i < allrentcdscount; i++)
-	{
-		if (allrentcds[i].isreturned == 0)
-			displayrentcd(allrentcds[i]);
-	}
-}
+//void displayrentcd(buydetail rcd)
+//{
+//	printf(FORMAT_RCD, MEMBERS_RCD);
+//}
+//
+//void displayallrentcds()
+//{
+//	int i;
+//	printf("所有学生租借情况如下\n");
+//	printf("学生\t菜肴\t天数\n");
+//	printf(LINE);
+//	for (i = 0; i < allrentcdscount; i++)
+//	{
+//		if (allrentcds[i].isreturned == 0)
+//			displayrentcd(allrentcds[i]);
+//	}
+//}
 
 
 student getstudentfromline(char *line)
@@ -187,6 +188,7 @@ void readallstudents()
 			continue;
 		allstudents[allstudentscount++] = getstudentfromline(line);
 	}
+	fclose(fp);
 	printf("\n已读入文件!", FILE_STU);
 
 }
@@ -390,6 +392,7 @@ void readallfoods()
 			continue;
 		allfoods[allfoodscount++] = getfoodfromline(line);
 	}
+	fclose(fp);
 	printf("\n已读入文件!", FILE_FD);
 
 }
@@ -438,19 +441,7 @@ void findfoodbyname(char *cuname, food **fd)
 	}
 }
 
-//假设一定能找到
-void findcunamebycdname(char *cdname, char *cuname)
-{
-	int i;
-	for (i = 0; i < allrentcdscount; i++)
-	{
-		if (streq(allrentcds[i].cdname, cdname))
-		{
-			strcpy(cuname, allrentcds[i].cuname);
-			break;
-		}
-	}
-}
+
 
 /////////////sell start//////////////
 int random(int min, int max)
@@ -609,6 +600,7 @@ void readsellfoods()
 			continue;
 		getsellidsfromline(line);
 	}
+	fclose(fp);
 	printf("\n已读入菜肴销售文件!");
 }
 /////////////sell end//////////////
@@ -734,7 +726,63 @@ void inputbuyfood()
 		printf("\n只有以学生姓名登录才能用餐消费！");
 	}
 }
+
+
 /////////////select end//////////////
+
+/////////////calc popular start//////////////
+
+buydetail getbuydetailfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	buydetail buy;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			buy.stuid = toint(part);
+			break;
+		case 2:
+			buy.fdid = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	return buy;
+}
+
+void readallbuydetails()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_BUY_ID, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!\n", FILE_BUY_ID);
+		return;
+	}
+	allbuydetailscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 2)
+			continue;
+		allbuydetails[allbuydetailscount++] = getbuydetailfromline(line);
+	}
+	fclose(fp);
+	printf("\n已读入文件!", FILE_STU);
+}
+
+void calcanddisplaypopularfood()
+{
+
+}
+/////////////calc popular end//////////////
+
 int main()
 {
 	int choice = -1;
@@ -760,6 +808,8 @@ int main()
 	//buyfood(2, 3, 1, 3);
 	//buyfood(1, 2, 1, 5);
 	//buyfood(2, 2, 1, 5);
+
+	readallbuydetails();
 #if DEV
 	//下面这些是测试时方便测试的，可以删除
 
