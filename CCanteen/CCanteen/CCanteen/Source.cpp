@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define DEV 0 //调试时候1， 发布时候0
+#define DEV 1 //调试时候1， 发布时候0
 #define CANTEEN_COUNT 5 //5个食堂
 #define MEAL_COUNT 3 //早中晚3顿
 #define MAX_COUNT 50 //暂定最多20条数据，随便改
@@ -730,7 +730,7 @@ void inputbuyfood()
 
 /////////////select end//////////////
 
-/////////////calc popular start//////////////
+/////////////statics   start//////////////
 
 buydetail getbuydetailfromline(char *line)
 {
@@ -780,11 +780,13 @@ void readallbuydetails()
 void calcanddisplaypopularfood()
 {
 	int i, fdid, max = 0, maxid = -1;
+	float sum = 0;
 	int buyfreq[MAX_COUNT] = { 0 };//每种菜肴被消费的次数
 	readallbuydetails();
 	for (i = 0; i < allbuydetailscount; i++)
 	{
 		fdid = allbuydetails[i].fdid;
+		sum += allfoods[fdid].price;//没做份数的功能，直接加价钱
 		if (max < ++buyfreq[fdid])
 		{
 			max = buyfreq[fdid];
@@ -792,8 +794,10 @@ void calcanddisplaypopularfood()
 		}
 	}
 	printf("\n最受欢迎的菜品是%s，销量是%d!\n", allfoods[fdid].name, max);
+	printf("\n所有销量总量是%.1f元!\n", sum);
 }
-/////////////calc popular end//////////////
+
+/////////////statics end//////////////
 
 int main()
 {
