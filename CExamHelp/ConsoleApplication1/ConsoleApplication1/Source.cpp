@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 void delchar(char *str, char c)
 {
 	char  *p, *q;
