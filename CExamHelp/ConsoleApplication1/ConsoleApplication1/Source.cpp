@@ -10,9 +10,10 @@ void delchar(char *str, char c)
 }
 int main()
 {
-	char str[100], c, *p, *q;
+	char str[100], c;
 	puts("请输入str，回车结束:");
-	//有些编译器不支持gets，而scanf又不能输入带空格的字符串
+	//有些编译器不支持gets，
+	//而scanf又不能输入带空格的字符串
 	fgets(str, 100, stdin);
 	printf("删除前的字符串：\n%s\n", str);
 	//清除缓冲区避免影响后面输入
