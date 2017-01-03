@@ -2,15 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define DEV 1 //调试时候1， 发布时候0
-#define FILE_STU "sgr.txt"
-//#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n"
-//#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\n"
+#define DEV 0 //调试时候1， 发布时候0
 #define MAX_STRLEN 20
-#define SINGERS_COUNT 3
-#define JUDGES_COUNT 3
-//#define STU_MEMBERS_FULL sgr.no, sgr.name,  sgr.score,sgr.total
-//#define STU_MEMBERS_NET sgr.no, sgr.name,  sgr.score
+#define SINGERS_COUNT 10
+#define JUDGES_COUNT 10
 #define LINE  "\n------------------------\n"
 typedef struct singer
 {
@@ -22,7 +17,6 @@ typedef struct singer
 }singer;
 
 singer allsingers[SINGERS_COUNT];
-//singer sortsingers[SINGERS_COUNT];
 int allsingerscount = 0;
 
 int streq(char *s1, char *s2)
@@ -30,27 +24,11 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-//char *FILE_STU = "sgr.txt";
-singer *head;
-
-//字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
-
-int tofloat(char *s)
-{
-	char *end;
-	return (float)strtol(s, &end, 10);
-}
-
 void displaysinger(singer sgr)
 {
 	int i;
 	printf("\n");
-	printf("歌手编号：%d\t姓名%s\t分数如下：\n", sgr.no, sgr.name, sgr.total);
+	printf("歌手编号：%d\t姓名：%s\t分数如下：\n", sgr.no, sgr.name, sgr.total);
 	for (i = 0; i < JUDGES_COUNT; i++)
 		printf("%d\t", sgr.score[i]);
 	printf("\n");
@@ -68,10 +46,6 @@ void displayallsingers()
 	printf("--------------------------------------------\n");
 }
 
-
-///////////
-
-
 void displayallave()
 {
 	int i;
@@ -86,7 +60,7 @@ void displayallave()
 	}
 	printf("--------------------------------------------\n");
 }
-////////////
+
 int cmpfunc(const void * a, const void * b)
 {
 	return ((singer*)b)->ave - ((singer*)a)->ave;
@@ -99,75 +73,6 @@ void displayscoreandrank(singer sgr, int rank)
 		sgr.no, sgr.name, sgr.ave, rank);
 }
 
-
-
-//输入歌手信息
-void inputname(char str[])
-{
-	printf("请输入姓名(2-45个字符)，不能带空格、Tab或回车符:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
-}
-
-
-
-int getsingeridexbyid(int no)
-{
-	int i;
-	for (i = 0; i < allsingerscount; i++)
-	{
-		singer b = allsingers[i];
-		if (b.no == no)
-			return i;
-	}
-}
-
-void removesinger(int no)
-{
-	int i;
-	int index;
-	index = getsingeridexbyid(no);
-	for (i = index; i < allsingerscount - 1; i++)
-		allsingers[i] = allsingers[i + 1];
-	allsingerscount--;
-	printf("删除完毕，剩下%d个。\n", allsingerscount);
-
-}
-
-void inputremovesinger()
-{
-	int no;
-	printf("请输入要删除的编号:");
-	scanf("%d", &no);
-	removesinger(no);
-}
-
-
-int login()
-{
-	char name[50] = "";
-	char pwd[50] = "";
-	printf("\n请输入姓名\n");
-	scanf("%s", name);
-	printf("\n请输入密码\n");
-	scanf("%s", pwd);
-	return streq(name, "username")
-		&& streq(pwd, "password");
-}
-
-
-
 void addsinger(int no, char name[], int scores[])
 {
 	int i;
@@ -177,22 +82,29 @@ void addsinger(int no, char name[], int scores[])
 	for (i = 0; i < JUDGES_COUNT; i++)
 		sgr.score[i] = scores[i];
 	sgr.total = 0;
-	//sgr.score = math;
-	//sgr.english = english;
-	//sgr.chinese = chinese;
-	//sgr.c = c;
 	allsingers[allsingerscount++] = sgr;
 }
 
 void createsamplesingers()
 {
-	int scores1[JUDGES_COUNT] = { 11,12,13 };
-	int scores2[JUDGES_COUNT] = { 21,22,23 };
-	int scores3[JUDGES_COUNT] = { 31,32,33 };
+	int scores1[JUDGES_COUNT] = { 11,12,13,14,15,16,17,18,19,91 };
+	int scores2[JUDGES_COUNT] = { 21,22,23,24,25,26,27,28,29,92 };
+	int scores3[JUDGES_COUNT] = { 31,32,33,34,35,36,37,38,39,93 };
+	int scores4[JUDGES_COUNT] = { 41,42,44,44,45,46,47,48,49,94 };
+	int scores5[JUDGES_COUNT] = { 51,52,55,55,55,56,57,58,59,95 };
+	int scores6[JUDGES_COUNT] = { 61,62,66,66,66,66,67,68,69,96 };
+	int scores7[JUDGES_COUNT] = { 71,72,77,77,77,77,77,78,79,97 };
+	int scores8[JUDGES_COUNT] = { 81,82,88,88,88,88,88,88,89,98 };
+
 	printf("创建示例歌手数据...");
 	addsinger(1, "name1", scores1);
 	addsinger(3, "name3", scores3);
 	addsinger(2, "name2", scores2);
+	addsinger(4, "name4", scores4);
+	addsinger(5, "name5", scores5);
+	addsinger(6, "name6", scores6);
+	addsinger(7, "name7", scores7);
+	addsinger(8, "name8", scores8);
 	printf("2条示例歌手数据已创建\n");
 }
 
@@ -230,14 +142,12 @@ void inputaddsinger()
 {
 	int no; char name[MAX_STRLEN] = "";
 	int scores[JUDGES_COUNT] = { 0 };
-
 	printf("\n请输入编号\n");
 	scanf("%d", &no);
 	printf("\n请输入姓名\n");
 	scanf("%s", name);
 	printf("\n请输入%d个裁判的成绩(正整数)，空格隔开\n", JUDGES_COUNT);
-	////
-	scanf("%d%d", &scores[0], &scores[1]);
+	scanf("%d%d%d%d%d%d%d%d%d%d", &scores[0], &scores[1], &scores[2], &scores[3], &scores[4], &scores[5], &scores[6], &scores[7], &scores[8], &scores[9]);
 	addsinger(no, name, scores);
 	printf("完成第%d个歌手录入!\n", allsingerscount);
 }
@@ -298,19 +208,11 @@ void inputfindtotalbyno()
 int main()
 {
 	int choice = -1;
+	createsamplesingers();
 
 #if DEV
 
-	createsamplesingers();
-
-
-	////printf("\n%d\n", allsingerscount);
-	///*inputaddsinger();
-	//writeallsingers();*/
-	///*inputremovesinger();
-	//writeallsingers();*/
-	////inputfindtotalbyname();
-	////inputfindtotalbyno();
+	inputaddsinger();
 
 	displayallsingers();
 
@@ -320,69 +222,53 @@ int main()
 	inputfindtotalbyname();
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
-	//calcanddisplayallsubjects();
-
-	//countbygrades();
 #else
 	while (choice != 0)
 	{
-		char *menu = "**********************菜单****************************\n"
-			"按1键：读入歌手档案               按6键：学科及格概率\n"
-			"按2键：按照姓名查询               按7键：歌手档案排序\n"
-			"按3键：按照编号查询               按8键：保存歌手档案\n"
-			"按4键：添加歌手档案               按9键 : 查看歌手档案\n"
-			"按5键：删除歌手档案               按10键：求各科平均分\n"
-			"按0键：退出管理系统";
-		printf("请输入选择数字，并回车\n", menu);
-		printf("%s\n", menu);
+		printf("\n\t 歌唱比赛评分");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 录入新一个歌手的成绩");
+		printf("\n\t 2. 查看所有歌手的成绩");
+		printf("\n\t 3. 计算排序输出成绩");
+		printf("\n\t 4. 根据歌手编号查找");
+		printf("\n\t 5. 根据歌手名字查找");
+		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
 		{
-		case 0:
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
 			break;
-		case 1:
-
-			break;
-		case 2:
-			inputfindtotalbyname();
-			break;
-		case 3:
-			inputfindtotalbyno();
-			break;
-		case 4:
+		case '1':
+			printf("\n\n你选择了 1\n");
 			inputaddsinger();
 			break;
-		case 5:
-			inputremovesinger();
+		case '2':
+			printf("\n\n你选择了 2\n");
+			displayallsingers();
 			break;
-		case 6:
-
+		case '3':
+			printf("\n\n你选择了 3\n");
+			calcsortanddisplayaverage();
 			break;
-		case 7:
-			sortanddisplay();
+		case '4':
+			printf("\n\n你选择了 4\n");
+			inputfindtotalbyno();
 			break;
-		case 8:
-
-			break;
-		case 9:
-			sortanddisplay();
-			break;
-		case 10:
-			calcanddisplaytotalandaverage();
-			calcanddisplayallsubjects();
-
+		case '5':
+			printf("\n\n你选择了 5\n");
+			inputfindtotalbyname();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
 		fseek(stdin, 0, SEEK_END);
-}
+	}
 #endif
-	//fseek(stdin, 0, SEEK_END);
-	printf("\n\n按任意键退出\n");
 	system("pause");
 	return 0;
 }
