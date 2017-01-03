@@ -7,7 +7,7 @@
 //#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n"
 //#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\n"
 #define MAX_STRLEN 20
-#define QUESTIONS_COUNT 35
+#define SINGERS_COUNT 3
 #define JUDGES_COUNT 2
 //#define STU_MEMBERS_FULL sgr.no, sgr.name,  sgr.score,sgr.total
 //#define STU_MEMBERS_NET sgr.no, sgr.name,  sgr.score
@@ -20,8 +20,8 @@ typedef struct singer
 	int total;
 }singer;
 
-singer allsingers[100];
-singer sortsingers[100];
+singer allsingers[SINGERS_COUNT];
+singer sortsingers[SINGERS_COUNT];
 int allsingerscount = 0;
 
 int streq(char *s1, char *s2)
@@ -132,7 +132,7 @@ void searchtotalbyname(char *name)
 	printf("没找到对应歌手的信息。\n");
 }
 
-int promptsearchtotalbyname()
+int inputsearchtotalbyname()
 {
 	char name[MAX_STRLEN] = "";
 	inputstring(name);
@@ -154,10 +154,10 @@ void searchtotalbyno(int no)
 	printf("没找到对应歌手的信息。\n");
 }
 
-void promptsearchtotalbyno()
+void inputsearchtotalbyno()
 {
 	int no;
-	printf("请输入要查询的学号:");
+	printf("请输入要查询的编号:");
 	scanf("%d", &no);
 	searchtotalbyno(no);
 }
@@ -206,10 +206,10 @@ void removesinger(int no)
 
 }
 
-void promptremovesinger()
+void inputremovesinger()
 {
 	int no;
-	printf("请输入要删除的学号:");
+	printf("请输入要删除的编号:");
 	scanf("%d", &no);
 	removesinger(no);
 }
@@ -219,7 +219,7 @@ int login()
 {
 	char name[50] = "";
 	char pwd[50] = "";
-	printf("\n请输入用户名\n");
+	printf("\n请输入姓名\n");
 	scanf("%s", name);
 	printf("\n请输入密码\n");
 	scanf("%s", pwd);
@@ -314,17 +314,20 @@ void calcanddisplayallsubjects()
 	//printf("--------------------------------------------\n");
 }
 
-void promptaddsinger()
+void inputaddsinger()
 {
-	int no; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
-	printf("\n请输入学号\n");
+	int no; char name[MAX_STRLEN] = "";
+	int scores[JUDGES_COUNT] = { 0 };
+
+	printf("\n请输入编号\n");
 	scanf("%d", &no);
-	printf("\n请输入用户名\n");
+	printf("\n请输入姓名\n");
 	scanf("%s", name);
-	printf("\n请输入数学、英语、语文、c语言歌手（整数），空格隔开\n");
-	scanf("%d%d%d%d", &math, &english, &chinese, &c);
-	//addsinger(no, name,null);
-	printf("完成第%d个入库录入!\n", allsingerscount);
+	printf("\n请输入%d个裁判的成绩(正整数)，空格隔开\n", JUDGES_COUNT);
+	////
+	scanf("%d%d", &scores[0], &scores[1]);
+	addsinger(no, name, scores);
+	printf("完成第%d个歌手录入!\n", allsingerscount);
 }
 
 
@@ -338,14 +341,18 @@ int main()
 
 
 	////printf("\n%d\n", allsingerscount);
-	///*promptaddsinger();
+	///*inputaddsinger();
 	//writeallsingers();*/
-	///*promptremovesinger();
+	///*inputremovesinger();
 	//writeallsingers();*/
-	////promptsearchtotalbyname();
-	////promptsearchtotalbyno();
+	////inputsearchtotalbyname();
+	////inputsearchtotalbyno();
 
 	displayallsingers();
+
+	inputaddsinger();
+	displayallsingers();
+
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
@@ -357,7 +364,7 @@ int main()
 		char *menu = "**********************菜单****************************\n"
 			"按1键：读入歌手档案               按6键：学科及格概率\n"
 			"按2键：按照姓名查询               按7键：歌手档案排序\n"
-			"按3键：按照学号查询               按8键：保存歌手档案\n"
+			"按3键：按照编号查询               按8键：保存歌手档案\n"
 			"按4键：添加歌手档案               按9键 : 查看歌手档案\n"
 			"按5键：删除歌手档案               按10键：求各科平均分\n"
 			"按0键：退出管理系统";
@@ -374,16 +381,16 @@ int main()
 
 			break;
 		case 2:
-			promptsearchtotalbyname();
+			inputsearchtotalbyname();
 			break;
 		case 3:
-			promptsearchtotalbyno();
+			inputsearchtotalbyno();
 			break;
 		case 4:
-			promptaddsinger();
+			inputaddsinger();
 			break;
 		case 5:
-			promptremovesinger();
+			inputremovesinger();
 			break;
 		case 6:
 
@@ -405,7 +412,7 @@ int main()
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-		}
+}
 		fseek(stdin, 0, SEEK_END);
 	}
 #endif
