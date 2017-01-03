@@ -92,47 +92,14 @@ int cmpfunc(const void * a, const void * b)
 	return ((singer*)b)->ave - ((singer*)a)->ave;
 }
 
-void searchtotalbyname(char *name)
+void displayscoreandrank(singer sgr, int rank)
 {
-	int i;
-	for (i = 0; i < allsingerscount; i++)
-		if (strcmp(name, allsingers[i].name) == 0)
-		{
-			displaysinger(allsingers[i]);
-			return;
-		}
-	printf("没找到对应歌手的信息。\n");
-}
-
-int inputsearchtotalbyname()
-{
-	char name[MAX_STRLEN] = "";
-	//inputstring(name);
-	searchtotalbyname(name);
-	return strcmp(name, "q");
+	printf("编号\t姓名\t成绩\t排名\n");
+	printf("%d\t%s\t%.1f\t%d\n",
+		sgr.no, sgr.name, sgr.ave, rank);
 }
 
 
-
-void searchtotalbyno(int no)
-{
-	int i;
-	for (i = 0; i < allsingerscount; i++)
-		if (allsingers[i].no == no)
-		{
-			displaysinger(allsingers[i]);
-			return;
-		}
-	printf("没找到对应歌手的信息。\n");
-}
-
-void inputsearchtotalbyno()
-{
-	int no;
-	printf("请输入要查询的编号:");
-	scanf("%d", &no);
-	searchtotalbyno(no);
-}
 
 //输入歌手信息
 void inputname(char str[])
@@ -229,14 +196,13 @@ void createsamplesingers()
 	printf("2条示例歌手数据已创建\n");
 }
 
-
-
-void calcanddisplayaverage()
+void calcandsortaverage()
 {
 	int i, j, min, max, score;
 	for (i = 0; i < allsingerscount; i++)
 	{
 		min = max = allsingers[i].score[0];//初始值
+		allsingers[i].total = 0;
 		for (j = 0; j < JUDGES_COUNT; j++)
 		{
 			score = allsingers[i].score[j];
@@ -250,6 +216,12 @@ void calcanddisplayaverage()
 		allsingers[i].ave = allsingers[i].total / (float)(JUDGES_COUNT - 2);
 	}
 	qsort(allsingers, allsingerscount, sizeof(singer), cmpfunc);
+
+}
+
+void calcsortanddisplayaverage()
+{
+	calcandsortaverage();
 	displayallave();
 }
 
@@ -270,6 +242,57 @@ void inputaddsinger()
 	printf("完成第%d个歌手录入!\n", allsingerscount);
 }
 
+void findtotalbyname(char *name)
+{
+	int i;
+	singer sgr;
+	calcandsortaverage();
+	for (i = 0; i < allsingerscount; i++)
+	{
+		sgr = allsingers[i];
+		if (strcmp(name, allsingers[i].name) == 0)
+		{
+			displayscoreandrank(sgr, i + 1);
+			return;
+		}
+	}
+	printf("没找到对应歌手的信息。\n");
+}
+
+int inputfindtotalbyname()
+{
+	char name[MAX_STRLEN] = "";
+	//inputstring(name);
+	findtotalbyname(name);
+	return strcmp(name, "q");
+}
+
+
+
+void findtotalbyno(int no)
+{
+	int i;
+	singer sgr;
+	calcandsortaverage();
+	for (i = 0; i < allsingerscount; i++)
+	{
+		sgr = allsingers[i];
+		if (allsingers[i].no == no)
+		{
+			displayscoreandrank(sgr, i + 1);
+			return;
+		}
+	}
+	printf("没找到对应歌手的信息。\n");
+}
+
+void inputfindtotalbyno()
+{
+	int no;
+	printf("请输入要查询的编号:");
+	scanf("%d", &no);
+	findtotalbyno(no);
+}
 
 int main()
 {
@@ -285,13 +308,13 @@ int main()
 	//writeallsingers();*/
 	///*inputremovesinger();
 	//writeallsingers();*/
-	////inputsearchtotalbyname();
-	////inputsearchtotalbyno();
+	////inputfindtotalbyname();
+	////inputfindtotalbyno();
 
 	displayallsingers();
 
-	calcanddisplayaverage();
-
+	calcsortanddisplayaverage();
+	findtotalbyno(3);
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
@@ -320,10 +343,10 @@ int main()
 
 			break;
 		case 2:
-			inputsearchtotalbyname();
+			inputfindtotalbyname();
 			break;
 		case 3:
-			inputsearchtotalbyno();
+			inputfindtotalbyno();
 			break;
 		case 4:
 			inputaddsinger();
