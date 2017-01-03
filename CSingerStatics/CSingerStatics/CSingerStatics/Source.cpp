@@ -262,7 +262,8 @@ void findtotalbyname(char *name)
 int inputfindtotalbyname()
 {
 	char name[MAX_STRLEN] = "";
-	//inputstring(name);
+	printf("请输入要查询的歌手的姓名，不带空格，回车结束:");
+	scanf("%s", name);
 	findtotalbyname(name);
 	return strcmp(name, "q");
 }
@@ -289,7 +290,7 @@ void findtotalbyno(int no)
 void inputfindtotalbyno()
 {
 	int no;
-	printf("请输入要查询的编号:");
+	printf("请输入要查询的歌手的编号:");
 	scanf("%d", &no);
 	findtotalbyno(no);
 }
@@ -314,7 +315,9 @@ int main()
 	displayallsingers();
 
 	calcsortanddisplayaverage();
-	findtotalbyno(3);
+	//findtotalbyno(3);
+	//inputfindtotalbyno();
+	inputfindtotalbyname();
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
 	//calcanddisplayallsubjects();
@@ -376,7 +379,7 @@ int main()
 			break;
 		}
 		fseek(stdin, 0, SEEK_END);
-	}
+}
 #endif
 	//fseek(stdin, 0, SEEK_END);
 	printf("\n\n按任意键退出\n");
