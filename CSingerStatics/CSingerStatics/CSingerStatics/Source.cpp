@@ -8,7 +8,7 @@
 //#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\n"
 #define MAX_STRLEN 20
 #define SINGERS_COUNT 3
-#define JUDGES_COUNT 2
+#define JUDGES_COUNT 3
 //#define STU_MEMBERS_FULL sgr.no, sgr.name,  sgr.score,sgr.total
 //#define STU_MEMBERS_NET sgr.no, sgr.name,  sgr.score
 #define LINE  "\n------------------------\n"
@@ -18,10 +18,11 @@ typedef struct singer
 	char name[50];
 	int score[JUDGES_COUNT];
 	int total;
+	float ave;
 }singer;
 
 singer allsingers[SINGERS_COUNT];
-singer sortsingers[SINGERS_COUNT];
+//singer sortsingers[SINGERS_COUNT];
 int allsingerscount = 0;
 
 int streq(char *s1, char *s2)
@@ -49,7 +50,7 @@ void displaysinger(singer sgr)
 {
 	int i;
 	printf("\n");
-	printf("歌手编号：%d\t姓名%s\t分数如下：\n", sgr.no, sgr.name);
+	printf("歌手编号：%d\t姓名%s\t分数如下：\n", sgr.no, sgr.name, sgr.total);
 	for (i = 0; i < JUDGES_COUNT; i++)
 		printf("%d\t", sgr.score[i]);
 	printf("\n");
@@ -58,7 +59,7 @@ void displaysinger(singer sgr)
 void displayallsingers()
 {
 	int i;
-	printf("所有%d分数如下\n", allsingerscount);
+	printf("所有原始成绩如下\n");
 	printf("--------------------------------------------\n");
 	for (i = 0; i < allsingerscount; i++)
 	{
@@ -67,57 +68,28 @@ void displayallsingers()
 	printf("--------------------------------------------\n");
 }
 
+
+///////////
+
+
+void displayallave()
+{
+	int i;
+	singer sgr;
+	printf("所有最终成绩如下\n", allsingerscount);
+	printf("编号\t姓名\t成绩\n");
+	printf("--------------------------------------------\n");
+	for (i = 0; i < allsingerscount; i++)
+	{
+		sgr = allsingers[i];
+		printf("%d\t%s\t%.1f\n", sgr.no, sgr.name, sgr.ave);
+	}
+	printf("--------------------------------------------\n");
+}
+////////////
 int cmpfunc(const void * a, const void * b)
 {
-	return ((singer*)a)->total - ((singer*)b)->total;
-}
-void sorttotal()
-{
-	int i;
-	for (i = 0; i < allsingerscount; i++)
-	{
-		sortsingers[i] = allsingers[i];
-	}
-	qsort(sortsingers, allsingerscount, sizeof(singer), cmpfunc);
-}
-
-void sortanddisplay()
-{
-	int i;
-	sorttotal();
-	printf("排序后如下\n");
-	printf("--------------------------------------------\n");
-	for (i = 0; i < allsingerscount; i++)
-	{
-		displaysinger(sortsingers[i]);
-	}
-	printf("--------------------------------------------\n");
-}
-
-
-
-
-float ave()
-{
-	int i;
-	float sum = 0;
-	for (i = 0; i < allsingerscount; i++)
-		sum += allsingers[i].total;
-	return sum / (float)allsingerscount;
-}
-
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
+	return ((singer*)b)->ave - ((singer*)a)->ave;
 }
 
 void searchtotalbyname(char *name)
@@ -135,7 +107,7 @@ void searchtotalbyname(char *name)
 int inputsearchtotalbyname()
 {
 	char name[MAX_STRLEN] = "";
-	inputstring(name);
+	//inputstring(name);
 	searchtotalbyname(name);
 	return strcmp(name, "q");
 }
@@ -228,15 +200,6 @@ int login()
 }
 
 
-int calctotal(int math, int english, int chinese, int c)
-{
-	return math + english + chinese + c;
-}
-
-float calcave(int total)
-{
-	return total / 4.0f;
-}
 
 void addsinger(int no, char name[], int scores[])
 {
@@ -246,6 +209,7 @@ void addsinger(int no, char name[], int scores[])
 	strcpy(sgr.name, name);
 	for (i = 0; i < JUDGES_COUNT; i++)
 		sgr.score[i] = scores[i];
+	sgr.total = 0;
 	//sgr.score = math;
 	//sgr.english = english;
 	//sgr.chinese = chinese;
@@ -255,64 +219,40 @@ void addsinger(int no, char name[], int scores[])
 
 void createsamplesingers()
 {
-	int scores1[JUDGES_COUNT] = { 11,12 };
-	int scores2[JUDGES_COUNT] = { 21,22 };
+	int scores1[JUDGES_COUNT] = { 11,12,13 };
+	int scores2[JUDGES_COUNT] = { 21,22,23 };
+	int scores3[JUDGES_COUNT] = { 31,32,33 };
 	printf("创建示例歌手数据...");
 	addsinger(1, "name1", scores1);
+	addsinger(3, "name3", scores3);
 	addsinger(2, "name2", scores2);
 	printf("2条示例歌手数据已创建\n");
 }
 
-void calcanddisplaytotalandaverage()
-{
-	//int i;
-	//singer sgr;
-	//printf("所有各科总分、平均分如下\n");
-	//printf("--------------------------------------------\n");
-	//for (i = 0; i < allsingerscount; i++)
-	//{
-	//	sgr = allsingers[i];
-	//	allsingers[i].total = sgr.total = calctotal(sgr.score, sgr.english, sgr.chinese, sgr.c);
-	//	allsingers[i].average = sgr.average = calcave(sgr.total);
-	//	printf("%d\t%s\t%d\t%.1f\n", sgr.no, sgr.name, sgr.total, sgr.average);
-	//}
-	//printf("--------------------------------------------\n");
-}
 
-void calcanddisplaysubject(char *subuject, int scores[])
+
+void calcanddisplayaverage()
 {
-	int i, sum = 0, below60 = 0;
+	int i, j, min, max, score;
 	for (i = 0; i < allsingerscount; i++)
 	{
-		sum += scores[i];
-		if (scores[i] < 60)
-			below60++;
+		min = max = allsingers[i].score[0];//初始值
+		for (j = 0; j < JUDGES_COUNT; j++)
+		{
+			score = allsingers[i].score[j];
+			allsingers[i].total += score;
+			if (min > score)
+				min = score;
+			if (max < score)
+				max = score;
+		}
+		allsingers[i].total -= (min + max);
+		allsingers[i].ave = allsingers[i].total / (float)(JUDGES_COUNT - 2);
 	}
-	printf("科目:%s 平均分%.1f、及格率百分之%.1f、不及格率百分之%.1f\n", subuject,
-		(sum / (float)allsingerscount),
-		(1 - below60 / (float)allsingerscount)*100.0f,
-		(below60 / (float)allsingerscount)*100.0f
-	);
+	qsort(allsingers, allsingerscount, sizeof(singer), cmpfunc);
+	displayallave();
 }
 
-
-void calcanddisplayallsubjects()
-{
-	//int i, sum = 0, below60 = 0;
-	//int scores[100];
-	//singer sgr;
-	//printf("所有科目歌手统计如下\n");
-	//printf("--------------------------------------------\n");
-	//for (i = 0; i < allsingerscount; i++)
-	//{
-	//	scores[i] = allsingers[i].score;
-	//}
-	//calcanddisplaysubject("数学", scores);
-
-
-	//calcanddisplaysubject("C语言", scores);
-	//printf("--------------------------------------------\n");
-}
 
 void inputaddsinger()
 {
@@ -350,8 +290,7 @@ int main()
 
 	displayallsingers();
 
-	inputaddsinger();
-	displayallsingers();
+	calcanddisplayaverage();
 
 	//calcanddisplaytotalandaverage();
 	//sortanddisplay();
@@ -412,7 +351,7 @@ int main()
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-}
+		}
 		fseek(stdin, 0, SEEK_END);
 	}
 #endif
