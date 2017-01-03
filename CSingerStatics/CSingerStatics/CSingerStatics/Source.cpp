@@ -105,7 +105,7 @@ void createsamplesingers()
 	addsinger(6, "name6", scores6);
 	addsinger(7, "name7", scores7);
 	addsinger(8, "name8", scores8);
-	printf("2条示例歌手数据已创建\n");
+	printf("8条示例歌手数据已创建\n");
 }
 
 void calcandsortaverage()
