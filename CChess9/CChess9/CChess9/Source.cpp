@@ -27,10 +27,17 @@ void gotoxy(int x, int y)
 
 void main()
 {
-	system("cls");
-	menu();
-	getchar();
 
+	int x = 100, y = 100;
+	SetCursorPos(x, y); //set your co-ordinate
+	Sleep(500);
+	mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0); // moving cursor leftdown
+	mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+	//system("cls");
+	//menu();
+	getchar();
+	printf("exit...");
+	system("pause");
 }
 
 void menu()
@@ -57,6 +64,8 @@ void menu()
 		start_game();
 		break;
 	case 3:
+		printf("exit...");
+		system("pause");
 		exit(1);
 	default:
 		menu();
@@ -235,7 +244,7 @@ void draw_board()
 {
 	int j;
 
-	for (j = 9; j<17; j++)
+	for (j = 9; j < 17; j++)
 	{
 		gotoxy(35, j);
 		printf("|       |");
@@ -245,7 +254,7 @@ void draw_board()
 	gotoxy(28, 14);
 	printf("-----------------------");
 
-	for (j = 1; j<10; j++)
+	for (j = 1; j < 10; j++)
 	{
 		if (board[j] == 3)
 			put_X_O('X', j);
