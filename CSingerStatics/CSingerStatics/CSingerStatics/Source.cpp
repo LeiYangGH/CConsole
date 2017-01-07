@@ -2,27 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define DEV 0 //调试时候1， 发布时候0
 #define MAX_STRLEN 20
 #define SINGERS_COUNT 10
 #define JUDGES_COUNT 10
 #define LINE  "\n------------------------\n"
-typedef struct singer
+typedef struct singer//结构体
 {
-	int no;
-	char name[50];
-	int score[JUDGES_COUNT];
-	int total;
-	float ave;
+	int no;//编号
+	char name[50];//姓名
+	int score[JUDGES_COUNT];//分数
+	int total;//总分
+	float ave;//平均分
 }singer;
 
+//结构体数组、全局变量、全部歌手
 singer allsingers[SINGERS_COUNT];
-int allsingerscount = 0;
-
-int streq(char *s1, char *s2)
-{
-	return strcmp(s1, s2) == 0;
-}
+int allsingerscount = 0;//歌手数量
 
 void displaysinger(singer sgr)
 {
@@ -61,10 +56,6 @@ void displayallave()
 	printf("--------------------------------------------\n");
 }
 
-int cmpfunc(const void * a, const void * b)
-{
-	return ((singer*)b)->ave - ((singer*)a)->ave;
-}
 
 void displayscoreandrank(singer sgr, int rank)
 {
@@ -73,12 +64,13 @@ void displayscoreandrank(singer sgr, int rank)
 		sgr.no, sgr.name, sgr.ave, rank);
 }
 
+//添加歌手
 void addsinger(int no, char name[], int scores[])
 {
 	int i;
 	singer sgr;
 	sgr.no = no;
-	strcpy(sgr.name, name);
+	strcpy(sgr.name, name);//字符串赋值
 	for (i = 0; i < JUDGES_COUNT; i++)
 		sgr.score[i] = scores[i];
 	sgr.total = 0;
@@ -108,13 +100,24 @@ void createsamplesingers()
 	printf("8条示例歌手数据已创建\n");
 }
 
+
+//排序要求的函数格式
+int cmpfunc(const void * a, const void * b)
+{
+	return ((singer*)b)->ave - ((singer*)a)->ave;//从高到低排序
+	//return ((singer*)a)->ave - ((singer*)b)->ave;//低到高排序
+}
+
+//计算排序平均
 void calcandsortaverage()
 {
 	int i, j, min, max, score;
+	//遍历每个歌手
 	for (i = 0; i < allsingerscount; i++)
 	{
 		min = max = allsingers[i].score[0];//初始值
 		allsingers[i].total = 0;
+		//遍历每个裁判的分数
 		for (j = 0; j < JUDGES_COUNT; j++)
 		{
 			score = allsingers[i].score[j];
@@ -124,9 +127,11 @@ void calcandsortaverage()
 			if (max < score)
 				max = score;
 		}
-		allsingers[i].total -= (min + max);
+		allsingers[i].total -= (min + max);//去掉最低最高分
 		allsingers[i].ave = allsingers[i].total / (float)(JUDGES_COUNT - 2);
 	}
+	//快速排序 stdlib.h
+	//http://baike.baidu.com/item/qsort
 	qsort(allsingers, allsingerscount, sizeof(singer), cmpfunc);
 
 }
@@ -137,7 +142,7 @@ void calcsortanddisplayaverage()
 	displayallave();
 }
 
-
+//输入歌手信息
 void inputaddsinger()
 {
 	int no; char name[MAX_STRLEN] = "";
@@ -156,13 +161,14 @@ void findtotalbyname(char *name)
 {
 	int i;
 	singer sgr;
-	calcandsortaverage();
+	calcandsortaverage();//
 	for (i = 0; i < allsingerscount; i++)
 	{
 		sgr = allsingers[i];
+		//比较字符串要用strcmp函数，0是相等
 		if (strcmp(name, allsingers[i].name) == 0)
 		{
-			displayscoreandrank(sgr, i + 1);
+			displayscoreandrank(sgr, i + 1);//+1是因为对人来说排名是从1开始的
 			return;
 		}
 	}
@@ -208,21 +214,8 @@ void inputfindtotalbyno()
 int main()
 {
 	int choice = -1;
-	createsamplesingers();
+	createsamplesingers();//添加测试8个
 
-#if DEV
-
-	inputaddsinger();
-
-	displayallsingers();
-
-	calcsortanddisplayaverage();
-	//findtotalbyno(3);
-	//inputfindtotalbyno();
-	inputfindtotalbyname();
-	//calcanddisplaytotalandaverage();
-	//sortanddisplay();
-#else
 	while (choice != 0)
 	{
 		printf("\n\t 歌唱比赛评分");
@@ -233,11 +226,12 @@ int main()
 		printf("\n\t 4. 根据歌手编号查找");
 		printf("\n\t 5. 根据歌手名字查找");
 		printf("\n\n  请选择: ");
-		choice = getchar();
+		choice = getchar();//输入一个字符
 		switch (choice)
 		{
 		case '0':
 			printf("\n\n 你选择了退出。");
+			//http://baike.baidu.com/item/fseek
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
@@ -266,9 +260,8 @@ int main()
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-		fseek(stdin, 0, SEEK_END);
-	}
-#endif
+		fseek(stdin, 0, SEEK_END);//清楚缓冲区
+}
 	system("pause");
 	return 0;
 }
