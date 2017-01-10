@@ -35,7 +35,7 @@ void displayaddress(address add)
 }
 
 //读取所有成绩到链表
-void readalladdresss()
+void createheadddresss()
 {
 	char line[200];
 	address *p1, *p2;
@@ -64,7 +64,7 @@ int inputscore()
 	}
 	return n;
 }
-//获取一个新的学生信息
+//获取一个新的通讯信息信息
 int getnewno(address **tail)
 {
 	int newno = 0;
@@ -171,11 +171,11 @@ void deleteaddress(char * name)  //删除成绩
 		{
 			p2->next = p1->next;
 			free(p1);
-			printf("已删除姓名为%s的学生的成绩。\r\n", name);
+			printf("已删除姓名为%s的通讯信息的成绩。\r\n", name);
 		}
 	}
 	else
-		printf("没找到姓名为%s的学生!\r\n", name);
+		printf("没找到姓名为%s的通讯信息!\r\n", name);
 }
 
 
@@ -199,10 +199,10 @@ void displayaddress(char * name)  //按姓名输出
 		p = p->next;
 	}
 	if (!found)
-		printf("没找到名为%s的学生\r\n", name);
+		printf("没找到名为%s的通讯信息\r\n", name);
 }
 
-void addaddress(char * name)  //追加学生信息
+void addaddress(char * name)  //追加通讯信息信息
 {
 	int found = 0;
 	address *p = head;
@@ -217,19 +217,19 @@ void addaddress(char * name)  //追加学生信息
 			printf("序号    姓名    成绩\n");
 
 			displayaddress(*p);
-			printf("更改学生成绩为：");
+			printf("更改通讯信息成绩为：");
 			getchar();
 			/*	scanf("%d", &p->score);
-				printf("修改成功，更改后的学生成绩是：%d。\n", p->score);*/
+				printf("修改成功，更改后的通讯信息成绩是：%d。\n", p->score);*/
 		}
 		p = p->next;
 	}
 	if (!found)
-		printf("没找到名为%s的学生\r\n", name);
+		printf("没找到名为%s的通讯信息\r\n", name);
 }
 
 //********************其实可以考虑作为一个通用函数，但我懒得改其他函数了
-void searchbyname(char * name, address **f)  //根据名字查找学生
+void searchbyname(char * name, address **f)  //根据名字查找通讯信息
 {
 	int found = 0;
 	address *p = head;
@@ -245,16 +245,16 @@ void searchbyname(char * name, address **f)  //根据名字查找学生
 	}
 	if (!found)
 	{
-		printf("没找到名为%s的学生\r\n", name);
+		printf("没找到名为%s的通讯信息\r\n", name);
 		*f = NULL;
 	}
 }
 
-void displayalladdresss()  //输出所有学生信息
+void displayalladdresss()  //输出所有通讯信息信息
 {
 	address *p = head->next;
 
-	printf("所有学生成绩如下\n");
+	printf("所有通讯信息成绩如下\n");
 	printf(LINE);
 
 	printf("姓名%t住址%t手机号%tqq%t邮箱\n");
@@ -270,7 +270,7 @@ void promptinsertbeforeno()  //按编号插入
 {
 	int no, score;
 	char name[50] = "";
-	printf("\n请输入要在哪个编号的学生之后插入?\n");
+	printf("\n请输入要在哪个编号的通讯信息之后插入?\n");
 	scanf("%d", &no);
 
 	//inputstring(name);
@@ -281,10 +281,10 @@ void promptinsertbeforeno()  //按编号插入
 
 
 
-void promptsearchtotalbyname()  //按姓名查找
+void promptsearchbyname()  //按姓名查找
 {
 	char name[50] = "";
-	//inputstring(name);
+	inputstring(name, "要查找记录的姓名");
 	displayaddress(name);
 }
 
@@ -303,9 +303,7 @@ int main()
 {
 	int choice = -1;
 
-	//createsampleaddresss();
-
-	readalladdresss();
+	createheadddresss();
 
 	while (choice != 0)
 	{
@@ -341,7 +339,7 @@ int main()
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptsearchtotalbyname();
+			promptsearchbyname();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
