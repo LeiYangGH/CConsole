@@ -17,45 +17,18 @@ char *scoresfile = "scores.txt";
 student *head;
 
 //字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
+//int toint(char *s)
+//{
+//	char *end;
+//	return (int)strtol(s, &end, 10);
+//}
 
-//从一行文本拆分出成绩
-void getstudentfromline(char *line, student *stu)
-{
-	char * part;
-	int index = 0;
-
-	part = strtok(line, "\t");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			stu->no = toint(part);
-			break;
-		case 2:
-			strcpy(stu->name, part);
-			break;
-		case 3:
-			stu->score = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-}
-
+ 
 
 //显示一个成绩
 void displaystudent(student stu)
 {
 	printf(FORMAT3DSD, stu.no, stu.name, stu.score);
-	printf("---------------------");
 	printf("\r\n");
 }
 
@@ -64,60 +37,33 @@ void readallstudents()
 {
 	char line[200];
 	student *p1, *p2;
-	FILE *fp = fopen(scoresfile, "r");
+	/*FILE *fp = fopen(scoresfile, "r");
 	if (fp == NULL)
 	{
 		printf("\nerror on open file!");
 		fp = fopen(scoresfile, "a+");
 		getchar();
-	}
+	}*/
 
 	p1 = p2 = (student *)malloc(sizeof(student));
 	head = p1;
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			break;
-		//读进来的行去掉末尾换行符，重要
-		//http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input
-		strtok(line, "\n");
-		getstudentfromline(line, p1);
-		if (head == NULL)
-			head = p1;
-		else
-			p2->next = p1;
-		p2 = p1;
-		p1 = (student*)malloc(sizeof(student));
-	}
+	//while (fgets(line, 1024, fp) != NULL)
+	//{
+	//	if (strlen(line) < 5)
+	//		break;
+	//	//读进来的行去掉末尾换行符，重要
+	//	//http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input
+	//	strtok(line, "\n");
+	//	getstudentfromline(line, p1);
+	//	if (head == NULL)
+	//		head = p1;
+	//	else
+	//		p2->next = p1;
+	//	p2 = p1;
+	//	p1 = (student*)malloc(sizeof(student));
+	//}
 	p2->next = NULL;
 }
-
-
-//保存所有成绩
-void writeallstudents()
-{
-	student *p;
-	FILE *fp = fopen(scoresfile, "wb");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-
-	p = head;
-
-	while (p != NULL)
-	{
-		student stu = *p;
-
-		fprintf(fp, FORMAT3DSD, stu.no, stu.name, stu.score);
-		p = p->next;
-	}
-	fclose(fp);
-	printf("已保存到文件。");
-}
-
 
 //输入成绩信息
 void inputname(char str[])
@@ -245,7 +191,7 @@ void deletestudent(char * name)  //删除成绩
 
 
 
-void viewstudent(char * name)  //按姓名输出
+void displaystudent(char * name)  //按姓名输出
 {
 	int found = 0;
 	student *p = head;
@@ -315,81 +261,22 @@ void searchbyname(char * name, student **f)  //根据名字查找学生
 	}
 }
 
-void viewallstudents()  //输出所有学生信息
+void displayallstudents()  //输出所有学生信息
 {
 	student *p = head->next;
 
-	printf("所有学生成绩如下\r\n");
+	printf("所有学生成绩如下\n");
+	printf("---------------------\n");
+
 	printf("序号    姓名    成绩\n");
 	while (p != NULL)
 	{
 		displaystudent(*p);
 		p = p->next;
 	}
+	printf("---------------------\n");
+
 }
-
-
-
-int cmpfunc(const void * a, const void * b)   //成绩比较
-{
-	return ((student*)a)->score - ((student*)b)->score;
-}
-
-
-
-void sortandviewall()  //按升序输出
-{
-	int i, cnt = 0;
-	student all[50];
-	student *p = head;
-
-	printf("所有学生成绩升序排序输出如下\r\n");
-	while (p != NULL)
-	{
-		student stu;
-		stu.no = p->no;
-		strcpy(stu.name, p->name);
-		stu.score = p->score;
-		all[cnt++] = stu;
-		p = p->next;
-	}
-	qsort(all, cnt, sizeof(student), cmpfunc);//快速排序
-
-	printf("序号    姓名    成绩\n");
-	for (i = 1; i < cnt; i++)
-	{
-		if (all[i].score < 60)
-			displaystudent(all[i]);
-	}
-}
-
-
-
-void copyallstudents()  //拷贝学生信息
-{
-	student *p;
-	FILE *fp = fopen("copy_score.txt", "w");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-
-	p = head;
-
-	while (p != NULL)
-	{
-		student stu = *p;
-
-		fprintf(fp, FORMAT3DSD, stu.no, stu.name, stu.score);
-		p = p->next;
-	}
-	fclose(fp);
-	printf("已拷贝到文件。\n");
-}
-
-
 
 void promptinsertbeforeno()  //按编号插入
 {
@@ -410,7 +297,7 @@ void promptsearchtotalbyname()  //按姓名查找
 {
 	char name[50] = "";
 	inputname(name);
-	viewstudent(name);
+	displaystudent(name);
 }
 
 
@@ -422,23 +309,7 @@ void promptdeletebyname()  //按姓名删除
 	deletestudent(name);
 }
 
-void promptmodifyscorebyname()  //按姓名更改分数
-{
-	int newscore;
-	student *stu;
-	char name[50] = "";
-	inputname(name);
-	searchbyname(name, &stu);
-	if (stu != NULL)
-	{
-		printf("更改学生成绩为：");
-		getchar();
-		scanf("%d", &newscore);
-		stu->score = newscore;
-		printf("修改成功，更改后的学生成绩是：%d。\n", stu->score);
-	}
-}
-
+ 
 
 int main()
 {
@@ -450,22 +321,15 @@ int main()
 
 	while (choice != 0)
 	{
-		printf("\n\t ★☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆★ ");
-		printf("\n\t ☆            学生成绩管理系统          ☆ ");
-		printf("\n\t ☆            0. 退出操作系统           ☆ ");
-		printf("\n\t ☆            1. 添加学生信息           ☆ ");
-		printf("\n\t ☆            2. 删除学生信息           ☆ ");
-		printf("\n\t ☆            3. 查看学生所有           ☆ ");
-		printf("\n\t ☆            4. 姓名查找单个           ☆ ");
-		printf("\n\t ☆            9. 追加学生信息           ☆ ");
-		printf("\n\t ☆            5. 成绩不及格的           ☆ ");
-		printf("\n\t ☆            6. 插入学生信息           ☆ ");
-		printf("\n\t ☆            7. 保存学生信息           ☆ ");
-		printf("\n\t ☆            8. 拷贝学生信息           ☆ ");
-		printf("\n\t ★☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆★");
+		printf("\n\t 歌唱比赛评分");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 添加联系人信息");
+		printf("\n\t 2. 查看所有联系人信息");
+		printf("\n\t 3. 删除联系人信息");
+		printf("\n\t 4. 根据联系人名字查找");
+		printf("\n\t 5. 插入联系人信息");
 		printf("\n\n  请选择: ");
-		scanf("%1[0123456789]d%*c", &choice);
-		choice = getche();
+		choice = getchar();//输入一个字符
 		switch (choice)
 		{
 		case '0':
@@ -481,11 +345,11 @@ int main()
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptdeletebyname();
+			displayallstudents();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			viewallstudents();
+			promptdeletebyname();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
@@ -493,24 +357,9 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			sortandviewall();
-			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
 			promptinsertbeforeno();
 			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			writeallstudents();
-			break;
-		case '8':
-			printf("\n\n你选择了 8\n");
-			copyallstudents();
-			break;
-		case '9':
-			printf("\n\n你选择了 9\n");
-			promptmodifyscorebyname();
-			break;
+		 
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
