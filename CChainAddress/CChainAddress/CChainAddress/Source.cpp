@@ -19,7 +19,6 @@ address *head;//头结点
 void displayaddress(address add)
 {
 	printf("%d\t%s\t%s\t%s\t%s\t%s\t\n", add.no, add.name, add.home, add.tel, add.qq, add.email);
-	//printf("\r\n");
 }
 
 //读取所有通讯信息到链表
