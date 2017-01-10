@@ -1,10 +1,7 @@
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
-//#define FORMAT3DSD "%d\t%s\t%d\r\n"
-#define LINE  "\n------------------------\n"
+#define LINE  "\n------------------------\n" 
 typedef struct address
 {
 	int no;
@@ -16,25 +13,16 @@ typedef struct address
 	address *next;
 }address;
 
-address *head;
+address *head;//头结点
 
-//字符串转整数
-//int toint(char *s)
-//{
-//	char *end;
-//	return (int)strtol(s, &end, 10);
-//}
-
-
-
-//显示一个成绩
+//显示一个通讯信息
 void displayaddress(address add)
 {
 	printf("%d\t%s\t%s\t%s\t%s\t%s\t\n", add.no, add.name, add.home, add.tel, add.qq, add.email);
 	//printf("\r\n");
 }
 
-//读取所有成绩到链表
+//读取所有通讯信息到链表
 void createheadddresss()
 {
 	char line[200];
@@ -54,16 +42,7 @@ void inputstring(char str[], char *description)
 	printf("您输入的%s为 %s \n", description, str);
 }
 
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
-}
+
 //获取一个新的通讯信息信息
 int getnewno(address **tail)
 {
@@ -84,10 +63,10 @@ int getnewno(address **tail)
 	return newno;
 }
 
-//新增成绩
+//新增通讯信息
 void addaddress()
 {
-	int newno = 0, score;//新成绩编号，当前最大+1
+	int newno = 0, score;//新通讯信息编号，当前最大+1
 	char name[30] = "";
 	char home[30] = "";
 	char tel[30] = "";
@@ -119,42 +98,46 @@ void addaddress()
 }
 
 
-bool insert(address *pHead, int front, char *name, int score)
+bool insert(address *pHead, int front, char *name, char *home, char *tel, char *qq, char *email)
 {
 	int i = 0, newno;
-	address *_node = pHead;
-	address *pSwap;
-	address *pNew;
+	address *h = pHead;
+	address *t;
+	address *n;
 	address *x;
 	newno = getnewno(&x);
-	if ((front < 1) && (NULL != _node))
+	if ((front < 1) && (NULL != h))
 	{
 		return false;
 	}
 	while (i < front - 1)
 	{
-		_node = _node->next;
+		h = h->next;
 		++i;
 	}
-	pNew = (address*)malloc(sizeof(address));
+	n = (address*)malloc(sizeof(address));
 
-	pNew->no = newno;
-	strcpy(pNew->name, name);
-	//pNew->score = score;
-	pSwap = _node->next;
-	_node->next = pNew;
-	pNew->next = pSwap;
+	n->no = newno;
+	strcpy(n->name, name);
+	strcpy(n->home, home);
+	strcpy(n->tel, tel);
+	strcpy(n->qq, qq);
+	strcpy(n->email, email);
+
+	t = h->next;
+	h->next = n;
+	n->next = t;
 	return true;
 
 }
 
 //http://blog.csdn.net/iwm_next/article/details/7450734
-void deleteaddress(char * name)  //删除成绩
+void deleteaddress(char * name)  //删除通讯信息
 {
 	address *p1 = head, *p2;
 	if (head == NULL)
 	{
-		printf("\n成绩为空!\n");
+		printf("\n通讯信息为空!\n");
 		return;
 	}
 	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
@@ -171,7 +154,7 @@ void deleteaddress(char * name)  //删除成绩
 		{
 			p2->next = p1->next;
 			free(p1);
-			printf("已删除姓名为%s的通讯信息的成绩。\r\n", name);
+			printf("已删除姓名为%s的通讯信息的通讯信息。\r\n", name);
 		}
 	}
 	else
@@ -190,9 +173,9 @@ void displayaddress(char * name)  //按姓名输出
 		if (strcmp(p->name, name) == 0)
 		{
 			found = 1;
-			printf("%s的成绩如下\r\n", name);
+			printf("%s的通讯信息如下\r\n", name);
 
-			printf("序号    姓名    成绩\n");
+			printf("序号    姓名    通讯信息\n");
 
 			displayaddress(*p);
 		}
@@ -202,34 +185,8 @@ void displayaddress(char * name)  //按姓名输出
 		printf("没找到名为%s的通讯信息\r\n", name);
 }
 
-void addaddress(char * name)  //追加通讯信息信息
-{
-	int found = 0;
-	address *p = head;
-
-	while (p != NULL)
-	{
-		if (strcmp(p->name, name) == 0)
-		{
-			found = 1;
-			printf("%s的成绩如下\r\n", name);
-
-			printf("序号    姓名    成绩\n");
-
-			displayaddress(*p);
-			printf("更改通讯信息成绩为：");
-			getchar();
-			/*	scanf("%d", &p->score);
-				printf("修改成功，更改后的通讯信息成绩是：%d。\n", p->score);*/
-		}
-		p = p->next;
-	}
-	if (!found)
-		printf("没找到名为%s的通讯信息\r\n", name);
-}
-
-//********************其实可以考虑作为一个通用函数，但我懒得改其他函数了
-void searchbyname(char * name, address **f)  //根据名字查找通讯信息
+//根据名字查找通讯信息
+void searchbyname(char * name, address **f)
 {
 	int found = 0;
 	address *p = head;
@@ -254,7 +211,7 @@ void displayalladdresss()  //输出所有通讯信息信息
 {
 	address *p = head->next;
 
-	printf("所有通讯信息成绩如下\n");
+	printf("所有通讯信息通讯信息如下\n");
 	printf(LINE);
 
 	printf("姓名%t住址%t手机号%tqq%t邮箱\n");
@@ -269,13 +226,22 @@ void displayalladdresss()  //输出所有通讯信息信息
 void promptinsertbeforeno()  //按编号插入
 {
 	int no, score;
-	char name[50] = "";
+	char name[30] = "";
+	char home[30] = "";
+	char tel[30] = "";
+	char qq[20] = "";
+	char email[30] = "";
+
 	printf("\n请输入要在哪个编号的通讯信息之后插入?\n");
 	scanf("%d", &no);
 
-	//inputstring(name);
-	score = inputscore();
-	if (insert(head, no, name, score))
+	inputstring(name, "姓名");
+	inputstring(home, "家庭地址");
+	inputstring(tel, "手机号");
+	inputstring(qq, "qq号");
+	inputstring(email, "邮箱");
+
+	if (insert(head, no, name, home, tel, qq, email))
 		printf("\n插入成功！\n");
 }
 
@@ -307,7 +273,7 @@ int main()
 
 	while (choice != 0)
 	{
-		printf("\n\t 歌唱比赛评分");
+		printf("\n\t 通讯录管理");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 添加联系人信息");
 		printf("\n\t 2. 查看所有联系人信息");
@@ -319,7 +285,6 @@ int main()
 		switch (choice)
 		{
 		case '0':
-			//writealladdresss();
 			printf("\n\n 你选择了退出: ");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
@@ -350,7 +315,8 @@ int main()
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-		getch();
+		fseek(stdin, 0, SEEK_END);
+		system("pause");
 	}
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
