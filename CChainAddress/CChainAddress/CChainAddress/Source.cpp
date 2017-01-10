@@ -148,8 +148,6 @@ bool insert(address *pHead, int front, char *name, int score)
 
 }
 
-
-
 //http://blog.csdn.net/iwm_next/article/details/7450734
 void deleteaddress(char * name)  //删除成绩
 {
@@ -295,7 +293,7 @@ void promptsearchtotalbyname()  //按姓名查找
 void promptdeletebyname()  //按姓名删除
 {
 	char name[50] = "";
-	//inputstring(name);
+	inputstring(name, "要删除记录的姓名");
 	deleteaddress(name);
 }
 
