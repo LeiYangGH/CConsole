@@ -1,26 +1,39 @@
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
-void delchar(char *str, char c)
+int index(char a[], int n, int i)
 {
-	char  *p, *q;
-	for (p = str, q = str; *p != '\0'; p++)
-		if (*p != c)*q++ = *p;
-	*q = *p;
+	int m, j;
+	for (m = i, j = i + 1; j < n; j++)
+		if (a[j] < a[m])
+			m = j;
+	return m;
 }
+
+void swap(char *p, char *q)
+{
+	char temp;
+	temp = *p;
+	*p = *q;
+	*q = temp;
+}
+
+void arrange(char a[], char n)
+{
+	int i;
+	for (i = 0; i <= n - 2; i++)
+	{
+		int m;
+		m = index(a, n, i);
+		if (m != i)swap(a + i, a + m);
+	}
+}
+
 int main()
 {
-	char str[100], c;
-	puts("请输入str，回车结束:");
-	//有些编译器不支持gets，
-	//而scanf又不能输入带空格的字符串
-	fgets(str, 100, stdin);
-	printf("删除前的字符串：\n%s\n", str);
-	//清除缓冲区避免影响后面输入
-	fseek(stdin, 0, SEEK_END);
-	printf("输入要删除的字符，回车结束:");
-	c = getchar();
-	delchar(str, c);
-	printf("删除后的字符串：\n%s\n", str);
+	char s[] = "2017";
+	arrange(s, strlen(s));
+	puts(s);
 	system("pause");
 	return 0;
 }
