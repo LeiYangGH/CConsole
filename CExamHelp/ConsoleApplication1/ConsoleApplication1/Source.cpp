@@ -46,18 +46,23 @@ int test()
 	b = !b;
 	return b;
 }
+
+int fun(int n)
+{
+	int s;
+	if (n == 1)
+		s = 1;
+	else 
+		s = n + fun(n - 1);
+	return s;
+}
+
 #define M 5
 #define N 5
 int main()
 {
-	int score[M][N];
-	int i;
-	//这是关键代码
-	int j, sumi = 0;
-	for (int m = 0; m < M; m++)
-		sumi += score[m][i];
-	printf("平均分%.2f\n",
-		(double)sumi / (double)(M));
+
+	printf("%d\n", fun(4));
 	//以上
 	system("pause");
 	return 0;
