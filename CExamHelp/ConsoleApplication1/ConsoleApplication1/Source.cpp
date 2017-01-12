@@ -40,18 +40,25 @@
 //	return m;
 //}
 
+int test()
+{
+	static int b = 1;
+	b = !b;
+	return b;
+}
+#define M 5
+#define N 5
 int main()
 {
-	int c = '-';
-	//测试
-	//int c = 'x';
-	//int c = '2';
-	if (isdigit(c))
-		printf("数字\n");
-	else if (isalpha(c))
-		printf("字母\n");
-	else
-		printf("其他\n");
+	int score[M][N];
+	int i;
+	//这是关键代码
+	int j, sumi = 0;
+	for (int m = 0; m < M; m++)
+		sumi += score[m][i];
+	printf("平均分%.2f\n",
+		(double)sumi / (double)(M));
+	//以上
 	system("pause");
 	return 0;
 }
