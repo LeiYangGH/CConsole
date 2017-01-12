@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+#include <ctype.h>
 
 
 //void swap(char *p, char *q)
@@ -22,22 +24,34 @@
 //	}
 //}
 
-int best(int a[], int n)
-{
-	int m, i;
-	for (m = a[0], i = 1; i < n; i++)
-		if (a[i] > m)
-			m = a[i];
-	return m;
-}
+
+//int s[3][5] = { { 1,2,3,4,5 },{ 2,3,4,5,1 },{ 3,4,5,1,2 } };
+//int i, sum;
+//for (sum = 0, i = 0; i < 3; i++)
+//	sum += best(s[i], 5);
+//printf("%d\n", sum);
+//
+//int best(int a[], int n)
+//{
+//	int m, i;
+//	for (m = a[0], i = 1; i < n; i++)
+//		if (a[i] > m)
+//			m = a[i];
+//	return m;
+//}
 
 int main()
 {
-	int s[3][5] = { {1,2,3,4,5}, { 2,3,4,5,1 }, { 3,4,5,1,2} };
-	int i, sum;
-	for (sum = 0, i = 0; i < 3; i++)
-		sum += best(s[i], 5);
-	printf("%d\n", sum);
+	int c = '-';
+	//²âÊÔ
+	//int c = 'x';
+	//int c = '2';
+	if (isdigit(c))
+		printf("Êý×Ö\n");
+	else if (isalpha(c))
+		printf("×ÖÄ¸\n");
+	else
+		printf("ÆäËû\n");
 	system("pause");
 	return 0;
 }
