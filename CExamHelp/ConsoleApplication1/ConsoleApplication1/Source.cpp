@@ -1,14 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-//int index(char a[], int n, int i)
-//{
-//	int m, j;
-//	for (m = i, j = i + 1; j < n; j++)
-//		if (a[j] < a[m])
-//			m = j;
-//	return m;
-//}
+
 
 //void swap(char *p, char *q)
 //{
@@ -29,11 +22,21 @@
 //	}
 //}
 
+int best(int a[], int n)
+{
+	int m, i;
+	for (m = a[0], i = 1; i < n; i++)
+		if (a[i] > m)
+			m = a[i];
+	return m;
+}
+
 int main()
 {
-	int i, sum = 0;
-	for (i = 1; i < 4; i++)
-		sum += i*i;
+	int s[3][5] = { {1,2,3,4,5}, { 2,3,4,5,1 }, { 3,4,5,1,2} };
+	int i, sum;
+	for (sum = 0, i = 0; i < 3; i++)
+		sum += best(s[i], 5);
 	printf("%d\n", sum);
 	system("pause");
 	return 0;
