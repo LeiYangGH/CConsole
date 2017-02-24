@@ -52,18 +52,28 @@ int fun(int n)
 	int s;
 	if (n == 1)
 		s = 1;
-	else 
+	else
 		s = n + fun(n - 1);
 	return s;
 }
 
 #define M 5
 #define N 5
+
+typedef struct node
+{
+	int data;
+	struct node *next;
+}node;
 int main()
 {
-
-	printf("%d\n", fun(4));
-	//以上
+	node *head;
+	node *p, *q;
+	//关键
+	q = head;
+	while (q->next != p)
+		q = q->next;
+	//这里q就是p的前一个
 	system("pause");
 	return 0;
 }
