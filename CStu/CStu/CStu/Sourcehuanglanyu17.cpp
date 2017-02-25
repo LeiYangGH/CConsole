@@ -82,35 +82,50 @@ void sortanddisplaybyno()
 	displayallstudents();
 }
 
-void countbygrades()
+void countbygradesforonesubject(int subjectId)
 {
-	int i, t, cnt270300 = 0, cnt240269 = 0, cnt210239 = 0, cnt180209 = 0, cnt150179 = 0, cnt149 = 0;
+	int i, t, cnt100_90 = 0, cnt89_80 = 0, cnt79_70 = 0, cnt69_60 = 0, cnt59_0 = 0;
 	student stu;
-	printf("总成绩在各分值段的成绩比例及及格率统计如下：\r\n", allstudentscount);
+	printf("第%d科目成绩在各分值段的成绩比例统计如下：\r\n", subjectId + 1);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
-		t = allstudents[i].total;
-		if (t >= 270)
-			cnt270300++;
-		else if (t >= 240 && t <= 269)
-			cnt240269++;
-		else if (t >= 210 && t <= 239)
-			cnt210239++;
-		else if (t >= 180 && t <= 209)
-			cnt180209++;
-		else if (t >= 150 && t <= 179)
-			cnt150179++;
+		t = allstudents[i].scores[subjectId];
+		if (t >= 90)
+			cnt100_90++;
+		else if (t >= 80 && t <= 89)
+			cnt89_80++;
+		else if (t >= 70 && t <= 79)
+			cnt79_70++;
+		else if (t >= 60 && t <= 69)
+			cnt69_60++;
 		else if (t < 149)
-			cnt149++;
+			cnt59_0++;
 	}
-	printf("270~300\t240~269\t210~239\t180~209\t150~179\t149以下\t及格率\r\n");
-	printf("%d\t%d\t%d\t%d\t%d\t%d\r\n",
-		cnt270300, cnt240269, cnt210239, cnt180209, cnt150179, cnt149);
-	//因为正好是10个人，所以百分比就是人数*10
-	printf("%d%%\t%d%%\t%d%%\t%d%%\t%d%%\t%d%%\t%d%%\r\n",
-		cnt270300 * 10, cnt240269 * 10, cnt210239 * 10, cnt180209 * 10, cnt150179 * 10, cnt149 * 10,
-		(cnt270300 + cnt240269 + cnt210239 + cnt180209) * 10);
+	printf("100-90\t89-80\t79-70\t69-60\t59-0\t\n");
+	printf("%d\t%d\t%d\t%d\t%d\n",
+		cnt100_90, cnt89_80, cnt79_70, cnt69_60, cnt59_0);
+	printf("%.1f%%\t%.1f%%\t%.1f%%\t%.1f%%\t%.1f%%\n",
+		cnt100_90 * 100 / (float)allstudentscount,
+		cnt89_80 * 100 / (float)allstudentscount,
+		cnt79_70 * 100 / (float)allstudentscount,
+		cnt69_60 * 100 / (float)allstudentscount,
+		cnt59_0 * 100 / (float)allstudentscount
+	);
+	printf("--------------------------------------------\r\n");
+}
+
+void countbygrades()
+{
+	int i;
+	int totalSubject = 0;
+	float aveSubject;
+	student stu;
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < subjects_count; i++)
+	{
+		countbygradesforonesubject(i);
+	}
 	printf("--------------------------------------------\r\n");
 }
 
@@ -194,7 +209,7 @@ void createsamplestudents()
 	addstudent("20161465", "Shawn", scores);
 	scores[0] = 92;
 	scores[1] = 82;
-	scores[2] = 61;
+	scores[2] = 1;
 	scores[3] = 0;
 	scores[4] = 0;
 	scores[5] = 0;
@@ -279,7 +294,7 @@ int main()
 		printf("\n\t 3. 按学生总分由高到低排出名次表");
 		printf("\n\t 4. 按学号由小到大排出成绩表");
 		printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
-		//printf("\n\t 6. 统计");
+		printf("\n\t 6. 统计");
 		printf("\n\t 7. 输出");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -314,6 +329,7 @@ int main()
 			break;
 		case '6':
 			printf("\n\n你选择了 6\n");
+			countbygrades();
 			break;
 		case '7':
 			printf("\n\n你选择了 7\n");
