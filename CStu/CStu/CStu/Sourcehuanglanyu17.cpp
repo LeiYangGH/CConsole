@@ -58,16 +58,27 @@ void displayallstudents()
 }
 
 //快速排序用
-int cmpfunc(const void * a, const void * b)
+int cmpbytotal(const void * a, const void * b)
 {
-	return ((student*)b)->total - ((student*)a)->total;
+	return ((student*)a)->total - ((student*)b)->total;
 }
 
-void sortanddisplay()
+int cmpbyno(const void * a, const void * b)
 {
-	int i;
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
-	printf("按总成绩降序排序后如下\r\n");
+	return ((student*)a)->no - ((student*)b)->no;
+}
+
+void sortanddisplaybytotal()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmpbytotal);
+	printf("按总分排序后如下\r\n");
+	displayallstudents();
+}
+
+void sortanddisplaybyno()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmpbyno);
+	printf("按学号排序后如下\r\n");
 	displayallstudents();
 }
 
@@ -281,8 +292,8 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 手动录入");
 		printf("\n\t 2. 计算每门课程的总分和平均分");
-		//printf("\n\t 3. 按学生总分由高到低排出名次表");
-		//printf("\n\t 4. 按学号由小到大排出成绩表");
+		printf("\n\t 3. 按学生总分由高到低排出名次表");
+		printf("\n\t 4. 按学号由小到大排出成绩表");
 		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
 		//printf("\n\t 6. 统计");
 		printf("\n\t 7. 输出");
@@ -307,11 +318,11 @@ int main()
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			countbygrades();
+			sortanddisplaybytotal();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			sortanddisplay();
+			sortanddisplaybyno();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
@@ -323,7 +334,7 @@ int main()
 			break;
 		case '7':
 			printf("\n\n你选择了 7\n");
-			sortanddisplay();
+			sortanddisplaybyno();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
