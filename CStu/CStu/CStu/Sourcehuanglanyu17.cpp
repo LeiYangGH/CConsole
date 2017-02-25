@@ -18,12 +18,6 @@ int subjects_count = 3;//默认科目数
 student allstudents[STUDENTS_COUNT];
 int allstudentscount = 0;
 
-//字符串相等
-int streq(char *s1, char *s2)
-{
-	return strcmp(s1, s2) == 0;
-}
-
 void promptinputsubjectcount()
 {
 	printf("请输入科目数量（1～6）:");
@@ -85,7 +79,6 @@ void sortanddisplaybyno()
 void countbygradesforonesubject(int subjectId)
 {
 	int i, t, cnt100_90 = 0, cnt89_80 = 0, cnt79_70 = 0, cnt69_60 = 0, cnt59_0 = 0;
-	student stu;
 	printf("第%d科目成绩在各分值段的成绩比例统计如下：\r\n", subjectId + 1);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
@@ -120,29 +113,12 @@ void countbygrades()
 	int i;
 	int totalSubject = 0;
 	float aveSubject;
-	student stu;
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < subjects_count; i++)
 	{
 		countbygradesforonesubject(i);
 	}
 	printf("--------------------------------------------\r\n");
-}
-
-void calcminmaxave()
-{
-	int i, min = 300, max = 0, t;
-	float sum = 0, ave;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		t = allstudents[i].total;
-		sum += t;
-		min = t < min ? t : min;
-		max = t > max ? t : max;
-	}
-	ave = sum / STUDENTS_COUNT;
-	printf("总成绩最高分：%d, 最低分:%d, 平均分:%.2f\r\n",
-		max, min, ave);
 }
 
 void searchtotalbyname(char *name)
@@ -278,12 +254,8 @@ void calcanddisplaytotalandaverage()
 int main()
 {
 	int choice = -1;
-	//promptinputsubjectcount();
+	promptinputsubjectcount();
 	createsamplestudents();
-	//displayallstudents();
-	//calcminmaxave();
-	//countbygrades();
-	//sortanddisplay();
 	//system("pause");
 	while (choice != 0)
 	{
