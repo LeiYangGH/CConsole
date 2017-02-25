@@ -133,9 +133,12 @@ void calcminmaxave()
 void searchtotalbyname(char *name)
 {
 	int i;
+	//先按总分排序
+	qsort(allstudents, allstudentscount, sizeof(student), cmpbytotal);
 	for (i = 0; i < allstudentscount; i++)
 		if (strcmp(name, allstudents[i].name) == 0)
 		{
+			printf("%s,第%d名, 详细如下\n", name, allstudentscount - i);
 			displaystudent(allstudents[i]);
 			return;
 		}
@@ -150,25 +153,6 @@ void promptsearchtotalbyname()
 	searchtotalbyname(name);
 }
 
-void searchtotalbyno(char no[])
-{
-	int i;
-	for (i = 0; i < allstudentscount; i++)
-		if (streq(allstudents[i].no, no))
-		{
-			displaystudent(allstudents[i]);
-			return;
-		}
-	printf("没找到对应学生的信息。\r\n");
-}
-
-void promptsearchtotalbyno()
-{
-	char no[MAX_STRLEN];
-	printf("请输入要查询的学号:");
-	scanf("%s", &no);
-	searchtotalbyno(no);
-}
 
 void addstudent(char no[], char name[], int scores[])
 {
@@ -294,7 +278,7 @@ int main()
 		printf("\n\t 2. 计算每门课程的总分和平均分");
 		printf("\n\t 3. 按学生总分由高到低排出名次表");
 		printf("\n\t 4. 按学号由小到大排出成绩表");
-		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
+		printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
 		//printf("\n\t 6. 统计");
 		printf("\n\t 7. 输出");
 		printf("\n\n  请选择: ");
@@ -326,11 +310,10 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			promptsearchtotalbyno();
+			promptsearchtotalbyname();
 			break;
 		case '6':
 			printf("\n\n你选择了 6\n");
-			promptsearchtotalbyname();
 			break;
 		case '7':
 			printf("\n\n你选择了 7\n");
