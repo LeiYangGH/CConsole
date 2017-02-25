@@ -26,8 +26,9 @@ int streq(char *s1, char *s2)
 
 void promptinputsubjectcount()
 {
-	printf("请输入科目数量（1～6）");
+	printf("请输入科目数量（1～6）:");
 	scanf("%d", &subjects_count);
+	fseek(stdin, 0, SEEK_END);
 	if (subjects_count < 1 || subjects_count>6)
 		subjects_count = 3;//默认科目数量
 }
@@ -174,7 +175,7 @@ void addstudent(char no[], char name[], int scores[])
 	{
 		stu.scores[i] = 0;
 	}
-	stu.average = stu.total / subjects_count;
+	stu.average = stu.total / (float)subjects_count;
 	allstudents[allstudentscount++] = stu;
 }
 
@@ -196,7 +197,13 @@ void createsamplestudents()
 	scores[4] = 0;
 	scores[5] = 0;
 	addstudent("20161465", "Shawn", scores);
-	//addstudent("16003", "Tony", 92, 82, 62);
+	scores[0] = 92;
+	scores[1] = 82;
+	scores[2] = 61;
+	scores[3] = 0;
+	scores[4] = 0;
+	scores[5] = 0;
+	addstudent("30161465", "Tony", scores);
 	//addstudent("16004", "Flex", 91, 81, 61);
 	//addstudent("16005", "Smile5", 63, 63, 66);
 	//addstudent("16006", "Smile6", 96, 83, 63);
@@ -232,6 +239,7 @@ void promptaddstudent()
 int main()
 {
 	int choice = -1;
+	promptinputsubjectcount();
 	createsamplestudents();
 	//displayallstudents();
 	//calcminmaxave();
