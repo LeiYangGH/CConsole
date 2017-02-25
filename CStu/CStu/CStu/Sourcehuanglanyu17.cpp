@@ -235,11 +235,40 @@ void promptaddstudent()
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
+void calcanddisplaytotalandaverageforonesubject(int subjectId)
+{
+	int i;
+	int totalSubject = 0;
+	float aveSubject;
+	student stu;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		totalSubject += allstudents[i].scores[subjectId];
+	}
+	aveSubject = totalSubject / (float)allstudentscount;
+	printf("%d\t%d\t%.1f\n", subjectId + 1, totalSubject, aveSubject);
+
+}
+
+void calcanddisplaytotalandaverage()
+{
+	int i;
+	int totalSubject = 0;
+	float aveSubject;
+	student stu;
+	printf("科目\t总分\t平均分\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < subjects_count; i++)
+	{
+		calcanddisplaytotalandaverageforonesubject(i);
+	}
+	printf("--------------------------------------------\r\n");
+}
 
 int main()
 {
 	int choice = -1;
-	promptinputsubjectcount();
+	//promptinputsubjectcount();
 	createsamplestudents();
 	//displayallstudents();
 	//calcminmaxave();
@@ -251,13 +280,14 @@ int main()
 		printf("\n\t 学生成绩输入查询统计");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 手动录入");
-		//printf("\n\t 2. 计算每门课程的总分和平均分");
+		printf("\n\t 2. 计算每门课程的总分和平均分");
 		//printf("\n\t 3. 按学生总分由高到低排出名次表");
 		//printf("\n\t 4. 按学号由小到大排出成绩表");
 		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
 		//printf("\n\t 6. 统计");
 		printf("\n\t 7. 输出");
 		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
@@ -273,7 +303,7 @@ int main()
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			calcminmaxave();
+			calcanddisplaytotalandaverage();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
