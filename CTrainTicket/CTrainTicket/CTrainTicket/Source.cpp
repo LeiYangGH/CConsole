@@ -164,77 +164,8 @@ int initdone = 0;
 //	allstudents[allstudentscount++] = stu;
 //}
 //
-//void createsamplestudents()
-//{
-//	int scores[MAX_SUBJECT_COUNT];
-//	printf("创建示例成绩数据...");
-//	scores[0] = 93;
-//	scores[1] = 96;
-//	scores[2] = 91;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addstudent("16001123", "Smile", scores);
-//	scores[0] = 95;
-//	scores[1] = 85;
-//	scores[2] = 65;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addstudent("20161465", "Shawn", scores);
-//	scores[0] = 92;
-//	scores[1] = 82;
-//	scores[2] = 1;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addstudent("30161465", "Tony", scores);
-//	//addstudent("16004", "Flex", 91, 81, 61);
-//	//addstudent("16005", "Smile5", 63, 63, 66);
-//	//addstudent("16006", "Smile6", 96, 83, 63);
-//	//addstudent("16007", "Smile7", 93, 83, 56);
-//	//addstudent("16008", "Smile8", 97, 83, 73);
-//	//addstudent("16009", "Smile9", 55, 55, 58);
-//	//addstudent("16010", "Smile10", 13, 13, 43);
-//	//allstudentscount = 1;
-//	printf("示例成绩数据已创建。\n");
-//
-//}
-//
-//void promptaddstudent()
-//{
-//	int i;
-//	char no[MAX_STRLEN];
-//	char name[MAX_STRLEN] = "";
-//	int scores[MAX_SUBJECT_COUNT];
-//	printf("\n请输入学号\n");
-//	scanf("%s", &no);
-//	printf("\n请输入姓名\n");
-//	scanf("%s", name);
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		printf("\n请输入第%d科成绩（整数）:", i + 1);
-//		scanf("%d", &scores[i]);
-//	}
-//	addstudent(no, name, scores);
-//	printf("完成第%d个入库录入!\r\n", allstudentscount);
-//}
-//
-//void calcanddisplaytotalandaverageforonesubject(int subjectId)
-//{
-//	int i;
-//	int totalSubject = 0;
-//	float aveSubject;
-//	student stu;
-//	for (i = 0; i < allstudentscount; i++)
-//	{
-//		totalSubject += allstudents[i].scores[subjectId];
-//	}
-//	aveSubject = totalSubject / (float)allstudentscount;
-//	printf("%d\t%d\t%.1f\n", subjectId + 1, totalSubject, aveSubject);
-//
-//}
-//
+
+
 //void calcanddisplaytotalandaverage()
 //{
 //	int i;
@@ -250,7 +181,7 @@ int initdone = 0;
 //	printf("--------------------------------------------\r\n");
 //}
 
-void initmax(int *num, int max, char *description)
+void inputnum(int *num, int max, char *description)
 {
 	int input = 0;
 	do
@@ -259,6 +190,7 @@ void initmax(int *num, int max, char *description)
 		scanf("%d", &input);
 		fseek(stdin, 0, SEEK_END);
 	} while (input<1 || input>max);
+	*num = input;
 }
 
 void init()
@@ -270,19 +202,56 @@ void init()
 	seatcount = 2;
 #else
 	if (initdone)
-		printf("已经初始化过，不能再初始化\n");
-	else
 	{
-		initmax(&traincount, MAX_TRAIN_COUNT, "车次数");
-		initmax(&carriagecount, MAX_CARRIAGE_COUNT, "每车次的车厢数");
-		initmax(&seatcount, MAX_SEAT_COUNT, "每车厢的座位数");
-		for (i = 0; i < traincount; i++)
-			for (j = 0; j < carriagecount; j++)
-				for (k = 0; k < seatcount; k++)
-					order[i][j][k] = 0;
-		initdone = 1;
+		printf("已经初始化过，不能再初始化\n");
+		return;
 	}
+	inputnum(&traincount, MAX_TRAIN_COUNT, "车次数");
+	inputnum(&carriagecount, MAX_CARRIAGE_COUNT, "每车次的车厢数");
+	inputnum(&seatcount, MAX_SEAT_COUNT, "每车厢的座位数");
+	for (i = 0; i < traincount; i++)
+		for (j = 0; j < carriagecount; j++)
+			for (k = 0; k < seatcount; k++)
+				order[i][j][k] = 0;
+	initdone = 1;
+
 #endif
+}
+
+void showavailableseats(int trainid, int carriageid)
+{
+	int train, i, j, k;
+	printf("第%d车次 第%d车厢剩余座位号如下:\n", trainid + 1, carriageid + 1);
+	printf("--------------------------------------------\n");
+	for (k = 0; k < seatcount; k++)
+	{
+		if (order[trainid][carriageid][k] == 0)
+		{
+			printf("%d\t", k + 1);
+		}
+	}
+	printf("\n--------------------------------------------\n");
+}
+
+
+
+void showavailable(int trainid)
+{
+	int j;
+	for (j = 0; j < carriagecount; j++)
+		showavailableseats(trainid, j);
+}
+
+void promptshowavailable()
+{
+	int i;
+	if (!initdone)
+	{
+		printf("请先初始化再执行其他操作\n");
+		return;
+	}
+	inputnum(&i, carriagecount, "要查询余票的车次");
+	showavailable(i - 1);
 }
 
 int main()
@@ -290,6 +259,8 @@ int main()
 	int choice = -1;
 #if TEST
 	init();
+	showavailable(0);
+	showavailable(1);
 	system("pause");
 #endif
 	while (choice != 0)
@@ -297,7 +268,7 @@ int main()
 		printf("\n\t 火车订票系统");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 初始化");
-		//printf("\n\t 2. 查询");
+		printf("\n\t 2. 查询");
 		//printf("\n\t 3. 售票");
 		//printf("\n\t 4. 退票");
 		printf("\n\n  请选择: ");
@@ -315,10 +286,10 @@ int main()
 			printf("\n\n你选择了 1\n");
 			init();
 			break;
-			//case '2':
-			//	printf("\n\n你选择了 2\n");
-			//	calcanddisplaytotalandaverage();
-			//	break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			promptshowavailable();
+			break;
 			//case '3':
 			//	printf("\n\n你选择了 3\n");
 			//	sortanddisplaybytotal();
