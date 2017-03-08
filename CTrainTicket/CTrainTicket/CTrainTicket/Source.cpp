@@ -254,13 +254,47 @@ void promptshowavailable()
 	showavailable(i - 1);
 }
 
+////
+void buy(int trainid, int carriageid, int seatid)
+{
+	if (order[trainid][carriageid][seatid] == 0)
+	{
+		order[trainid][carriageid][seatid] = 1;
+		printf("售票成功！第%d车次 第%d车厢 第%d号座位。\n", trainid + 1, carriageid + 1, seatid + 1);
+	}
+	else
+		printf("此票已经卖出！");
+}
+
+void promptbuy()
+{
+	int i, j, k;
+	if (!initdone)
+	{
+		printf("请先初始化再执行其他操作\n");
+		return;
+	}
+	inputnum(&i, traincount, "要购买的车次");
+	inputnum(&j, carriagecount, "要购买的车厢");
+	inputnum(&k, seatcount, "要购买的座位");
+	buy(i - 1, j - 1, k - 1);
+}
+///
+
+
 int main()
 {
 	int choice = -1;
 #if TEST
 	init();
+	//showavailable(0);
+	//showavailable(1);
+	buy(0, 0, 1);
+	buy(0, 0, 1);
 	showavailable(0);
-	showavailable(1);
+	buy(0, 1, 1);
+	showavailable(0);
+
 	system("pause");
 #endif
 	while (choice != 0)
@@ -269,7 +303,7 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 初始化");
 		printf("\n\t 2. 查询");
-		//printf("\n\t 3. 售票");
+		printf("\n\t 3. 售票");
 		//printf("\n\t 4. 退票");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -290,10 +324,10 @@ int main()
 			printf("\n\n你选择了 2\n");
 			promptshowavailable();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	sortanddisplaybytotal();
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			promptbuy();
+			break;
 			//case '4':
 			//	printf("\n\n你选择了 4\n");
 			//	sortanddisplaybyno();
