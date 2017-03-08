@@ -263,6 +263,7 @@ void initmax(int *num, int max, char *description)
 
 void init()
 {
+	int i, j, k;
 #if TEST
 	traincount = 2;
 	carriagecount = 2;
@@ -275,6 +276,10 @@ void init()
 		initmax(&traincount, MAX_TRAIN_COUNT, "车次数");
 		initmax(&carriagecount, MAX_CARRIAGE_COUNT, "每车次的车厢数");
 		initmax(&seatcount, MAX_SEAT_COUNT, "每车厢的座位数");
+		for (i = 0; i < traincount; i++)
+			for (j = 0; j < carriagecount; j++)
+				for (k = 0; k < seatcount; k++)
+					order[i][j][k] = 0;
 		initdone = 1;
 	}
 #endif
