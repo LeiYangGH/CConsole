@@ -121,11 +121,15 @@ int main(int argc, char *argv[])
 	//char line[200];
 	char filename[255] = "input.txt";
 	setlocale(LC_ALL, "chs");
-	if (argc > 1)
-	{
-		printf("%s\n", argv[1]);
-		strcpy(filename, argv[1]);
-	}
+	printf("请输入文件名：");
+
+	fgets(filename, 255, stdin);
+	strtok(filename, "\n\r");
+	//if (argc > 1)
+	//{
+	//	printf("%s\n", argv[1]);
+	//	strcpy(filename, argv[1]);
+	//}
 
 	fp = fopen(filename, "r");
 	if (fp == NULL)
