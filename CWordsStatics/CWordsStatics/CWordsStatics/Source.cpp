@@ -19,17 +19,7 @@ int maxcount = 0;
 FILE *fp;
 FILE *fpc;
 
-void count_words(FILE *f)
-{
-	char x[1024];
-	while (fscanf(f, " %1023s", x) == 1)
-	{
-		puts(x);
-	}
-}
-
-
-char *getWord()
+char *getword()
 {
 	char word[100];
 	int ch, i = 0;
@@ -46,26 +36,13 @@ char *getWord()
 	return strdup(word);
 }
 
-void fgetwsexample()
-{
-	wchar_t line[100];
-	while (fgetws(line, 100, fp) != NULL)
-	{
-		for (int i = 0; i < wcslen(line); i++)
-		{
-			int d = line[i];
-			if (d >= 19968 && d <= 40869)
-				wprintf(L"%c\n", line[i]);
-		}
-	}
-}
 
 void count_enwords()
 {
 	int i, exist;
 	char *word;
 
-	while (word = getWord())
+	while (word = getword())
 	{
 		exist = 0;
 		for (int i = 0; i < encnt; i++)
@@ -139,36 +116,36 @@ void count_chwords()
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i, j, exist;
 	char line[200];
-
+	char filename[255] = "input.txt";
 	setlocale(LC_ALL, "chs");
-	//wchar_t test[] = L"测试Test";
-	//wprintf(L"%s", test);
+	if (argc > 1)
+	{
+		printf("%s\n", argv[1]);
+		strcpy(filename, argv[1]);
+	}
 
-	//fgetwsexample();
-	//system("pause");
-
-	fp = fopen("input.txt", "r");
+	fp = fopen(filename, "r");
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!");
 		getchar();
 		exit(1);
 	}
+
 	count_enwords();
 	fclose(fp);
 
-	fpc = fopen("input.txt", "r");
-	if (fp == NULL)
+	fpc = fopen(filename, "r");
+	if (fpc == NULL)
 	{
 		printf("\n打开文件%s失败!");
 		getchar();
 		exit(1);
 	}
-	//fgetwsexample();
 	count_chwords();
 	fclose(fpc);
 
