@@ -1,16 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <string.h>
 #include <stdio.h>
 #include <locale.h>
 
 #define MAX_WORDS 1000
-char en[MAX_WORDS][20] = {};
+char en[MAX_WORDS][20];
 int encount[MAX_WORDS];
 int encnt = 0;
 
-wchar_t ch[MAX_WORDS] = {};
+wchar_t ch[MAX_WORDS];
 int chcount[MAX_WORDS];
 int chcnt = 0;
 
@@ -45,7 +44,7 @@ void count_enwords()
 	while (word = getword())
 	{
 		exist = 0;
-		for (int i = 0; i < encnt; i++)
+		for (i = 0; i < encnt; i++)
 		{
 			if (strcmp(en[i], word) == 0)
 			{
@@ -63,7 +62,7 @@ void count_enwords()
 	}
 
 
-	for (int i = 0; i < encnt; i++)
+	for (i = 0; i < encnt; i++)
 	{
 		if (maxcount < encount[i])
 			maxcount = encount[i];
@@ -74,14 +73,14 @@ void count_enwords()
 
 void count_chwords()
 {
-	int i, exist;
+	int i, j, d, exist;
 	char *word;
 
 	wchar_t line[100];
 	wchar_t c;
 	while (fgetws(line, 100, fp) != NULL)
 	{
-		for (int i = 0; i < wcslen(line); i++)
+		for (i = 0; i < wcslen(line); i++)
 		{
 			int d = line[i];
 			if (d >= 19968 && d <= 40869)
@@ -89,11 +88,11 @@ void count_chwords()
 				c = line[i];
 				//wprintf(L"%c\n", c);
 				exist = 0;
-				for (int i = 0; i < chcnt; i++)
+				for (j = 0; j < chcnt; j++)
 				{
-					if (ch[i] == c)
+					if (ch[j] == c)
 					{
-						chcount[i]++;
+						chcount[j]++;
 						exist = 1;
 						break;
 					}
@@ -108,7 +107,7 @@ void count_chwords()
 		}
 	}
 
-	for (int i = 0; i < chcnt; i++)
+	for (i = 0; i < chcnt; i++)
 	{
 		if (maxcount < chcount[i])
 			maxcount = chcount[i];
@@ -119,7 +118,7 @@ void count_chwords()
 int main(int argc, char *argv[])
 {
 	int i, j, exist;
-	char line[200];
+	//char line[200];
 	char filename[255] = "input.txt";
 	setlocale(LC_ALL, "chs");
 	if (argc > 1)
