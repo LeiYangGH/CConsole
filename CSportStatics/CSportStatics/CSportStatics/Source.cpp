@@ -213,7 +213,58 @@ void readallplayers()
 	printf("\n已读入文件!\n");
 
 }
+//**///
+result getresultfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	result q;
+	part = strtok(line, "\t\n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(q.playername, part);
+			break;
+		case 2:
+			strcpy(q.sportname, part);
+			break;
+		case 3:
+			q.score = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t\n");
+	}
+	q.playerid = 0;
+	q.sportid = 0;
+	return q;
+}
 
+void readallresults()
+{
+	char line[200];
+	FILE *fp = fopen(RESULT_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", RESULT_FILE);
+		getchar();
+		exit(1);
+	}
+	allresultscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allresults[allresultscount++] = getresultfromline(line);
+	}
+	printf("\n已读入文件!\n");
+
+}
+//**//
 //////
 //快速排序用
 //int cmpbytotal(const void * a, const void * b)
@@ -349,11 +400,12 @@ int main()
 	readallteams();
 	readallsports();
 	readallplayers();
-	addresult("p1", "s1", 11);
-	addresult("p1", "s2", 12);
-	addresult("p2", "s1", 21);
+	//addresult("p1", "s1", 11);
+	//addresult("p1", "s2", 12);
+	//addresult("p2", "s1", 21);
+	readallresults();
 	displayallresults();
-	writeallresults();
+	//writeallresults();
 #else
 
 
