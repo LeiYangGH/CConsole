@@ -4,11 +4,12 @@
 #define TEAM_FILE "team.txt"
 #define PLAYER_FILE "player.txt"
 #define SPORT_FILE "sport.txt"
+#define RESULT_FILE "result.txt"
 #define TEST 1
 typedef struct team
 {
-	char name[50];
-	char leader[50];
+	char name[20];
+	char leader[20];
 	int total;
 }team;
 team allteams[10];
@@ -16,19 +17,22 @@ int allteamscount = 0;
 
 typedef struct sport
 {
-	char name[50];
+	char name[20];
 }sport;
 sport allsports[10];
 int allsportscount = 0;
 
 typedef struct result
 {
+	char playername[20];
+	char sportname[20];
 	int playerid;
 	int sportid;
 	int score;
 }result;
 result allresults[50];
 int allresultscount = 0;
+
 typedef struct player
 {
 	char name[50];
@@ -60,29 +64,21 @@ int streq(char *s1, char *s2)
 //		subjects_count = 3;//默认科目数量
 //}
 //
-//void displayplayer(player stu)
-//{
-//	int i;
-//	printf("\r\n");
-//	printf("%s\t%s\t", stu.no, stu.name);
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		printf("%d\t", stu.scores[i]);
-//	}
-//	printf("%d\t%.1f\n", stu.total, stu.average);
-//
-//}
-//
-//void displayallplayers()
-//{
-//	int i;
-//	printf("--------------------------------------------\r\n");
-//	for (i = 0; i < allplayerscount; i++)
-//	{
-//		displayplayer(allplayers[i]);
-//	}
-//	printf("--------------------------------------------\r\n");
-//}
+void displayresult(result re)
+{
+	printf("%s\t%s\t%d\n", re.playername, re.sportname, re.score);
+}
+
+void displayallresults()
+{
+	int i;
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allresultscount; i++)
+	{
+		displayresult(allresults[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
 
 team getteamfromline(char *line)
 {
@@ -313,111 +309,39 @@ void readallplayers()
 //}
 //
 //
-//void addplayer(char no[], char name[], int scores[])
-//{
-//	int i;
-//	player stu;
-//	strcpy(stu.no, no);
-//	strcpy(stu.name, name);
-//	stu.total = 0;
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		stu.scores[i] = scores[i];
-//		stu.total += scores[i];
-//	}
-//	for (i = subjects_count; i < MAX_SUBJECT_COUNT; i++)
-//	{
-//		stu.scores[i] = 0;
-//	}
-//	stu.average = stu.total / (float)subjects_count;
-//	allplayers[allplayerscount++] = stu;
-//}
-//
-//void createsampleplayers()
-//{
-//	int scores[MAX_SUBJECT_COUNT];
-//	printf("创建示例成绩数据...");
-//	scores[0] = 93;
-//	scores[1] = 96;
-//	scores[2] = 91;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addplayer("16001123", "Smile", scores);
-//	scores[0] = 95;
-//	scores[1] = 85;
-//	scores[2] = 65;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addplayer("20161465", "Shawn", scores);
-//	scores[0] = 92;
-//	scores[1] = 82;
-//	scores[2] = 1;
-//	scores[3] = 0;
-//	scores[4] = 0;
-//	scores[5] = 0;
-//	addplayer("30161465", "Tony", scores);
-//	//addplayer("16004", "Flex", 91, 81, 61);
-//	//addplayer("16005", "Smile5", 63, 63, 66);
-//	//addplayer("16006", "Smile6", 96, 83, 63);
-//	//addplayer("16007", "Smile7", 93, 83, 56);
-//	//addplayer("16008", "Smile8", 97, 83, 73);
-//	//addplayer("16009", "Smile9", 55, 55, 58);
-//	//addplayer("16010", "Smile10", 13, 13, 43);
-//	//allplayerscount = 1;
-//	printf("示例成绩数据已创建。\n");
-//
-//}
-//
-//void promptaddplayer()
-//{
-//	int i;
-//	char no[MAX_STRLEN];
-//	char name[MAX_STRLEN] = "";
-//	int scores[MAX_SUBJECT_COUNT];
-//	printf("\n请输入学号\n");
-//	scanf("%s", &no);
-//	printf("\n请输入姓名\n");
-//	scanf("%s", name);
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		printf("\n请输入第%d科成绩（整数）:", i + 1);
-//		scanf("%d", &scores[i]);
-//	}
-//	addplayer(no, name, scores);
-//	printf("完成第%d个入库录入!\r\n", allplayerscount);
-//}
-//
-//void calcanddisplaytotalandaverageforonesubject(int subjectId)
-//{
-//	int i;
-//	int totalSubject = 0;
-//	float aveSubject;
-//	player stu;
-//	for (i = 0; i < allplayerscount; i++)
-//	{
-//		totalSubject += allplayers[i].scores[subjectId];
-//	}
-//	aveSubject = totalSubject / (float)allplayerscount;
-//	printf("%d\t%d\t%.1f\n", subjectId + 1, totalSubject, aveSubject);
-//
-//}
-//
-//void calcanddisplaytotalandaverage()
-//{
-//	int i;
-//	int totalSubject = 0;
-//	float aveSubject;
-//	player stu;
-//	printf("科目\t总分\t平均分\n");
-//	printf("--------------------------------------------\r\n");
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		calcanddisplaytotalandaverageforonesubject(i);
-//	}
-//	printf("--------------------------------------------\r\n");
-//}
+void addresult(char *playername, char *sportname, int score)
+{
+	int i;
+	result re;
+	strcpy(re.playername, playername);
+	strcpy(re.sportname, sportname);
+	re.score = score;
+	//
+	re.sportid = 0;
+	re.playerid = 0;
+	allresults[allresultscount++] = re;
+}
+
+void writeallresults()
+{
+	FILE *fp = fopen(RESULT_FILE, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", RESULT_FILE);
+		getchar();
+		exit(1);
+	}
+
+	int i;
+	result re;
+	for (i = 0; i < allresultscount; i++)
+	{
+		re = allresults[i];
+		fprintf(fp, "%s\t%s\t%d\n", re.playername, re.sportname, re.score);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
 
 int main()
 {
@@ -425,6 +349,11 @@ int main()
 	readallteams();
 	readallsports();
 	readallplayers();
+	addresult("p1", "s1", 11);
+	addresult("p1", "s2", 12);
+	addresult("p2", "s1", 21);
+	displayallresults();
+	writeallresults();
 #else
 
 
