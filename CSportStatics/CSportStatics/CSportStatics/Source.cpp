@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define MAX_STRLEN 20
-#define MAX_SUBJECT_COUNT 6
 #define TEAM_FILE "team.txt"
 #define PLAYER_FILE "player.txt"
+#define SPORT_FILE "sport.txt"
 #define TEST 1
 typedef struct team
 {
@@ -14,6 +13,14 @@ typedef struct team
 }team;
 team allteams[10];
 int allteamscount = 0;
+
+typedef struct sport
+{
+	char name[50];
+}sport;
+sport allsports[10];
+int allsportscount = 0;
+
 typedef struct result
 {
 	int playerid;
@@ -28,9 +35,6 @@ typedef struct player
 	char teamname[50];
 	int teamid;
 }player;
-
-int subjects_count = 3;//默认科目数
-
 player allplayers[50];
 int allplayerscount = 0;
 
@@ -46,39 +50,39 @@ int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-
-void promptinputsubjectcount()
-{
-	printf("请输入科目数量（1～6）:");
-	scanf("%d", &subjects_count);
-	fseek(stdin, 0, SEEK_END);
-	if (subjects_count < 1 || subjects_count>6)
-		subjects_count = 3;//默认科目数量
-}
-
-void displayplayer(player stu)
-{
-	//int i;
-	//printf("\r\n");
-	//printf("%s\t%s\t", stu.no, stu.name);
-	//for (i = 0; i < subjects_count; i++)
-	//{
-	//	printf("%d\t", stu.scores[i]);
-	//}
-	//printf("%d\t%.1f\n", stu.total, stu.average);
-
-}
-
-void displayallplayers()
-{
-	int i;
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allplayerscount; i++)
-	{
-		displayplayer(allplayers[i]);
-	}
-	printf("--------------------------------------------\r\n");
-}
+//
+//void promptinputsubjectcount()
+//{
+//	printf("请输入科目数量（1～6）:");
+//	scanf("%d", &subjects_count);
+//	fseek(stdin, 0, SEEK_END);
+//	if (subjects_count < 1 || subjects_count>6)
+//		subjects_count = 3;//默认科目数量
+//}
+//
+//void displayplayer(player stu)
+//{
+//	int i;
+//	printf("\r\n");
+//	printf("%s\t%s\t", stu.no, stu.name);
+//	for (i = 0; i < subjects_count; i++)
+//	{
+//		printf("%d\t", stu.scores[i]);
+//	}
+//	printf("%d\t%.1f\n", stu.total, stu.average);
+//
+//}
+//
+//void displayallplayers()
+//{
+//	int i;
+//	printf("--------------------------------------------\r\n");
+//	for (i = 0; i < allplayerscount; i++)
+//	{
+//		displayplayer(allplayers[i]);
+//	}
+//	printf("--------------------------------------------\r\n");
+//}
 
 team getteamfromline(char *line)
 {
@@ -127,6 +131,30 @@ void readallteams()
 
 }
 
+
+void readallsports()
+{
+	char line[200];
+	FILE *fp = fopen(SPORT_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", SPORT_FILE);
+		getchar();
+		exit(1);
+	}
+	allsportscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 2)
+			continue;
+		sport q;
+		strcpy(q.name, strtok(line, "\t\n"));
+		allsports[allsportscount++] = q;
+	}
+	printf("\n已读入文件!\n");
+
+}
 
 //////
 int getteamidbyname(char *name)
@@ -395,6 +423,7 @@ int main()
 {
 #if TEST
 	readallteams();
+	readallsports();
 	readallplayers();
 #else
 
