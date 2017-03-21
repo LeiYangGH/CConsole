@@ -4,6 +4,24 @@
 #define MAX_STRLEN 20
 #define MAX_SUBJECT_COUNT 6
 #define STUDENTS_COUNT 30
+#define TEAM_FILE "team.txt"
+#define TEST 1
+typedef struct team
+{
+	char name[50];
+	char leader[50];
+	int total;
+}team;
+team allteams[10];
+int allteamscnt = 0;
+typedef struct result
+{
+	int playerid;
+	int sportid;
+	int score;
+}result;
+result allresults[50];
+int allresultscount = 0;
 typedef struct student
 {
 	char no[50];
@@ -49,6 +67,53 @@ void displayallstudents()
 		displaystudent(allstudents[i]);
 	}
 	printf("--------------------------------------------\r\n");
+}
+
+team getteamfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	team q;
+	part = strtok(line, "\t");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(q.name, part);
+			break;
+		case 2:
+			strcpy(q.leader, part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t");
+	}
+	q.total = 0;
+	return q;
+}
+
+void readallteams()
+{
+	char line[200];
+	FILE *fp = fopen(TEAM_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", TEAM_FILE);
+		getchar();
+		exit(1);
+	}
+	allteamscnt = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allteams[allteamscnt++] = getteamfromline(line);
+	}
+	printf("\n已读入文件!\n");
+
 }
 
 //快速排序用
@@ -253,6 +318,11 @@ void calcanddisplaytotalandaverage()
 
 int main()
 {
+#if TEST
+	readallteams();
+#else
+
+
 	int choice = -1;
 	promptinputsubjectcount();
 	createsamplestudents();
@@ -313,6 +383,7 @@ int main()
 		}
 	}
 	fseek(stdin, 0, SEEK_END);
+#endif // TEST
 	system("pause");
 	return 0;
 }
