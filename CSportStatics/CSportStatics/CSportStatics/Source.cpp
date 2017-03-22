@@ -59,12 +59,13 @@ int streq(char *s1, char *s2)
 
 void displayresult(result re)
 {
-	printf("%s\t%s\t%d\n", re.playername, re.sportname, re.score);
+	printf("%s\t%s\t%d\t%d\t%d\n", re.playername, re.sportname, re.score, re.order, re.points);
 }
 
 void displayallresults()
 {
 	int i;
+	printf("姓名\t比赛\t成绩\t排名\t积分\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allresultscount; i++)
 	{
@@ -360,28 +361,7 @@ void promptaddresult()
 
 //**//
 //////
-//快速排序用
-//int cmpbytotal(const void * a, const void * b)
-//{
-//	return ((player*)a)->total - ((player*)b)->total;
-//}
-//
 
-//
-//void sortanddisplaybytotal()
-//{
-//	qsort(allplayers, allplayerscount, sizeof(player), cmpbytotal);
-//	printf("按总分排序后如下\r\n");
-//	displayallplayers();
-//}
-//
-//void sortanddisplaybyno()
-//{
-//	qsort(allplayers, allplayerscount, sizeof(player), cmpbyno);
-//	printf("按学号排序后如下\r\n");
-//	displayallplayers();
-//}
-// 
 int cmpbyscoredesc(const void * a, const void * b)
 {
 	return *(int*)b - *(int*)a;
@@ -410,22 +390,39 @@ void sortandgetorders(int scores[], int scorescnt, int orders[])//init -1
 
 }
 
-void setresultorderpointsvalue(char *playername, char *sportname, int order, int points)
+void setresultorderpointsvalue(char *playername, char *sportname, int order)
 {
-
+	int i;
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].playername, playername)
+			&& streq(allresults[i].sportname, sportname))
+		{
+			allresults[i].order = order;
+			if (order == 1)
+				allresults[i].points = 3;
+			else if (order == 2)
+				allresults[i].points = 2;
+			else if (order == 3)
+				allresults[i].points = 1;
+			else
+				allresults[i].points = 0;
+			break;
+		}
+	}
 }
 void calcresultorderpointsbysport(char *sportname)
 {
 	int i;
-	int t1, t2, t3;
+	int orders[100] = { 0 };
 	int playerinsportcnt = 0;
 	int copyscores[100];
-	result copyresults[100];
+	result copyresults[100] = {};
 	for (i = 0; i < allresultscount; i++)
 	{
 		if (streq(allresults[i].sportname, sportname))
 		{
-			copyresults[i] = allresults[i];
+			copyresults[playerinsportcnt] = allresults[i];
 			playerinsportcnt++;
 		}
 	}
@@ -435,38 +432,43 @@ void calcresultorderpointsbysport(char *sportname)
 	{
 		copyscores[i] = copyresults[i].score;
 	}
-	//sortandgettop3(copyscores, playerinsportcnt, &t1, &t2, &t3);
-	//if (playerinsportcnt >= 3)
-	//{
+	sortandgetorders(copyscores, playerinsportcnt, orders);
+	for (i = 0; i < playerinsportcnt; i++)
+	{
+		setresultorderpointsvalue(copyresults[i].playername, copyresults[i].sportname, orders[i]);
+	}
+}
 
-	//}
-	//else
+void calcallresultorderpoints()
+{
+	int i;
+	for (i = 0; i < allsportscount; i++)
+	{
+		calcresultorderpointsbysport(allsports[i].name);
+	}
 }
 
 int main()
 {
 	int choice = -1;
-	//readallteams();
-	//readallsports();
-	//readallplayers();
-	//readallresults();
-	//displayallresults();
+	readallteams();
+	readallsports();
+	readallplayers();
+	readallresults();
+	calcallresultorderpoints();
+	displayallresults();
 
 
 #if TEST
 	int i;
-	int n = 1;
-	int orders[100] = { 0 };
-	int nums[] = { 24 };
-	sortandgetorders(nums, n, orders);
+	//int n = 1;
+	//int orders[100] = { 0 };
+	//int nums[] = { 24 };
+	//sortandgetorders(nums, n, orders);
 	//for (i = 0; i < n; i++)
 	//{
-	//	printf("%d\n", nums[i]);
+	//	printf("%d\t", orders[i]);
 	//}
-	for (i = 0; i < n; i++)
-	{
-		printf("%d\t", orders[i]);
-	}
 
 
 	//addresult("p1", "s1", 11);
