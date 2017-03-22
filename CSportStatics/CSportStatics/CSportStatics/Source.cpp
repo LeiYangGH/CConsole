@@ -26,6 +26,7 @@ int allsportscount = 0;
 typedef struct result
 {
 	char playername[20];
+	char teamname[20];
 	char sportname[20];
 	int score;
 	int order;
@@ -74,6 +75,25 @@ void displayallresults()
 	printf("--------------------------------------------\r\n");
 }
 
+
+//-
+void displayteam(team t)
+{
+	printf("%s\t%s\t%d\t%d\n", t.name, t.leader, t.points, t.order);
+}
+
+void displayallteams()
+{
+	int i;
+	printf("团队\t领队\t积分\t排名\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allteamscount; i++)
+	{
+		displayteam(allteams[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+//-///
 team getteamfromline(char *line)
 {
 	char *part;
@@ -147,19 +167,8 @@ void readallsports()
 }
 
 //////
-//int getteamidbyname(char *name)
-//{
-//	int i;
-//	for (i = 0; i < allteamscount; i++)
-//	{
-//		if (streq(allteams[i].name, name))
-//		{
-//			return i;
-//		}
-//	}
-//	printf("\n基础数据中未找到团队名称%s!\n", name);
-//	return -1;
-//}
+
+
 player getplayerfromline(char *line)
 {
 	char *part;
@@ -206,10 +215,29 @@ void readallplayers()
 	printf("\n已读入文件!\n");
 
 }
+
+void getteamdbyplayer(char *playername, char teamname[])
+{
+	int i;
+	int found = 0;
+	for (i = 0; i < allplayerscount; i++)
+	{
+		if (streq(allplayers[i].name, playername))
+		{
+			strcpy(teamname, allplayers[i].teamname);
+			found = 1;
+			break;
+		}
+	}
+	if (found == 0)
+		printf("\n基础数据中未找到姓名%s对应的团队!\n", playername);
+}
+
 //**///
 result getresultfromline(char *line)
 {
 	char *part;
+	char teamname[20] = "";
 	int index = 0;
 	result q;
 	part = strtok(line, "\t\n");
@@ -219,6 +247,8 @@ result getresultfromline(char *line)
 		{
 		case 1:
 			strcpy(q.playername, part);
+			getteamdbyplayer(part, teamname);
+			strcpy(q.teamname, teamname);
 			break;
 		case 2:
 			strcpy(q.sportname, part);
@@ -415,9 +445,11 @@ void calcallresultorderpoints()
 }
 
 
+
 void addresult(char *playername, char *sportname, int score)
 {
 	int i;
+	char teamname[20] = "";
 	if (checkplayerexists(playername)
 		&& checksportexists(sportname)
 		&& !checkplayersportexists(playername, sportname)
@@ -427,6 +459,8 @@ void addresult(char *playername, char *sportname, int score)
 		strcpy(re.playername, playername);
 		strcpy(re.sportname, sportname);
 		re.score = score;
+		getteamdbyplayer(playername, teamname);
+		strcpy(re.teamname, teamname);
 		//
 		allresults[allresultscount++] = re;
 		appendresult(re);
@@ -448,10 +482,44 @@ void promptaddresult()
 }
 
 //**//
+void calconeteam(char *teamname)
+{
+	int i;
+	int totalpoints = 0;
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].teamname, teamname))
+		{
+			totalpoints += allresults[i].points;
+		}
+	}
+	for (i = 0; i < allteamscount; i++)
+	{
+		if (streq(allteams[i].name, teamname))
+		{
+			allteams[i].points = totalpoints;
+			break;
+		}
+	}
+}
 //////
-
-
- 
+int cmpteambypointsdesc(const void * a, const void * b)
+{
+	return ((team*)b)->points - ((team*)a)->points;
+}
+void calcallteams()
+{
+	int i;
+	for (i = 0; i < allteamscount; i++)
+	{
+		calconeteam(allteams[i].name);
+	}
+	qsort(allteams, allteamscount, sizeof(team), cmpteambypointsdesc);
+	for (i = 0; i < allteamscount; i++)
+	{
+		allteams[i].order = i + 1;
+	}
+}
 
 int main()
 {
@@ -466,6 +534,9 @@ int main()
 
 #if TEST
 	int i;
+
+	calcallteams();
+	displayallteams();
 	//int n = 1;
 	//int orders[100] = { 0 };
 	//int nums[] = { 24 };
@@ -493,6 +564,7 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 录入成绩");
 		printf("\n\t 2. 查看所有成绩");
+		printf("\n\t 3. 查看团队排名");
 		//printf("\n\t 3. 按学生总分由高到低排出名次表");
 		//printf("\n\t 4. 按学号由小到大排出成绩表");
 		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
@@ -517,10 +589,11 @@ int main()
 			printf("\n\n你选择了 2\n");
 			displayallresults();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	sortanddisplaybytotal();
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			calcallteams();
+			displayallteams();
+			break;
 			//case '4':
 			//	printf("\n\n你选择了 4\n");
 			//	sortanddisplaybyno();
