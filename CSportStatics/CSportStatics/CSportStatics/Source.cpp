@@ -5,7 +5,6 @@
 #define PLAYER_FILE "player.txt"
 #define SPORT_FILE "sport.txt"
 #define RESULT_FILE "result.txt"
-#define TEST 0
 typedef struct team
 {
 	char name[20];
@@ -76,7 +75,6 @@ void displayallresults()
 }
 
 
-//-
 void displayteam(team t)
 {
 	printf("%s\t%s\t%d\t%d\n", t.name, t.leader, t.points, t.order);
@@ -93,7 +91,7 @@ void displayallteams()
 	}
 	printf("--------------------------------------------\r\n");
 }
-//-///
+
 team getteamfromline(char *line)
 {
 	char *part;
@@ -141,7 +139,6 @@ void readallteams()
 
 }
 
-
 void readallsports()
 {
 	char line[200];
@@ -166,9 +163,6 @@ void readallsports()
 
 }
 
-//////
-
-
 player getplayerfromline(char *line)
 {
 	char *part;
@@ -190,7 +184,6 @@ player getplayerfromline(char *line)
 		}
 		part = strtok(NULL, "\t\n");
 	}
-	//q.total = 0;
 	return q;
 }
 
@@ -233,7 +226,6 @@ void getteamdbyplayer(char *playername, char teamname[])
 		printf("\n基础数据中未找到姓名%s对应的团队!\n", playername);
 }
 
-//**///
 result getresultfromline(char *line)
 {
 	char *part;
@@ -374,16 +366,12 @@ void sortandgetorders(int scores[], int scorescnt, int orders[])//init -1
 	for (i = 0; i < scorescnt; i++)
 		for (s = 0; s < scorescnt; s++)
 		{
-			//printf("scores[%d]=%d\tsortscores[%d]=%d\n", i, scores[i], s, sortscores[s]);
-
 			if (scores[i] == sortscores[s])
 			{
 				orders[i] = s + 1;
 				break;
 			}
 		}
-	//printf("%d\t", nums[i]);
-
 }
 
 void setresultorderpointsvalue(char *playername, char *sportname, int order)
@@ -444,8 +432,6 @@ void calcallresultorderpoints()
 	}
 }
 
-
-
 void addresult(char *playername, char *sportname, int score)
 {
 	int i;
@@ -461,14 +447,11 @@ void addresult(char *playername, char *sportname, int score)
 		re.score = score;
 		getteamdbyplayer(playername, teamname);
 		strcpy(re.teamname, teamname);
-		//
 		allresults[allresultscount++] = re;
 		appendresult(re);
-		//printf("\n比赛成绩添加成功!\n");
 		calcallresultorderpoints();
 	}
 }
-
 
 void promptaddresult()
 {
@@ -481,7 +464,6 @@ void promptaddresult()
 	addresult(playername, sportname, score);
 }
 
-//**//
 void calconeteam(char *teamname)
 {
 	int i;
@@ -502,7 +484,7 @@ void calconeteam(char *teamname)
 		}
 	}
 }
-//////
+
 int cmpteambypointsdesc(const void * a, const void * b)
 {
 	return ((team*)b)->points - ((team*)a)->points;
@@ -537,6 +519,7 @@ void displayteambyplayer(char *playername)
 		}
 	}
 }
+
 void promptdisplayteambyplayer()
 {
 	char playername[20] = "";
@@ -578,34 +561,6 @@ int main()
 	calcallresultorderpoints();
 	displayallresults();
 
-
-#if TEST
-	int i;
-	displayplayer("p2");
-	//displayteambyplayer("p3");
-	//calcallteams();
-	//displayallteams();
-	//int n = 1;
-	//int orders[100] = { 0 };
-	//int nums[] = { 24 };
-	//sortandgetorders(nums, n, orders);
-	//for (i = 0; i < n; i++)
-	//{
-	//	printf("%d\t", orders[i]);
-	//}
-
-
-	//addresult("p1", "s1", 11);
-	//addresult("p1", "s2", 12);
-	//addresult("p2", "s1", 21);
-
-	//promptaddresult();
-	//addresult("p2", "s3", 22);
-	//writeallresults();
-#else
-
-
-
 	while (choice != 0)
 	{
 		printf("\n\t 比赛成绩录入统计");
@@ -615,8 +570,6 @@ int main()
 		printf("\n\t 3. 查看所有团队");
 		printf("\n\t 4. 运动员姓名查看团队");
 		printf("\n\t 5. 运动员姓名查看自己的比赛");
-		//printf("\n\t 6. 统计");
-		//printf("\n\t 7. ");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -649,22 +602,12 @@ int main()
 			printf("\n\n你选择了 5\n");
 			promptdisplayplayer();
 			break;
-			//case '6':
-			//	printf("\n\n你选择了 6\n");
-			//	countbygrades();
-			//	break;
-			//case '7':
-			//	printf("\n\n你选择了 7\n");
-			//	sortanddisplaybyno();
-			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
+			fseek(stdin, 0, SEEK_END);
+			system("pause");
+			return 0;
 		}
 	}
-	fseek(stdin, 0, SEEK_END);
-#endif // TEST
-	system("pause");
-	return 0;
 }
-
