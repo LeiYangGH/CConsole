@@ -26,8 +26,6 @@ typedef struct result
 {
 	char playername[20];
 	char sportname[20];
-	int playerid;
-	int sportid;
 	int score;
 }result;
 result allresults[50];
@@ -37,7 +35,6 @@ typedef struct player
 {
 	char name[50];
 	char teamname[50];
-	int teamid;
 }player;
 player allplayers[50];
 int allplayerscount = 0;
@@ -153,19 +150,19 @@ void readallsports()
 }
 
 //////
-int getteamidbyname(char *name)
-{
-	int i;
-	for (i = 0; i < allteamscount; i++)
-	{
-		if (streq(allteams[i].name, name))
-		{
-			return i;
-		}
-	}
-	printf("\n基础数据中未找到团队名称%s!\n", name);
-	return -1;
-}
+//int getteamidbyname(char *name)
+//{
+//	int i;
+//	for (i = 0; i < allteamscount; i++)
+//	{
+//		if (streq(allteams[i].name, name))
+//		{
+//			return i;
+//		}
+//	}
+//	printf("\n基础数据中未找到团队名称%s!\n", name);
+//	return -1;
+//}
 player getplayerfromline(char *line)
 {
 	char *part;
@@ -181,7 +178,6 @@ player getplayerfromline(char *line)
 			break;
 		case 2:
 			strcpy(q.teamname, part);
-			q.teamid = getteamidbyname(part);
 			break;
 		default:
 			break;
@@ -238,8 +234,6 @@ result getresultfromline(char *line)
 		}
 		part = strtok(NULL, "\t\n");
 	}
-	q.playerid = 0;
-	q.sportid = 0;
 	return q;
 }
 
@@ -368,8 +362,6 @@ void addresult(char *playername, char *sportname, int score)
 	strcpy(re.sportname, sportname);
 	re.score = score;
 	//
-	re.sportid = 0;
-	re.playerid = 0;
 	allresults[allresultscount++] = re;
 }
 
