@@ -5,7 +5,7 @@
 #define PLAYER_FILE "player.txt"
 #define SPORT_FILE "sport.txt"
 #define RESULT_FILE "result.txt"
-#define TEST 1
+#define TEST 0
 typedef struct team
 {
 	char name[20];
@@ -51,16 +51,7 @@ int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-//
-//void promptinputsubjectcount()
-//{
-//	printf("请输入科目数量（1～6）:");
-//	scanf("%d", &subjects_count);
-//	fseek(stdin, 0, SEEK_END);
-//	if (subjects_count < 1 || subjects_count>6)
-//		subjects_count = 3;//默认科目数量
-//}
-//
+
 void displayresult(result re)
 {
 	printf("%s\t%s\t%d\n", re.playername, re.sportname, re.score);
@@ -354,68 +345,142 @@ void readallresults()
 //}
 //
 //
-void addresult(char *playername, char *sportname, int score)
+int checkplayerexists(char *name)
 {
 	int i;
-	result re;
-	strcpy(re.playername, playername);
-	strcpy(re.sportname, sportname);
-	re.score = score;
-	//
-	allresults[allresultscount++] = re;
+	for (i = 0; i < allplayerscount; i++)
+	{
+		if (streq(allplayers[i].name, name))
+		{
+			return 1;
+		}
+	}
+	printf("\n基础数据中未找到选手%s!\n", name);
+	return 0;
 }
 
-void writeallresults()
+int checksportexists(char *name)
 {
-	FILE *fp = fopen(RESULT_FILE, "w+");
+	int i;
+	for (i = 0; i < allsportscount; i++)
+	{
+		if (streq(allsports[i].name, name))
+		{
+			return 1;
+		}
+	}
+	printf("\n基础数据中未找到比赛%s!\n", name);
+	return 0;
+}
+
+int checkplayersportexists(char *playername, char *sportname)
+{
+	int i;
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].playername, playername)
+			&& streq(allresults[i].sportname, sportname))
+		{
+			printf("\n同一选手不能多次参加同一比赛!\n");
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int checksportscoreexists(char *sportname, int score)
+{
+	int i;
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].sportname, sportname)
+			&& allresults[i].score == score)
+		{
+			printf("\n同一比赛分数必须唯一，否则无法计算排名!\n");
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void appendresult(result re)
+{
+	FILE *fp = fopen(RESULT_FILE, "a");
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!", RESULT_FILE);
 		getchar();
 		exit(1);
 	}
-
-	int i;
-	result re;
-	for (i = 0; i < allresultscount; i++)
-	{
-		re = allresults[i];
-		fprintf(fp, "%s\t%s\t%d\n", re.playername, re.sportname, re.score);
-	}
+	fprintf(fp, "%s\t%s\t%d\n", re.playername, re.sportname, re.score);
 	fclose(fp);
-	printf("已保存记录到文件。");
+	printf("已保存成绩到文件。");
+}
+
+void addresult(char *playername, char *sportname, int score)
+{
+	int i;
+	if (checkplayerexists(playername)
+		&& checksportexists(sportname)
+		&& !checkplayersportexists(playername, sportname)
+		&& !checksportscoreexists(sportname, score))
+	{
+		result re;
+		strcpy(re.playername, playername);
+		strcpy(re.sportname, sportname);
+		re.score = score;
+		//
+		allresults[allresultscount++] = re;
+		appendresult(re);
+		//printf("\n比赛成绩添加成功!\n");
+	}
+}
+
+
+void promptaddresult()
+{
+	char playername[20] = "";
+	char sportname[20] = "";
+	int score = 0;
+	printf("请依次输入选手姓名、比赛项目、得分（整数），空格隔开，回车结束:");
+	scanf("%s%s%d", playername, sportname, &score);
+	fseek(stdin, 0, SEEK_END);
+	addresult(playername, sportname, score);
 }
 
 int main()
 {
-#if TEST
+	int choice = -1;
 	readallteams();
 	readallsports();
 	readallplayers();
+	readallresults();
+	displayallresults();
+#if TEST
+
+
 	//addresult("p1", "s1", 11);
 	//addresult("p1", "s2", 12);
 	//addresult("p2", "s1", 21);
-	readallresults();
-	displayallresults();
+
+	promptaddresult();
+	//addresult("p2", "s3", 22);
 	//writeallresults();
 #else
 
 
-	int choice = -1;
-	promptinputsubjectcount();
-	createsampleplayers();
-	//system("pause");
+ 
 	while (choice != 0)
 	{
-		printf("\n\t 学生成绩输入查询统计");
+		printf("\n\t 比赛成绩录入统计");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 手动录入");
-		printf("\n\t 2. 计算每门课程的总分和平均分");
-		printf("\n\t 3. 按学生总分由高到低排出名次表");
-		printf("\n\t 4. 按学号由小到大排出成绩表");
-		printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
-		printf("\n\t 6. 统计");
-		printf("\n\t 7. 输出");
+		printf("\n\t 1. 录入成绩");
+		printf("\n\t 2. 查看所有成绩");
+		//printf("\n\t 3. 按学生总分由高到低排出名次表");
+		//printf("\n\t 4. 按学号由小到大排出成绩表");
+		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
+		//printf("\n\t 6. 统计");
+		//printf("\n\t 7. ");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -429,31 +494,31 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaddplayer();
+			promptaddresult();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			calcanddisplaytotalandaverage();
+			displayallresults();
 			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			sortanddisplaybytotal();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			sortanddisplaybyno();
-			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			promptsearchtotalbyname();
-			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
-			countbygrades();
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			sortanddisplaybyno();
+		//case '3':
+		//	printf("\n\n你选择了 3\n");
+		//	sortanddisplaybytotal();
+		//	break;
+		//case '4':
+		//	printf("\n\n你选择了 4\n");
+		//	sortanddisplaybyno();
+		//	break;
+		//case '5':
+		//	printf("\n\n你选择了 5\n");
+		//	promptsearchtotalbyname();
+		//	break;
+		//case '6':
+		//	printf("\n\n你选择了 6\n");
+		//	countbygrades();
+		//	break;
+		//case '7':
+		//	printf("\n\n你选择了 7\n");
+		//	sortanddisplaybyno();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
