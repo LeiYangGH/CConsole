@@ -5,7 +5,7 @@
 #define PLAYER_FILE "player.txt"
 #define SPORT_FILE "sport.txt"
 #define RESULT_FILE "result.txt"
-#define TEST 1
+#define TEST 0
 typedef struct team
 {
 	char name[20];
@@ -328,40 +328,6 @@ void appendresult(result re)
 	printf("已保存成绩到文件。");
 }
 
-void addresult(char *playername, char *sportname, int score)
-{
-	int i;
-	if (checkplayerexists(playername)
-		&& checksportexists(sportname)
-		&& !checkplayersportexists(playername, sportname)
-		&& !checksportscoreexists(sportname, score))
-	{
-		result re;
-		strcpy(re.playername, playername);
-		strcpy(re.sportname, sportname);
-		re.score = score;
-		//
-		allresults[allresultscount++] = re;
-		appendresult(re);
-		//printf("\n比赛成绩添加成功!\n");
-	}
-}
-
-
-void promptaddresult()
-{
-	char playername[20] = "";
-	char sportname[20] = "";
-	int score = 0;
-	printf("请依次输入选手姓名、比赛项目、得分（整数），空格隔开，回车结束:");
-	scanf("%s%s%d", playername, sportname, &score);
-	fseek(stdin, 0, SEEK_END);
-	addresult(playername, sportname, score);
-}
-
-//**//
-//////
-
 int cmpbyscoredesc(const void * a, const void * b)
 {
 	return *(int*)b - *(int*)a;
@@ -447,6 +413,45 @@ void calcallresultorderpoints()
 		calcresultorderpointsbysport(allsports[i].name);
 	}
 }
+
+
+void addresult(char *playername, char *sportname, int score)
+{
+	int i;
+	if (checkplayerexists(playername)
+		&& checksportexists(sportname)
+		&& !checkplayersportexists(playername, sportname)
+		&& !checksportscoreexists(sportname, score))
+	{
+		result re;
+		strcpy(re.playername, playername);
+		strcpy(re.sportname, sportname);
+		re.score = score;
+		//
+		allresults[allresultscount++] = re;
+		appendresult(re);
+		//printf("\n比赛成绩添加成功!\n");
+		calcallresultorderpoints();
+	}
+}
+
+
+void promptaddresult()
+{
+	char playername[20] = "";
+	char sportname[20] = "";
+	int score = 0;
+	printf("请依次输入选手姓名、比赛项目、得分（整数），空格隔开，回车结束:");
+	scanf("%s%s%d", playername, sportname, &score);
+	fseek(stdin, 0, SEEK_END);
+	addresult(playername, sportname, score);
+}
+
+//**//
+//////
+
+
+ 
 
 int main()
 {
