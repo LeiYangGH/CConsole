@@ -5,12 +5,13 @@
 #define PLAYER_FILE "player.txt"
 #define SPORT_FILE "sport.txt"
 #define RESULT_FILE "result.txt"
-#define TEST 0
+#define TEST 1
 typedef struct team
 {
 	char name[20];
 	char leader[20];
-	int total;
+	int points;
+	int order;
 }team;
 team allteams[10];
 int allteamscount = 0;
@@ -27,6 +28,8 @@ typedef struct result
 	char playername[20];
 	char sportname[20];
 	int score;
+	int order;
+	int points;
 }result;
 result allresults[50];
 int allresultscount = 0;
@@ -35,6 +38,8 @@ typedef struct player
 {
 	char name[50];
 	char teamname[50];
+	int points;
+	int order;
 }player;
 player allplayers[50];
 int allplayerscount = 0;
@@ -89,7 +94,7 @@ team getteamfromline(char *line)
 		}
 		part = strtok(NULL, "\t\n");
 	}
-	q.total = 0;
+	q.points = 0;
 	return q;
 }
 
@@ -249,102 +254,7 @@ void readallresults()
 	printf("\n已读入文件!\n");
 
 }
-//**//
-//////
-//快速排序用
-//int cmpbytotal(const void * a, const void * b)
-//{
-//	return ((player*)a)->total - ((player*)b)->total;
-//}
-//
-//int cmpbyno(const void * a, const void * b)
-//{
-//	return ((player*)a)->no - ((player*)b)->no;
-//}
-//
-//void sortanddisplaybytotal()
-//{
-//	qsort(allplayers, allplayerscount, sizeof(player), cmpbytotal);
-//	printf("按总分排序后如下\r\n");
-//	displayallplayers();
-//}
-//
-//void sortanddisplaybyno()
-//{
-//	qsort(allplayers, allplayerscount, sizeof(player), cmpbyno);
-//	printf("按学号排序后如下\r\n");
-//	displayallplayers();
-//}
-//
-//void countbygradesforonesubject(int subjectId)
-//{
-//	int i, t, cnt100_90 = 0, cnt89_80 = 0, cnt79_70 = 0, cnt69_60 = 0, cnt59_0 = 0;
-//	printf("第%d科目成绩在各分值段的成绩比例统计如下：\r\n", subjectId + 1);
-//	printf("--------------------------------------------\r\n");
-//	for (i = 0; i < allplayerscount; i++)
-//	{
-//		t = allplayers[i].scores[subjectId];
-//		if (t >= 90)
-//			cnt100_90++;
-//		else if (t >= 80 && t <= 89)
-//			cnt89_80++;
-//		else if (t >= 70 && t <= 79)
-//			cnt79_70++;
-//		else if (t >= 60 && t <= 69)
-//			cnt69_60++;
-//		else if (t < 149)
-//			cnt59_0++;
-//	}
-//	printf("100-90\t89-80\t79-70\t69-60\t59-0\t\n");
-//	printf("%d\t%d\t%d\t%d\t%d\n",
-//		cnt100_90, cnt89_80, cnt79_70, cnt69_60, cnt59_0);
-//	printf("%.1f%%\t%.1f%%\t%.1f%%\t%.1f%%\t%.1f%%\n",
-//		cnt100_90 * 100 / (float)allplayerscount,
-//		cnt89_80 * 100 / (float)allplayerscount,
-//		cnt79_70 * 100 / (float)allplayerscount,
-//		cnt69_60 * 100 / (float)allplayerscount,
-//		cnt59_0 * 100 / (float)allplayerscount
-//	);
-//	printf("--------------------------------------------\r\n");
-//}
-//
-//void countbygrades()
-//{
-//	int i;
-//	int totalSubject = 0;
-//	float aveSubject;
-//	printf("--------------------------------------------\r\n");
-//	for (i = 0; i < subjects_count; i++)
-//	{
-//		countbygradesforonesubject(i);
-//	}
-//	printf("--------------------------------------------\r\n");
-//}
-//
-//void searchtotalbyname(char *name)
-//{
-//	int i;
-//	//先按总分排序
-//	qsort(allplayers, allplayerscount, sizeof(player), cmpbytotal);
-//	for (i = 0; i < allplayerscount; i++)
-//		if (strcmp(name, allplayers[i].name) == 0)
-//		{
-//			printf("%s,第%d名, 详细如下\n", name, allplayerscount - i);
-//			displayplayer(allplayers[i]);
-//			return;
-//		}
-//	printf("没找到对应学生的信息。\r\n");
-//}
-//
-//void promptsearchtotalbyname()
-//{
-//	char name[MAX_STRLEN] = "";
-//	printf("请输入要查询的学生姓名:");
-//	scanf("%s", &name);
-//	searchtotalbyname(name);
-//}
-//
-//
+
 int checkplayerexists(char *name)
 {
 	int i;
@@ -448,28 +358,128 @@ void promptaddresult()
 	addresult(playername, sportname, score);
 }
 
+//**//
+//////
+//快速排序用
+//int cmpbytotal(const void * a, const void * b)
+//{
+//	return ((player*)a)->total - ((player*)b)->total;
+//}
+//
+
+//
+//void sortanddisplaybytotal()
+//{
+//	qsort(allplayers, allplayerscount, sizeof(player), cmpbytotal);
+//	printf("按总分排序后如下\r\n");
+//	displayallplayers();
+//}
+//
+//void sortanddisplaybyno()
+//{
+//	qsort(allplayers, allplayerscount, sizeof(player), cmpbyno);
+//	printf("按学号排序后如下\r\n");
+//	displayallplayers();
+//}
+// 
+int cmpbyscoredesc(const void * a, const void * b)
+{
+	return *(int*)b - *(int*)a;
+}
+void sortandgetorders(int scores[], int scorescnt, int orders[])//init -1
+{
+	int i, s;
+	int sortscores[100] = { -1 };//
+	for (i = 0; i < scorescnt; i++)
+	{
+		sortscores[i] = scores[i];
+	}
+	qsort(sortscores, scorescnt, sizeof(int), cmpbyscoredesc);
+	for (i = 0; i < scorescnt; i++)
+		for (s = 0; s < scorescnt; s++)
+		{
+			//printf("scores[%d]=%d\tsortscores[%d]=%d\n", i, scores[i], s, sortscores[s]);
+
+			if (scores[i] == sortscores[s])
+			{
+				orders[i] = s + 1;
+				break;
+			}
+		}
+	//printf("%d\t", nums[i]);
+
+}
+
+void setresultorderpointsvalue(char *playername, char *sportname, int order, int points)
+{
+
+}
+void calcresultorderpointsbysport(char *sportname)
+{
+	int i;
+	int t1, t2, t3;
+	int playerinsportcnt = 0;
+	int copyscores[100];
+	result copyresults[100];
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].sportname, sportname))
+		{
+			copyresults[i] = allresults[i];
+			playerinsportcnt++;
+		}
+	}
+	if (playerinsportcnt <= 0)
+		return;
+	for (i = 0; i < playerinsportcnt; i++)
+	{
+		copyscores[i] = copyresults[i].score;
+	}
+	//sortandgettop3(copyscores, playerinsportcnt, &t1, &t2, &t3);
+	//if (playerinsportcnt >= 3)
+	//{
+
+	//}
+	//else
+}
+
 int main()
 {
 	int choice = -1;
-	readallteams();
-	readallsports();
-	readallplayers();
-	readallresults();
-	displayallresults();
+	//readallteams();
+	//readallsports();
+	//readallplayers();
+	//readallresults();
+	//displayallresults();
+
+
 #if TEST
+	int i;
+	int n = 1;
+	int orders[100] = { 0 };
+	int nums[] = { 24 };
+	sortandgetorders(nums, n, orders);
+	//for (i = 0; i < n; i++)
+	//{
+	//	printf("%d\n", nums[i]);
+	//}
+	for (i = 0; i < n; i++)
+	{
+		printf("%d\t", orders[i]);
+	}
 
 
 	//addresult("p1", "s1", 11);
 	//addresult("p1", "s2", 12);
 	//addresult("p2", "s1", 21);
 
-	promptaddresult();
+	//promptaddresult();
 	//addresult("p2", "s3", 22);
 	//writeallresults();
 #else
 
 
- 
+
 	while (choice != 0)
 	{
 		printf("\n\t 比赛成绩录入统计");
@@ -500,25 +510,25 @@ int main()
 			printf("\n\n你选择了 2\n");
 			displayallresults();
 			break;
-		//case '3':
-		//	printf("\n\n你选择了 3\n");
-		//	sortanddisplaybytotal();
-		//	break;
-		//case '4':
-		//	printf("\n\n你选择了 4\n");
-		//	sortanddisplaybyno();
-		//	break;
-		//case '5':
-		//	printf("\n\n你选择了 5\n");
-		//	promptsearchtotalbyname();
-		//	break;
-		//case '6':
-		//	printf("\n\n你选择了 6\n");
-		//	countbygrades();
-		//	break;
-		//case '7':
-		//	printf("\n\n你选择了 7\n");
-		//	sortanddisplaybyno();
+			//case '3':
+			//	printf("\n\n你选择了 3\n");
+			//	sortanddisplaybytotal();
+			//	break;
+			//case '4':
+			//	printf("\n\n你选择了 4\n");
+			//	sortanddisplaybyno();
+			//	break;
+			//case '5':
+			//	printf("\n\n你选择了 5\n");
+			//	promptsearchtotalbyname();
+			//	break;
+			//case '6':
+			//	printf("\n\n你选择了 6\n");
+			//	countbygrades();
+			//	break;
+			//case '7':
+			//	printf("\n\n你选择了 7\n");
+			//	sortanddisplaybyno();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
