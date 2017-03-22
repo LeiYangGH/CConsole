@@ -546,6 +546,28 @@ void promptdisplayteambyplayer()
 	displayteambyplayer(playername);
 }
 
+void displayplayer(char *playername)
+{
+	int i;
+	printf("姓名\t比赛\t成绩\t排名\t积分\n");
+	for (i = 0; i < allresultscount; i++)
+	{
+		if (streq(allresults[i].playername, playername))
+		{
+			displayresult(allresults[i]);
+		}
+	}
+}
+
+void promptdisplayplayer()
+{
+	char playername[20] = "";
+	printf("请输入选手姓名:");
+	scanf("%s", playername);
+	fseek(stdin, 0, SEEK_END);
+	displayplayer(playername);
+}
+
 int main()
 {
 	int choice = -1;
@@ -559,7 +581,8 @@ int main()
 
 #if TEST
 	int i;
-	displayteambyplayer("p3");
+	displayplayer("p2");
+	//displayteambyplayer("p3");
 	//calcallteams();
 	//displayallteams();
 	//int n = 1;
@@ -590,8 +613,8 @@ int main()
 		printf("\n\t 1. 录入成绩");
 		printf("\n\t 2. 查看所有成绩");
 		printf("\n\t 3. 查看所有团队");
-		printf("\n\t 4. 根据运动员姓名查看团队");
-		//printf("\n\t 5. 按姓名查询学生排名及其考试成绩");
+		printf("\n\t 4. 运动员姓名查看团队");
+		printf("\n\t 5. 运动员姓名查看自己的比赛");
 		//printf("\n\t 6. 统计");
 		//printf("\n\t 7. ");
 		printf("\n\n  请选择: ");
@@ -622,10 +645,10 @@ int main()
 			printf("\n\n你选择了 4\n");
 			promptdisplayteambyplayer();
 			break;
-			//case '5':
-			//	printf("\n\n你选择了 5\n");
-			//	promptsearchtotalbyname();
-			//	break;
+		case '5':
+			printf("\n\n你选择了 5\n");
+			promptdisplayplayer();
+			break;
 			//case '6':
 			//	printf("\n\n你选择了 6\n");
 			//	countbygrades();
