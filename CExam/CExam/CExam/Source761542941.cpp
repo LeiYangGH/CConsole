@@ -1,17 +1,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdio.h>
-#include <conio.h>
 #include <time.h>
 #define TEST 0
 #define MAX_QUESTIONS_COUNT 98
+#define STUDENT_FILE "student.txt"
 #define FILE_SEL "test.txt"
 #define RESULT_FILE "result.txt"
 #define ADMIN "admin"
 
 int use_questions_count = 3;
 char username[50] = "";
+typedef struct student
+{
+	char no[20];
+	char name[20];
+	char idcard[20];
+}student;
+student allstudents[20];
+int allstudentscount = 0;
 
 typedef struct question
 {
@@ -43,6 +50,116 @@ void login()
 	printf("您输入的用户名是:%s", username);
 }
 
+//---
+student getstudentfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	student q;
+	part = strtok(line, "\t\n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(q.no, part);
+			break;
+		case 2:
+			strcpy(q.name, part);
+			break;
+		case 3:
+			strcpy(q.idcard, part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, "\t\n");
+	}
+	return q;
+}
+
+
+void readallstudents()
+{
+	char line[200];
+	FILE *fp = fopen(STUDENT_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", STUDENT_FILE);
+		getchar();
+		exit(1);
+	}
+	allstudentscount = 0;
+
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 5)
+			continue;
+		allstudents[allstudentscount++] = getstudentfromline(line);
+	}
+	printf("\n已读入文件!\n");
+
+}
+
+void appendstudent(student re)
+{
+	FILE *fp = fopen(STUDENT_FILE, "a");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", STUDENT_FILE);
+		getchar();
+		exit(1);
+	}
+	fprintf(fp, "%s\t%s\t%s\r\n", re.no, re.name, re.idcard);
+	fclose(fp);
+	printf("已保存学生到文件。");
+}
+
+int checkstudentexists(char *name)
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (streq(allstudents[i].name, name))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void addstudent(char *no, char *name, char *idcard)
+{
+	int i;
+	student re;
+	char teamname[20] = "";
+	if (checkstudentexists(name))
+	{
+		printf("学生%s已存在不能重复添加。\n", name);
+		return;
+	}
+	strcpy(re.no, no);
+	strcpy(re.name, name);
+	strcpy(re.idcard, idcard);
+	allstudents[allstudentscount++] = re;
+	appendstudent(re);
+}
+void promptaddstudent()
+{
+	char no[20] = "";
+	char name[20] = "";
+	char idcard[20] = "";
+	if (!streq(username, ADMIN))
+	{
+		printf("必须以管理员登录才能添加考生信息！");
+		return;
+	}
+	printf("请依次输入要添加的学生考号、姓名、身份证号（都不带空格），空格隔开，回车结束:\n");
+	scanf("%s%s%s", no, name, idcard);
+	fseek(stdin, 0, SEEK_END);
+	addstudent(no, name, idcard);
+}
+//--//
 int checklogin()
 {
 	if (strlen(username) == 0)
@@ -54,7 +171,6 @@ int checklogin()
 		return 1;
 }
 
-//把新的答题结果追加到文件末尾
 void appendresult(char *name, int allcount, int correctcount)
 {
 	FILE *fp = fopen(RESULT_FILE, "a");
@@ -76,7 +192,7 @@ void displayallresults()
 	{
 		return;
 	}
-	if (!streq(username, ADMIN))
+	else if (!streq(username, ADMIN))
 	{
 		printf("必须以管理员登录才能查询");
 		return;
@@ -131,7 +247,6 @@ question getquestionfromline(char *line)
 }
 
 
-
 void readallquestions()
 {
 	char line[200];
@@ -150,13 +265,9 @@ void readallquestions()
 			continue;
 		allquestions[allquestioncnt++] = getquestionfromline(line);
 	}
-	printf("\n已读入文件!\n");
+	printf("\n已读入所有考题文件!\n");
 
 }
-
-
-
-
 
 
 int random(int min, int max)
@@ -232,35 +343,33 @@ void inputcountandexam()
 	{
 		return;
 	}
+	else if (!checkstudentexists(username))
+	{
+		printf("当前登录用户%s没登记，请联系管理员。", username);
+		return;
+	}
 	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allquestioncnt - 2);
 	scanf("%d", &usecnt);
 	srand(time(NULL));
-
-	//printf("\n请输入考生姓名，不能带空格、Tab或回车符，并以回车结束:");
-	//scanf("%s", name);
-	readallquestions();
 	testallquestions(usecnt);
 	printf("----------共%d题，答对%d题-----------\n\n", usecnt, score);
 	appendresult(username, usecnt, score);
-	//score = displayquestionstestresult();
-	//printf("\n题目全部做完，请选择是否保存成绩？选1保存，否则考试记录清除。以回车结束:");
-	//scanf("%d", &save);
-	//if (save == 1)
-	//{
-	//	appendscores(no, name, score);
-	//}
 }
-
-
-
 
 
 int main()
 {
+	readallstudents();
+	readallquestions();
+
 #if TEST
-	strcpy(username, "ly");
-	//inputcountandexam();
-	displayallresults();
+	//strcpy(username, "ly");
+	strcpy(username, "s7");
+	//strcpy(username, "stu1");
+	//strcpy(username, "admin");
+	//promptaddstudent();
+	inputcountandexam();
+	//displayallresults();
 #else
 	char choice = ' ';
 	while (choice != 0)
@@ -269,6 +378,7 @@ int main()
 		printf("\t 1. 登录\n");
 		printf("\t 2. 学生考试\n");
 		printf("\t 3. 查看所有成绩\n");
+		printf("\t 4. 添加考生信息\n");
 		printf("\t 0. 退出");
 		printf("\n\n 请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -293,10 +403,10 @@ int main()
 			printf("\n\n你选择了 3\n");
 			displayallresults();
 			break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			// 
-			//	break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			promptaddstudent();
+			break;
 			//case '5':
 			//	printf("\n\n你选择了 5\n");
 			//	break;
