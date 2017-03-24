@@ -5,7 +5,6 @@
 #include <conio.h>
 #include <time.h>
 #define TEST 0
-//#define USE_QUESTIONS_COUNT 20
 #define MAX_QUESTIONS_COUNT 20
 #define FILE_SEL "file1.txt"
 #define RESULT_FILE "result.txt"
@@ -20,24 +19,11 @@ typedef struct selectiveqestion
 	char title[50];
 	char choices[4][50] = { "","", "", "", };
 	int best;//1~4
-	//int userchoice;
 }selq;
-
-//typedef struct examscore
-//{
-//	int no;
-//	char name[50];
-//	int score;
-//}escore;
 
 
 selq allselqs[100];
-//selq useselqs[MAX_QUESTIONS_COUNT];
-//selq sortqs[MAX_QUESTIONS_COUNT];
 int allselqcnt = 0;
-
-//escore allescores[100];
-//int allescorecnt = 0;
 
 int streq(char *s1, char *s2)
 {
@@ -49,6 +35,24 @@ int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
+}
+
+void login()
+{
+	printf("\n请输入用户名:");
+	scanf("%s", &username);
+	printf("您输入的用户名是:%s", username);
+}
+
+int checklogin()
+{
+	if (strlen(username) == 0)
+	{
+		printf("\n请先登录!");
+		return 0;
+	}
+	else
+		return 1;
 }
 
 //把新的答题结果追加到文件末尾
@@ -64,6 +68,37 @@ void appendresult(char *name, int allcount, int correctcount)
 	fprintf(fp, "%s\t%d\t%d\n", name, allcount, allcount);
 	fclose(fp);
 	printf("已保存成绩到文件。");
+}
+
+void displayallresults()
+{
+	char line[50];
+	if (!checklogin())
+	{
+		return;
+	}
+	if (!streq(username, ADMIN))
+	{
+		printf("必须以管理员登录才能查询");
+		return;
+	}
+	FILE *fp = fopen(RESULT_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", RESULT_FILE);
+		getchar();
+		exit(1);
+	}
+	printf("\n所有考试结果\n");
+	printf("姓名\t总题数\t答对\n");
+	printf("-------------------\n");
+	while (fgets(line, 1024, fp) != NULL)
+	{
+		if (strlen(line) < 3)
+			continue;
+		printf("%s", line);
+	}
+	printf("-------------------\n");
 }
 
 selq getselqfromline(char *line)
@@ -189,26 +224,13 @@ int testallselqs(int usequestionscount)
 
 }
 
-void login()
-{
-	printf("\n请输入用户名:");
-	scanf("%s", &username);
-}
 
-int checklogin()
-{
-	if (strlen(username) == 0)
-		return 0;
-	else
-		return 1;
-}
 
 void inputcountandexam()
 {
 	int i, usecnt, score = 0;
 	if (!checklogin())
 	{
-		printf("\n请先登录!");
 		return;
 	}
 	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allselqcnt - 2);
@@ -237,15 +259,17 @@ void inputcountandexam()
 int main()
 {
 #if TEST
-	strcpy(name, "ly");
-	inputstudentandexam();
+	strcpy(username, "ly");
+	//inputcountandexam();
+	displayallresults();
 #else
 	char choice = ' ';
 	while (choice != 0)
 	{
-		printf("\n\t---考试系统---\n");
+		printf("\n\n\t---考试系统---\n");
 		printf("\t 1. 登录\n");
 		printf("\t 2. 学生考试\n");
+		printf("\t 3. 查看所有成绩\n");
 		printf("\t 0. 退出");
 		printf("\n\n 请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -266,10 +290,10 @@ int main()
 			printf("\n\n你选择了 2\n");
 			inputcountandexam();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			// 
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			displayallresults();
+			break;
 			//case '4':
 			//	printf("\n\n你选择了 4\n");
 			// 
