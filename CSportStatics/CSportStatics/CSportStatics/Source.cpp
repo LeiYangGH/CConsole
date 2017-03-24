@@ -644,7 +644,7 @@ int main()
 			break;
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
-			return 0;
 		}
 	}
+	return 0;
 }
