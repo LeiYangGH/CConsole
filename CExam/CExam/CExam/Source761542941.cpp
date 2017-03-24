@@ -402,7 +402,7 @@ int testallquestions(int usequestionscount)
 
 void inputcountandexam()
 {
-	int i, usecnt, score = 0;
+	int i, usecnt, score;
 	if (!checklogin())
 	{
 		return;
@@ -415,7 +415,7 @@ void inputcountandexam()
 	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allquestionscount - 2);
 	scanf("%d", &usecnt);
 	srand(time(NULL));
-	testallquestions(usecnt);
+	score = testallquestions(usecnt);
 	printf("----------共%d题，答对%d题-----------\n\n", usecnt, score);
 	appendresult(username, usecnt, score);
 }
