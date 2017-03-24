@@ -5,10 +5,9 @@
 #include <conio.h>
 #include <time.h>
 #define TEST 0
-#define MAX_QUESTIONS_COUNT 20
-#define FILE_SEL "file1.txt"
+#define MAX_QUESTIONS_COUNT 98
+#define FILE_SEL "test.txt"
 #define RESULT_FILE "result.txt"
-#define FILE_SCORE "num_name.txt"
 #define ADMIN "admin"
 
 int use_questions_count = 3;
