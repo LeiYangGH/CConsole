@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#define TEST 0
 #define MAX_QUESTIONS_COUNT 98
 #define STUDENT_FILE "student.txt"
 #define QUESTION_FILE "test.txt"
@@ -26,7 +25,6 @@ typedef struct question
 	char choices[4][50] = { "","", "", "", };
 	int best;//1~4
 }question;
-
 
 question allquestions[100];
 int allquestionscount = 0;
@@ -158,7 +156,7 @@ void promptaddstudent()
 	fseek(stdin, 0, SEEK_END);
 	addstudent(no, name, idcard);
 }
-//---
+
 void appendquestion(question re)
 {
 	FILE *fp = fopen(QUESTION_FILE, "a");
@@ -228,7 +226,6 @@ void promptaddquestion()
 	addquestion(title, c1, c2, c3, c4, best);
 }
 
-//--//
 int checklogin()
 {
 	if (strlen(username) == 0)
@@ -249,13 +246,14 @@ void appendresult(char *name, int allcount, int correctcount)
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, "%s\t%d\t%d\n", name, allcount, allcount);
+	fprintf(fp, "%s\t%d\t%d\n", name, allcount, correctcount);
 	fclose(fp);
 	printf("已保存成绩到文件。");
 }
 
 void displayallresults()
 {
+	FILE *fp;
 	char line[50];
 	if (!checklogin())
 	{
@@ -266,7 +264,7 @@ void displayallresults()
 		printf("必须以管理员登录才能查询");
 		return;
 	}
-	FILE *fp = fopen(RESULT_FILE, "r");
+	fp = fopen(RESULT_FILE, "r");
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!", RESULT_FILE);
@@ -403,8 +401,6 @@ int testallquestions(int usequestionscount)
 
 }
 
-
-
 void inputcountandexam()
 {
 	int i, usecnt, score = 0;
@@ -428,19 +424,9 @@ void inputcountandexam()
 
 int main()
 {
+	char choice = ' ';
 	readallstudents();
 	readallquestions();
-	//addquestion("t9", "c91", "c92", "c93", "c94", 1);
-#if TEST
-	//strcpy(username, "ly");
-	strcpy(username, "s7");
-	//strcpy(username, "stu1");
-	//strcpy(username, "admin");
-	//promptaddstudent();
-	inputcountandexam();
-	//displayallresults();
-#else
-	char choice = ' ';
 	while (choice != 0)
 	{
 		printf("\n\n\t---考试系统---\n");
@@ -488,7 +474,6 @@ int main()
 			system("pause");
 		}
 	}
-#endif // TEST
 	system("pause");
 	return 0;
 }
