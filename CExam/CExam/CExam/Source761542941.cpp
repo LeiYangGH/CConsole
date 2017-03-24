@@ -22,7 +22,7 @@ int allstudentscount = 0;
 typedef struct question
 {
 	char title[50];
-	char choices[4][50] = { "","", "", "", };
+	char choices[4][50];
 	int best;//1~4
 }question;
 
@@ -127,7 +127,6 @@ int checkstudentexists(char *name)
 
 void addstudent(char *no, char *name, char *idcard)
 {
-	int i;
 	student re;
 	char teamname[20] = "";
 	if (checkstudentexists(name))
@@ -345,7 +344,7 @@ int random(int min, int max)
 void generateuseids(int allcnt, int usecnt, int useids[])
 {
 	int i;
-	int r, ri, ucnt = 0, tmp, top;
+	int r, ri, ucnt = 0, top;
 	int allids[100];
 	for (i = 0; i < allcnt; i++)
 	{
@@ -365,7 +364,7 @@ void generateuseids(int allcnt, int usecnt, int useids[])
 
 int testonequestion(question *q)
 {
-	int i, b, r, answer = 0, repeat = -2;
+	int i, b, answer = 0;
 	char o;
 	printf("--%s--\n\n", q->title);
 	for (i = 0; i < 4; i++)
