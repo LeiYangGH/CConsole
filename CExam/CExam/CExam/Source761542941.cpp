@@ -13,16 +13,16 @@
 int use_questions_count = 3;
 char username[50] = "";
 
-typedef struct selectiveqestion
+typedef struct question
 {
 	char title[50];
 	char choices[4][50] = { "","", "", "", };
 	int best;//1~4
-}selq;
+}question;
 
 
-selq allselqs[100];
-int allselqcnt = 0;
+question allquestions[100];
+int allquestioncnt = 0;
 
 int streq(char *s1, char *s2)
 {
@@ -100,11 +100,11 @@ void displayallresults()
 	printf("-------------------\n");
 }
 
-selq getselqfromline(char *line)
+question getquestionfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	selq q;
+	question q;
 	part = strtok(line, "\t");
 	while (part != NULL)
 	{
@@ -132,7 +132,7 @@ selq getselqfromline(char *line)
 
 
 
-void readallselqs()
+void readallquestions()
 {
 	char line[200];
 	FILE *fp = fopen(FILE_SEL, "r");
@@ -142,13 +142,13 @@ void readallselqs()
 		getchar();
 		exit(1);
 	}
-	allselqcnt = 0;
+	allquestioncnt = 0;
 
 	while (fgets(line, 1024, fp) != NULL)
 	{
 		if (strlen(line) < 5)
 			continue;
-		allselqs[allselqcnt++] = getselqfromline(line);
+		allquestions[allquestioncnt++] = getquestionfromline(line);
 	}
 	printf("\n已读入文件!\n");
 
@@ -185,7 +185,7 @@ void generateuseids(int allcnt, int usecnt, int useids[])
 	}
 }
 
-int testoneselq(selq *q)
+int testonequestion(question *q)
 {
 	int i, b, r, answer = 0, repeat = -2;
 	char o;
@@ -209,15 +209,15 @@ int testoneselq(selq *q)
 	}
 }
 
-int testallselqs(int usequestionscount)
+int testallquestions(int usequestionscount)
 {
 	int i, score = 0;
 	int useids[MAX_QUESTIONS_COUNT] = { 0 };
-	generateuseids(allselqcnt, usequestionscount, useids);
+	generateuseids(allquestioncnt, usequestionscount, useids);
 	printf("----------共%d题-----------\n\n", usequestionscount);
 	for (i = 0; i < usequestionscount; i++)
 	{
-		score += testoneselq(&allselqs[useids[i]]);
+		score += testonequestion(&allquestions[useids[i]]);
 	}
 	return score;
 
@@ -232,17 +232,17 @@ void inputcountandexam()
 	{
 		return;
 	}
-	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allselqcnt - 2);
+	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allquestioncnt - 2);
 	scanf("%d", &usecnt);
 	srand(time(NULL));
 
 	//printf("\n请输入考生姓名，不能带空格、Tab或回车符，并以回车结束:");
 	//scanf("%s", name);
-	readallselqs();
-	testallselqs(usecnt);
+	readallquestions();
+	testallquestions(usecnt);
 	printf("----------共%d题，答对%d题-----------\n\n", usecnt, score);
 	appendresult(username, usecnt, score);
-	//score = displayselqstestresult();
+	//score = displayquestionstestresult();
 	//printf("\n题目全部做完，请选择是否保存成绩？选1保存，否则考试记录清除。以回车结束:");
 	//scanf("%d", &save);
 	//if (save == 1)
