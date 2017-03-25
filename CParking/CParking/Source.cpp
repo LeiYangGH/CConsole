@@ -4,14 +4,12 @@
 #include <time.h>
 #define PARK_FILE "park.txt"
 
-#define TEST 0
 int price = 5;//每小时费用
 typedef struct park
 {
 	char no[20];
 	int intime;
 	int outtime;
-	int money;
 }park;
 park allparks[50];
 int allparkscount = 0;
@@ -39,9 +37,17 @@ int checktimevalid(int t)
 	}
 }
 
+int calcmoney(park p)
+{
+	if (p.outtime > p.intime)
+		return price*(p.outtime - p.intime);
+	else
+		return 0;
+}
+
 void displaypark(park stu)
 {
-	printf("%8s\t%d\t%d\t%d元\r\n", stu.no, stu.intime, stu.outtime, stu.money);
+	printf("%8s\t%d\t%d\t%d元\r\n", stu.no, stu.intime, stu.outtime, calcmoney(stu));
 }
 
 void displayallparks()
@@ -56,6 +62,8 @@ void displayallparks()
 	}
 	printf("--------------------------------------------\r\n");
 }
+
+
 
 park getparkfromline(char *line)
 {
@@ -81,10 +89,33 @@ park getparkfromline(char *line)
 		}
 		part = strtok(NULL, "\t\n");
 	}
-	q.money = price*(q.outtime - q.intime);
 	return q;
 }
 
+void createsampleparks()
+{
+	char *format = "%s\t%d\t%d\r\n";
+	FILE *fp;
+	fp = fopen(PARK_FILE, "r");
+	if (fp != NULL)
+		return;
+	fp = fopen(PARK_FILE, "w");
+	printf("创建示例成绩数据...");
+	if (fp == NULL)
+	{
+		printf("\nerror on open file!");
+		getchar();
+		exit(1);
+	}
+	fprintf(fp, format, "111", 1, 2);
+	fprintf(fp, format, "222", 2, 4);
+	fprintf(fp, format, "333", 3, 6);
+	fprintf(fp, format, "444", 4, 8);
+	fprintf(fp, format, "555", 5, 10);
+	allparkscount = 5;
+	fclose(fp);
+	printf("5条示例成绩数据已保存到park.txt。\n");
+}
 
 void readallparks()
 {
@@ -92,9 +123,8 @@ void readallparks()
 	FILE *fp = fopen(PARK_FILE, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", PARK_FILE);
-		getchar();
-		exit(1);
+		exit(0);
+		return;
 	}
 	allparkscount = 0;
 
@@ -191,7 +221,6 @@ void addparkin(char *no, int intime)
 		strcpy(p.no, no);
 		p.intime = intime;
 		p.outtime = 0;
-		p.money = 0;
 		allparks[allparkscount++] = p;
 		writeallparks();
 	}
@@ -223,7 +252,6 @@ void addparkout(char *no, int outtime)
 				if (checktimevalid(outtime))
 				{
 					allparks[index].outtime = outtime;
-					allparks[index].money = price * (outtime - allparks[index].intime);
 					writeallparks();
 				}
 			}
@@ -245,7 +273,7 @@ void promptaddparkout()
 	fseek(stdin, 0, SEEK_END);
 	addparkout(no, outtime);
 }
-//--
+
 void editpark(char *no, char *newno)
 {
 	char c;
@@ -275,6 +303,34 @@ void prompteditpark()
 	scanf("%s%s", no, newno);
 	fseek(stdin, 0, SEEK_END);
 	editpark(no, newno);
+}
+//--
+void findpark(char *no)
+{
+	char c;
+	park p;
+	int i, index;
+	index = getparkindexbyno(no);
+	if (index >= 0)
+	{
+		p = allparks[index];
+		if (p.outtime > 0)
+			printf("查找到：车牌%s，%d点进入，%d点离开，停车费%d元。\n", p.no, p.intime, p.outtime, calcmoney(p));
+		else
+			printf("查找到：车牌%s，%d点进入，还未离开。\n", p.no, p.intime);
+	}
+	else
+		printf("车牌%s还未登记！\n", no);
+}
+
+
+void promptfindpark()
+{
+	char no[20] = "";
+	printf("请输入要查找的车牌号:");
+	scanf("%s", no);
+	fseek(stdin, 0, SEEK_END);
+	findpark(no);
 }
 //
 
@@ -311,45 +367,12 @@ void promptdeletepark()
 	deletepark(no);
 }
 
-void createsampleparks()
-{
-	FILE *fp = fopen(PARK_FILE, "w");
-	char *format = "%s\t%d\t%d\r\n";
-	printf("创建示例成绩数据...");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-	fprintf(fp, format, "111", 1, 2);
-	fprintf(fp, format, "222", 2, 4);
-	fprintf(fp, format, "333", 3, 6);
-	fprintf(fp, format, "444", 4, 8);
-	fprintf(fp, format, "555", 5, 10);
 
-	fclose(fp);
-	printf("5条示例成绩数据已保存到park.txt。\n");
-}
 int main()
 {
-	readallparks();
-
-#if TEST
+	char choice = ' ';
 	createsampleparks();
 	readallparks();
-
-	//displayallparks();
-	//promptaddparkin();
-	//addparkin("6", 1);
-	//addparkout("7", 24);
-	//deletepark("555");
-	//addparkin("555", 1);
-	editpark("555", "555");
-	readallparks();
-	displayallparks();
-#else
-	char choice = ' ';
 	while (choice != 0)
 	{
 		printf("\n\n\t---停车收费管理系统---\n");
@@ -358,6 +381,7 @@ int main()
 		printf("\t 3. 删除停车信息\n");
 		printf("\t 4. 修改车牌号\n");
 		printf("\t 5. 查看所有停车信息\n");
+		printf("\t 6. 查看某辆车信息\n");
 		printf("\t 0. 退出");
 		printf("\n\n 请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -390,6 +414,10 @@ int main()
 			printf("\n\n你选择了 5\n");
 			displayallparks();
 			break;
+		case '6':
+			printf("\n\n你选择了 5\n");
+			promptfindpark();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
@@ -397,8 +425,6 @@ int main()
 			system("pause");
 		}
 	}
-#endif // TEST
-
 	system("pause");
 	return 0;
 }
