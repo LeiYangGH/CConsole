@@ -180,7 +180,10 @@ void addparkin(char *no, int intime)
 		else
 		{
 			if (checktimevalid(intime))
+			{
 				allparks[index].intime = intime;
+				writeallparks();
+			}
 		}
 	}
 	else
