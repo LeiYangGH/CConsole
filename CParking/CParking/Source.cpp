@@ -3,31 +3,18 @@
 #include <stdio.h>
 #include <time.h>
 #define MAX_QUESTIONS_COUNT 98
-#define STUDENT_FILE "student.txt"
-#define QUESTION_FILE "test.txt"
-#define RESULT_FILE "result.txt"
-#define ADMIN "admin"
+#define PARK_FILE "park.txt"
 
-int use_questions_count = 3;
-char username[50] = "";
-typedef struct student
+#define TEST 1
+
+typedef struct park
 {
 	char no[20];
-	char name[20];
-	char idcard[20];
-}student;
-student allstudents[20];
-int allstudentscount = 0;
-
-typedef struct question
-{
-	char title[50];
-	char choices[4][50];
-	int best;//1~4
-}question;
-
-question allquestions[100];
-int allquestionscount = 0;
+	int intime;
+	int outtime;
+}park;
+park allparks[20];
+int allparkscount = 0;
 
 int streq(char *s1, char *s2)
 {
@@ -41,18 +28,28 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-void login()
+void displaypark(park stu)
 {
-	printf("\n请输入用户名:");
-	scanf("%s", &username);
-	printf("您输入的用户名是:%s", username);
+	printf("%s\t%d\t%d\r\n", stu.no, stu.intime, stu.outtime);
 }
 
-student getstudentfromline(char *line)
+void displayallparks()
+{
+	int i;
+	printf("所有%d车辆信息如下\r\n", allparkscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allparkscount; i++)
+	{
+		displaypark(allparks[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
+park getparkfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	student q;
+	park q;
 	part = strtok(line, "\t\n");
 	while (part != NULL)
 	{
@@ -62,10 +59,10 @@ student getstudentfromline(char *line)
 			strcpy(q.no, part);
 			break;
 		case 2:
-			strcpy(q.name, part);
+			q.intime = toint(part);
 			break;
 		case 3:
-			strcpy(q.idcard, part);
+			q.outtime = toint(part);
 			break;
 		default:
 			break;
@@ -76,48 +73,53 @@ student getstudentfromline(char *line)
 }
 
 
-void readallstudents()
+void readallparks()
 {
 	char line[200];
-	FILE *fp = fopen(STUDENT_FILE, "r");
+	FILE *fp = fopen(PARK_FILE, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", STUDENT_FILE);
+		printf("\n打开文件%s失败!", PARK_FILE);
 		getchar();
 		exit(1);
 	}
-	allstudentscount = 0;
+	allparkscount = 0;
 
 	while (fgets(line, 1024, fp) != NULL)
 	{
 		if (strlen(line) < 5)
 			continue;
-		allstudents[allstudentscount++] = getstudentfromline(line);
+		allparks[allparkscount++] = getparkfromline(line);
 	}
 	printf("\n已读入文件!\n");
 
 }
 
-void appendstudent(student re)
+void writeallparks(park re)
 {
-	FILE *fp = fopen(STUDENT_FILE, "a");
+	int i;
+	FILE *fp = fopen(PARK_FILE, "w");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", STUDENT_FILE);
+		printf("\n打开文件%s失败!", PARK_FILE);
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, "%s\t%s\t%s\r\n", re.no, re.name, re.idcard);
+	for (i = 0; i < allparkscount; i++)
+	{
+		park p = allparks[i];
+		fprintf(fp, "%s\t%d\t%d\r\n", p.no, p.intime, p.outtime);
+	}
 	fclose(fp);
-	printf("已保存学生到文件。");
+	printf("已保存到文件。");
 }
 
-int checkstudentexists(char *name)
+int checkparkexists(char *no)
 {
 	int i;
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allparkscount; i++)
 	{
-		if (streq(allstudents[i].name, name))
+		if (streq(allparks[i].no, no))
 		{
 			return 1;
 		}
@@ -125,307 +127,68 @@ int checkstudentexists(char *name)
 	return 0;
 }
 
-void addstudent(char *no, char *name, char *idcard)
+void addpark(char *no, int intime, int outtime)
 {
-	student re;
+	park re;
 	char teamname[20] = "";
-	if (checkstudentexists(name))
-	{
-		printf("学生%s已存在不能重复添加。\n", name);
-		return;
-	}
+	//if (checkparkexists(name))
+	//{
+	//	printf("学生%s已存在不能重复添加。\n", name);
+	//	return;
+	//}
 	strcpy(re.no, no);
-	strcpy(re.name, name);
-	strcpy(re.idcard, idcard);
-	allstudents[allstudentscount++] = re;
-	appendstudent(re);
-}
-void promptaddstudent()
-{
-	char no[20] = "";
-	char name[20] = "";
-	char idcard[20] = "";
-	if (!streq(username, ADMIN))
-	{
-		printf("必须以管理员登录才能添加考生信息！");
-		return;
-	}
-	printf("请依次输入要添加的学生考号、姓名、身份证号（都不带空格），空格隔开，回车结束:\n");
-	scanf("%s%s%s", no, name, idcard);
-	fseek(stdin, 0, SEEK_END);
-	addstudent(no, name, idcard);
+	re.intime = intime;
+	re.outtime = outtime;
+	allparks[allparkscount++] = re;
+	writeallparks(re);
 }
 
-void appendquestion(question re)
+
+//void promptaddpark()
+//{
+//	char no[20] = "";
+//	char name[20] = "";
+//	char idcard[20] = "";
+//
+//	printf("请依次输入要添加的学生考号、姓名、身份证号（都不带空格），空格隔开，回车结束:\n");
+//	scanf("%s%s%s", no, name, idcard);
+//	fseek(stdin, 0, SEEK_END);
+//	addpark(no, name, idcard);
+//}
+
+void createsampleparks()
 {
-	FILE *fp = fopen(QUESTION_FILE, "a");
+	FILE *fp = fopen(PARK_FILE, "w");
+	char *format = "%s\t%d\t%d\r\n";
+	printf("创建示例成绩数据...");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", QUESTION_FILE);
+		printf("\nerror on open file!");
 		getchar();
 		exit(1);
 	}
-	fprintf(fp, "%s\t%s\t%s\t%s\t%s\t%d\r\n", re.title, re.choices[0], re.choices[1], re.choices[2], re.choices[3], re.best);
+	fprintf(fp, format, "111", 1, 2);
+	fprintf(fp, format, "222", 2, 4);
+	fprintf(fp, format, "333", 3, 6);
+	fprintf(fp, format, "444", 4, 8);
+	fprintf(fp, format, "555", 5, 10);
+
 	fclose(fp);
-	printf("已保存题库到文件。");
+	printf("5条示例成绩数据已保存到park.txt。\n");
 }
-
-int checkquestionexists(char *title)
-{
-	int i;
-	for (i = 0; i < allquestionscount; i++)
-	{
-		if (streq(allquestions[i].title, title))
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
-
-void addquestion(char *title, char *c1, char *c2, char *c3, char *c4, int best)
-{
-	int i;
-	question re;
-	char teamname[20] = "";
-	strcpy(re.title, title);
-	strcpy(re.choices[0], c1);
-	strcpy(re.choices[1], c2);
-	strcpy(re.choices[2], c3);
-	strcpy(re.choices[3], c4);
-	re.best = best;
-	allquestions[allquestionscount++] = re;
-	appendquestion(re);
-}
-void promptaddquestion()
-{
-	char title[20] = "";
-	char c1[20] = "";
-	char c2[20] = "";
-	char c3[20] = "";
-	char c4[20] = "";
-	int best = 0;
-	if (!streq(username, ADMIN))
-	{
-		printf("必须以管理员登录才能添加考生信息！");
-		return;
-	}
-	printf("请输入要添加考题标题（不带空格）回车结束:\n");
-	scanf("%s", title);
-	if (checkquestionexists(title))
-	{
-		printf("考题%s已存在不能重复添加。\n", title);
-		return;
-	}
-	printf("请依次输入四个选项（选项本身不带空格，选项之间以空格隔开）回车结束:\n");
-	scanf("%s%s%s%s", c1, c2, c3, c4);
-	printf("请输入答案序号（1～4）回车结束:");
-	scanf("%d", &best);
-	fseek(stdin, 0, SEEK_END);
-	addquestion(title, c1, c2, c3, c4, best);
-}
-
-int checklogin()
-{
-	if (strlen(username) == 0)
-	{
-		printf("\n请先登录!");
-		return 0;
-	}
-	else
-		return 1;
-}
-
-void appendresult(char *name, int allcount, int correctcount)
-{
-	FILE *fp = fopen(RESULT_FILE, "a");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", RESULT_FILE);
-		getchar();
-		exit(1);
-	}
-	fprintf(fp, "%s\t%d\t%d\n", name, allcount, correctcount);
-	fclose(fp);
-	printf("已保存成绩到文件。");
-}
-
-void displayallresults()
-{
-	FILE *fp;
-	char line[50];
-	if (!checklogin())
-	{
-		return;
-	}
-	else if (!streq(username, ADMIN))
-	{
-		printf("必须以管理员登录才能查询");
-		return;
-	}
-	fp = fopen(RESULT_FILE, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", RESULT_FILE);
-		getchar();
-		exit(1);
-	}
-	printf("\n所有考试结果\n");
-	printf("姓名\t总题数\t答对\n");
-	printf("-------------------\n");
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 3)
-			continue;
-		printf("%s", line);
-	}
-	printf("-------------------\n");
-}
-
-question getquestionfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	question q;
-	part = strtok(line, "\t");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			strcpy(q.title, part);
-			break;
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			strcpy(q.choices[index - 2], part);
-			break;
-		case 6:
-			q.best = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-	return q;
-}
-
-
-void readallquestions()
-{
-	char line[200];
-	FILE *fp = fopen(QUESTION_FILE, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", QUESTION_FILE);
-		getchar();
-		exit(1);
-	}
-	allquestionscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		allquestions[allquestionscount++] = getquestionfromline(line);
-	}
-	printf("\n已读入所有考题文件!\n");
-
-}
-
-
-int random(int min, int max)
-{
-	return rand() % (max - min) + min;
-}
-
-void generateuseids(int allcnt, int usecnt, int useids[])
-{
-	int i;
-	int r, ri, ucnt = 0, top;
-	int allids[100];
-	for (i = 0; i < allcnt; i++)
-	{
-		allids[i] = i;
-	}
-	while (ucnt < usecnt)
-	{
-		ri = random(0, allcnt - ucnt);
-		useids[ucnt++] = r = allids[ri];
-		top = allcnt - ucnt - 1;
-		if (r < top)
-		{
-			allids[r] = allids[top];
-		}
-	}
-}
-
-int testonequestion(question *q)
-{
-	int i, b, answer = 0;
-	char o;
-	printf("--%s--\n\n", q->title);
-	for (i = 0; i < 4; i++)
-	{
-		printf("%d  %s \n", i + 1, q->choices[i]);
-	}
-	printf("请输入你的选项（1～4），并以回车结束:");
-
-	scanf("%d", &answer);
-	if (answer == q->best)
-	{
-		printf("\t\t\t\t正确！\n");
-		return 1;
-	}
-	else
-	{
-		printf("--错误，正确答案是：%s\n\n", q->choices[q->best - 1]);
-		return 0;
-	}
-}
-
-int testallquestions(int usequestionscount)
-{
-	int i, score = 0;
-	int useids[MAX_QUESTIONS_COUNT] = { 0 };
-	generateuseids(allquestionscount, usequestionscount, useids);
-	printf("----------共%d题-----------\n\n", usequestionscount);
-	for (i = 0; i < usequestionscount; i++)
-	{
-		score += testonequestion(&allquestions[useids[i]]);
-	}
-	return score;
-
-}
-
-void inputcountandexam()
-{
-	int i, usecnt, score;
-	if (!checklogin())
-	{
-		return;
-	}
-	else if (!checkstudentexists(username))
-	{
-		printf("当前登录用户%s没登记，请联系管理员。", username);
-		return;
-	}
-	printf("\n请输入要抽取的考题数量(2~%d)，并以回车结束:", allquestionscount - 2);
-	scanf("%d", &usecnt);
-	srand(time(NULL));
-	score = testallquestions(usecnt);
-	printf("----------共%d题，答对%d题-----------\n\n", usecnt, score);
-	appendresult(username, usecnt, score);
-}
-
-
 int main()
 {
+	createsampleparks();
+	readallparks();
+	displayallparks();
+#if TEST
+	;
+#else
+
+
 	char choice = ' ';
-	readallstudents();
-	readallquestions();
+	readallparks();
+
 	while (choice != 0)
 	{
 		printf("\n\n\t---考试系统---\n");
@@ -460,7 +223,7 @@ int main()
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptaddstudent();
+			promptaddpark();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
@@ -473,6 +236,8 @@ int main()
 			system("pause");
 		}
 	}
+#endif // TEST
+
 	system("pause");
 	return 0;
 }
