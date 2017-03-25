@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#define MAX_QUESTIONS_COUNT 98
 #define PARK_FILE "park.txt"
 
 #define TEST 0
@@ -13,7 +12,7 @@ typedef struct park
 	int intime;
 	int outtime;
 }park;
-park allparks[20];
+park allparks[50];
 int allparkscount = 0;
 
 int streq(char *s1, char *s2)
@@ -125,17 +124,17 @@ void writeallparks()
 	printf("已保存到文件。");
 }
 
-int checknoexists(char *no)
+int getparkindexbyno(char *no)
 {
 	int i;
 	for (i = 0; i < allparkscount; i++)
 	{
 		if (streq(allparks[i].no, no))
 		{
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 int checkparkinexists(char *no)
@@ -166,11 +165,10 @@ int checkparkoutexists(char *no)
 
 void addparkin(char *no, int intime)
 {
-	int i;
+	int i, index;
 	park p;
-	if (!checktimevalid(intime))
-		return;
-	if (checknoexists(no))
+	index = getparkindexbyno(no);
+	if (index >= 0)
 	{
 		if (checkparkinexists(no))
 		{
@@ -178,14 +176,8 @@ void addparkin(char *no, int intime)
 		}
 		else
 		{
-			for (i = 0; i < allparkscount; i++)
-			{
-				if (streq(allparks[i].no, no))
-				{
-					allparks[i].intime = intime;
-					break;
-				}
-			}
+			if (checktimevalid(intime))
+				allparks[index].intime = intime;
 		}
 	}
 	else
@@ -209,34 +201,27 @@ void promptaddparkin()
 	addparkin(no, intime);
 }
 
-//--
 void addparkout(char *no, int outtime)
 {
-	int i;
-	if (!checktimevalid(outtime))
-		return;
-	if (checkparkinexists(no))
+	int i, index;
+	index = getparkindexbyno(no);
+	if (index >= 0)
 	{
 		if (checkparkoutexists(no))
 			printf("车牌%s已经登记过离开，不能再次登记！\n", no);
 		else
-			for (i = 0; i < allparkscount; i++)
+		{
+			if (allparks[index].intime < outtime)
 			{
-				if (streq(allparks[i].no, no))
+				if (checktimevalid(outtime))
 				{
-					if (allparks[i].intime < outtime)
-					{
-						if (checktimevalid(outtime))
-						{
-							allparks[i].outtime = outtime;
-							writeallparks();
-						}
-					}
-					else
-						printf("车牌%s于%d点进入，离开时间必须晚于进入时间！\n", no, allparks[i].intime);
-					break;
+					allparks[index].outtime = outtime;
+					writeallparks();
 				}
 			}
+			else
+				printf("车牌%s于%d点进入，离开时间必须晚于进入时间！\n", no, allparks[i].intime);
+		}
 	}
 	else
 		printf("车牌%s还未登记进入，不能登记离开！\n", no);
@@ -251,6 +236,39 @@ void promptaddparkout()
 	scanf("%s%d", no, &outtime);
 	fseek(stdin, 0, SEEK_END);
 	addparkout(no, outtime);
+}
+//--
+void deletepark(char *no)
+{
+	char c;
+	int i, index;
+	index = getparkindexbyno(no);
+	if (index >= 0)
+	{
+		printf("真的要删除车牌%s相关信息吗？y/n\n", no);
+		c = getchar();
+		fseek(stdin, 0, SEEK_END);
+		if (c == 'y' || c == 'Y')
+		{
+			for (i = index; i < allparkscount - 1; i++)
+				allparks[i] = allparks[i + 1];
+			allparkscount--;
+			writeallparks();
+			printf("成功删除车牌%s相关信息。\n", no);
+		}
+	}
+	else
+		printf("车牌%s还未登记！\n", no);
+}
+
+
+void promptdeletepark()
+{
+	char no[20] = "";
+	printf("请输入要删除的车牌号:");
+	scanf("%s", no);
+	fseek(stdin, 0, SEEK_END);
+	deletepark(no);
 }
 //
 
@@ -282,8 +300,11 @@ int main()
 #if TEST
 	//displayallparks();
 	//promptaddparkin();
-	addparkin("6", 1);
-	addparkout("7", 24);
+	//addparkin("6", 1);
+	//addparkout("7", 24);
+	//deletepark("555");
+	//addparkin("555", 1);
+
 	readallparks();
 	displayallparks();
 #else
@@ -293,7 +314,7 @@ int main()
 		printf("\n\n\t---停车收费管理系统---\n");
 		printf("\t 1. 添加停车进入\n");
 		printf("\t 2. 添加停车离开\n");
-		//printf("\t 3. 删除停车信息\n");
+		printf("\t 3. 删除停车信息\n");
 		//printf("\t 4. 修改车牌号\n");
 		printf("\t 5. 查看所有停车信息\n");
 		printf("\t 0. 退出");
@@ -316,10 +337,10 @@ int main()
 			printf("\n\n你选择了 2\n");
 			promptaddparkout();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	displayallresults();
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			promptdeletepark();
+			break;
 			//case '4':
 			//	printf("\n\n你选择了 4\n");
 			//	promptaddpark();
