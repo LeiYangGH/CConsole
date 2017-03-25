@@ -238,6 +238,38 @@ void promptaddparkout()
 	addparkout(no, outtime);
 }
 //--
+void editpark(char *no, char *newno)
+{
+	char c;
+	int i, index;
+	index = getparkindexbyno(no);
+	if (index >= 0)
+	{
+		if (streq(no, newno))
+			printf("要修改的车牌号和原来相同，不用修改。");
+		else
+		{
+			strcpy(allparks[index].no, newno);
+			writeallparks();
+			printf("成功修改车牌%s为%s相关信息。\n", no, newno);
+		}
+	}
+	else
+		printf("车牌%s还未登记！\n", no);
+}
+
+
+void prompteditpark()
+{
+	char no[20] = "";
+	char newno[20] = "";
+	printf("请依次输入要修改的车牌号和新车牌号，空格隔开，回车结束:\n");
+	scanf("%s%s", no, newno);
+	fseek(stdin, 0, SEEK_END);
+	editpark(no, newno);
+}
+//
+
 void deletepark(char *no)
 {
 	char c;
@@ -270,7 +302,6 @@ void promptdeletepark()
 	fseek(stdin, 0, SEEK_END);
 	deletepark(no);
 }
-//
 
 void createsampleparks()
 {
@@ -304,7 +335,7 @@ int main()
 	//addparkout("7", 24);
 	//deletepark("555");
 	//addparkin("555", 1);
-
+	editpark("555", "555");
 	readallparks();
 	displayallparks();
 #else
@@ -315,7 +346,7 @@ int main()
 		printf("\t 1. 添加停车进入\n");
 		printf("\t 2. 添加停车离开\n");
 		printf("\t 3. 删除停车信息\n");
-		//printf("\t 4. 修改车牌号\n");
+		printf("\t 4. 修改车牌号\n");
 		printf("\t 5. 查看所有停车信息\n");
 		printf("\t 0. 退出");
 		printf("\n\n 请选择: ");
@@ -341,10 +372,10 @@ int main()
 			printf("\n\n你选择了 3\n");
 			promptdeletepark();
 			break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			//	promptaddpark();
-			//	break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			prompteditpark();
+			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
 			displayallparks();
