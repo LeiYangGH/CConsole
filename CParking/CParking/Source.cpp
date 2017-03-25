@@ -106,7 +106,7 @@ void readallparks()
 
 }
 
-void writeallparks(park re)
+void writeallparks()
 {
 	int i;
 	FILE *fp = fopen(PARK_FILE, "w");
@@ -151,11 +151,23 @@ int checkparkinexists(char *no)
 	return 0;
 }
 
+int checkparkoutexists(char *no)
+{
+	int i;
+	for (i = 0; i < allparkscount; i++)
+	{
+		if (streq(allparks[i].no, no) && allparks[i].outtime > 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 void addparkin(char *no, int intime)
 {
 	int i;
 	park p;
-	char teamname[20] = "";
 	if (!checktimevalid(intime))
 		return;
 	if (checknoexists(no))
@@ -182,7 +194,7 @@ void addparkin(char *no, int intime)
 		p.intime = intime;
 		p.outtime = 0;
 		allparks[allparkscount++] = p;
-		writeallparks(p);
+		writeallparks();
 	}
 }
 
@@ -196,6 +208,51 @@ void promptaddparkin()
 	fseek(stdin, 0, SEEK_END);
 	addparkin(no, intime);
 }
+
+//--
+void addparkout(char *no, int outtime)
+{
+	int i;
+	if (!checktimevalid(outtime))
+		return;
+	if (checkparkinexists(no))
+	{
+		if (checkparkoutexists(no))
+			printf("车牌%s已经登记过离开，不能再次登记！\n", no);
+		else
+			for (i = 0; i < allparkscount; i++)
+			{
+				if (streq(allparks[i].no, no))
+				{
+					if (allparks[i].intime < outtime)
+					{
+						if (checktimevalid(outtime))
+						{
+							allparks[i].outtime = outtime;
+							writeallparks();
+						}
+					}
+					else
+						printf("车牌%s于%d点进入，离开时间必须晚于进入时间！\n", no, allparks[i].intime);
+					break;
+				}
+			}
+	}
+	else
+		printf("车牌%s还未登记进入，不能登记离开！\n", no);
+}
+
+
+void promptaddparkout()
+{
+	char no[20] = "";
+	int outtime = 0;
+	printf("请依次输入要离开的车牌号和时间(1-23)，空格隔开，回车结束:\n");
+	scanf("%s%d", no, &outtime);
+	fseek(stdin, 0, SEEK_END);
+	addparkout(no, outtime);
+}
+//
 
 void createsampleparks()
 {
@@ -224,8 +281,9 @@ int main()
 
 #if TEST
 	//displayallparks();
-	promptaddparkin();
-	//addparkin("555", 1);
+	//promptaddparkin();
+	addparkin("6", 1);
+	addparkout("7", 24);
 	readallparks();
 	displayallparks();
 #else
@@ -234,7 +292,7 @@ int main()
 	{
 		printf("\n\n\t---停车收费管理系统---\n");
 		printf("\t 1. 添加停车进入\n");
-		//printf("\t 2. 添加停车离开\n");
+		printf("\t 2. 添加停车离开\n");
 		//printf("\t 3. 删除停车信息\n");
 		//printf("\t 4. 修改车牌号\n");
 		printf("\t 5. 查看所有停车信息\n");
@@ -254,10 +312,10 @@ int main()
 			printf("\n\n你选择了 1\n");
 			promptaddparkin();
 			break;
-			//case '2':
-			//	printf("\n\n你选择了 2\n");
-			//	inputcountandexam();
-			//	break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			promptaddparkout();
+			break;
 			//case '3':
 			//	printf("\n\n你选择了 3\n");
 			//	displayallresults();
