@@ -5,12 +5,13 @@
 #define PARK_FILE "park.txt"
 
 #define TEST 0
-
+int price = 5;//每小时费用
 typedef struct park
 {
 	char no[20];
 	int intime;
 	int outtime;
+	int money;
 }park;
 park allparks[50];
 int allparkscount = 0;
@@ -40,13 +41,14 @@ int checktimevalid(int t)
 
 void displaypark(park stu)
 {
-	printf("%s\t%d\t%d\r\n", stu.no, stu.intime, stu.outtime);
+	printf("%8s\t%d\t%d\t%d元\r\n", stu.no, stu.intime, stu.outtime, stu.money);
 }
 
 void displayallparks()
 {
 	int i;
-	printf("所有%d车辆信息如下\r\n", allparkscount);
+	printf("所有%d辆车信息如下\r\n", allparkscount);
+	printf("车牌号\t进入\t离开\t费用\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allparkscount; i++)
 	{
@@ -79,6 +81,7 @@ park getparkfromline(char *line)
 		}
 		part = strtok(NULL, "\t\n");
 	}
+	q.money = price*(q.outtime - q.intime);
 	return q;
 }
 
@@ -185,6 +188,7 @@ void addparkin(char *no, int intime)
 		strcpy(p.no, no);
 		p.intime = intime;
 		p.outtime = 0;
+		p.money = 0;
 		allparks[allparkscount++] = p;
 		writeallparks();
 	}
@@ -216,6 +220,7 @@ void addparkout(char *no, int outtime)
 				if (checktimevalid(outtime))
 				{
 					allparks[index].outtime = outtime;
+					allparks[index].money = price * (outtime - allparks[index].intime);
 					writeallparks();
 				}
 			}
@@ -325,10 +330,12 @@ void createsampleparks()
 }
 int main()
 {
-	createsampleparks();
 	readallparks();
 
 #if TEST
+	createsampleparks();
+	readallparks();
+
 	//displayallparks();
 	//promptaddparkin();
 	//addparkin("6", 1);
