@@ -5,7 +5,7 @@
 #define MAX_QUESTIONS_COUNT 98
 #define PARK_FILE "park.txt"
 
-#define TEST 1
+#define TEST 0
 
 typedef struct park
 {
@@ -26,6 +26,17 @@ int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
+}
+
+int checktimevalid(int t)
+{
+	if (t > 0 && t < 24)
+		return 1;
+	else
+	{
+		printf("时间只能限制在1～23之间的整数！\n");
+		return 0;
+	}
 }
 
 void displaypark(park stu)
@@ -114,7 +125,7 @@ void writeallparks(park re)
 	printf("已保存到文件。");
 }
 
-int checkparkexists(char *no)
+int checknoexists(char *no)
 {
 	int i;
 	for (i = 0; i < allparkscount; i++)
@@ -127,34 +138,64 @@ int checkparkexists(char *no)
 	return 0;
 }
 
-void addpark(char *no, int intime, int outtime)
+int checkparkinexists(char *no)
 {
-	park re;
+	int i;
+	for (i = 0; i < allparkscount; i++)
+	{
+		if (streq(allparks[i].no, no) && allparks[i].intime > 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void addparkin(char *no, int intime)
+{
+	int i;
+	park p;
 	char teamname[20] = "";
-	//if (checkparkexists(name))
-	//{
-	//	printf("学生%s已存在不能重复添加。\n", name);
-	//	return;
-	//}
-	strcpy(re.no, no);
-	re.intime = intime;
-	re.outtime = outtime;
-	allparks[allparkscount++] = re;
-	writeallparks(re);
+	if (!checktimevalid(intime))
+		return;
+	if (checknoexists(no))
+	{
+		if (checkparkinexists(no))
+		{
+			printf("车牌%s已经进入，不能再次登记！\n", no);
+		}
+		else
+		{
+			for (i = 0; i < allparkscount; i++)
+			{
+				if (streq(allparks[i].no, no))
+				{
+					allparks[i].intime = intime;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		strcpy(p.no, no);
+		p.intime = intime;
+		p.outtime = 0;
+		allparks[allparkscount++] = p;
+		writeallparks(p);
+	}
 }
 
 
-//void promptaddpark()
-//{
-//	char no[20] = "";
-//	char name[20] = "";
-//	char idcard[20] = "";
-//
-//	printf("请依次输入要添加的学生考号、姓名、身份证号（都不带空格），空格隔开，回车结束:\n");
-//	scanf("%s%s%s", no, name, idcard);
-//	fseek(stdin, 0, SEEK_END);
-//	addpark(no, name, idcard);
-//}
+void promptaddparkin()
+{
+	char no[20] = "";
+	int intime = 0;
+	printf("请依次输入要进入的车牌号和时间(1-23)，空格隔开，回车结束:\n");
+	scanf("%s%d", no, &intime);
+	fseek(stdin, 0, SEEK_END);
+	addparkin(no, intime);
+}
 
 void createsampleparks()
 {
@@ -180,23 +221,23 @@ int main()
 {
 	createsampleparks();
 	readallparks();
-	displayallparks();
+
 #if TEST
-	;
-#else
-
-
-	char choice = ' ';
+	//displayallparks();
+	promptaddparkin();
+	//addparkin("555", 1);
 	readallparks();
-
+	displayallparks();
+#else
+	char choice = ' ';
 	while (choice != 0)
 	{
-		printf("\n\n\t---考试系统---\n");
-		printf("\t 1. 登录\n");
-		printf("\t 2. 学生考试\n");
-		printf("\t 3. 查看所有成绩\n");
-		printf("\t 4. 添加考生信息\n");
-		printf("\t 5. 添加考题\n");
+		printf("\n\n\t---停车收费管理系统---\n");
+		printf("\t 1. 添加停车进入\n");
+		//printf("\t 2. 添加停车离开\n");
+		//printf("\t 3. 删除停车信息\n");
+		//printf("\t 4. 修改车牌号\n");
+		printf("\t 5. 查看所有停车信息\n");
 		printf("\t 0. 退出");
 		printf("\n\n 请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -211,23 +252,23 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			login();
+			promptaddparkin();
 			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			inputcountandexam();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			displayallresults();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptaddpark();
-			break;
+			//case '2':
+			//	printf("\n\n你选择了 2\n");
+			//	inputcountandexam();
+			//	break;
+			//case '3':
+			//	printf("\n\n你选择了 3\n");
+			//	displayallresults();
+			//	break;
+			//case '4':
+			//	printf("\n\n你选择了 4\n");
+			//	promptaddpark();
+			//	break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			promptaddquestion();
+			displayallparks();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
