@@ -6,6 +6,28 @@
 
 FILE *fin;
 FILE *fout;
+int q1 = 0;
+int q2 = 0;
+wchar_t convertpunctuation(wchar_t input)
+{
+	switch (input)
+	{
+	case ',':
+		return L'£¬';
+	case '.':
+		return L'¡£';
+	case ':':
+		return L'£º';
+	case '\'':
+		q1 = !q1;
+		return q1 ? L'¡®' : L'¡¯';
+	case '"':
+		q2 = !q2;
+		return q2 ? L'¡°' : L'¡±';
+	default:
+		return input;
+	}
+}
 
 void count_chwords()
 {
@@ -19,8 +41,7 @@ void count_chwords()
 		for (i = 0; i < wcslen(line); i++)
 		{
 			c = line[i];
-			if (c == '.')
-				c = L'¡£';
+			c = convertpunctuation(c);
 			//wprintf(L"%c\n", c);
 			fwprintf(fout, L"%lc", c);
 		}
