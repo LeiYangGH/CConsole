@@ -44,6 +44,16 @@ void trimparagraphendspaces(wchar_t line[])
 	}
 }
 
+void keepparagraphstart2spaces(wchar_t line[])
+{
+	int i, j;
+	while (line[0] == L' ')
+	{
+		for (i = 1; i < wcslen(line) - 1; i++)
+			line[i - 1] = line[i];
+	}
+}
+
 void count_chwords()
 {
 	int i, j, d, exist;
@@ -54,6 +64,9 @@ void count_chwords()
 	while (fgetws(line, 100, fin) != NULL)
 	{
 		trimparagraphendspaces(line);
+		keepparagraphstart2spaces(line);
+		fwprintf(fout, L"%lc", L' ');
+		fwprintf(fout, L"%lc", L' ');
 		for (i = 0; i < wcslen(line); i++)
 		{
 			c = line[i];
@@ -67,8 +80,8 @@ void count_chwords()
 int main(int argc, char *argv[])
 {
 	int i, j, exist;
-	char inputfilename[255] = "input.txt";
-	char outputfilename[255] = "output.txt";
+	char inputfilename[255] = "C:\\input.txt";
+	char outputfilename[255] = "C:\\output.txt";
 	setlocale(LC_ALL, "chs");
 
 	fin = fopen(inputfilename, "r");
