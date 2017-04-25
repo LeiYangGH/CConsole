@@ -20,12 +20,27 @@ wchar_t convertpunctuation(wchar_t input)
 		return L'£º';
 	case '\'':
 		q1 = !q1;
-		return q1 ? L'¡®' : L'¡¯';
+		return (q1 ? L'¡®' : L'¡¯');
 	case '"':
 		q2 = !q2;
 		return q2 ? L'¡°' : L'¡±';
 	default:
 		return input;
+	}
+}
+
+void trimparagraphendspaces(wchar_t line[])
+{
+	int i;
+	for (i = wcslen(line) - 2; i >= 0; i--)
+	{
+		if (line[i] != L' ')
+		{
+			line[i + 1] = L'\r';
+			line[i + 2] = L'\n';
+			line[i + 3] = L'\0';
+			break;
+		}
 	}
 }
 
@@ -38,6 +53,7 @@ void count_chwords()
 	wchar_t c;
 	while (fgetws(line, 100, fin) != NULL)
 	{
+		trimparagraphendspaces(line);
 		for (i = 0; i < wcslen(line); i++)
 		{
 			c = line[i];
