@@ -47,10 +47,12 @@ void trimparagraphendspaces(wchar_t line[])
 void keepparagraphstart2spaces(wchar_t line[])
 {
 	int i, j;
-	while (line[0] == L' ')
+	while (isspace(line[0]))
 	{
-		for (i = 1; i < wcslen(line) - 1; i++)
-			line[i - 1] = line[i];
+		for (i = 0; i < wcslen(line); i++)
+		{
+			line[i] = line[i + 1];
+		}
 	}
 }
 
@@ -63,8 +65,14 @@ void count_chwords()
 	wchar_t c;
 	while (fgetws(line, 100, fin) != NULL)
 	{
+		if (wcslen(line) <= 1)
+			continue;
 		trimparagraphendspaces(line);
+		if (wcslen(line) <= 1)
+			continue;
 		keepparagraphstart2spaces(line);
+		if (wcslen(line) <= 1)
+			continue;
 		fwprintf(fout, L"%lc", L' ');
 		fwprintf(fout, L"%lc", L' ');
 		for (i = 0; i < wcslen(line); i++)
