@@ -11,17 +11,18 @@
 #define COURSES_COUNT 5
 
 char best[QUESTIONS_COUNT];
+
 typedef struct student
 {
 	char name[MAX_STRLEN];
-	//char choice[QUESTIONS_COUNT];
 	int score[COURSES_COUNT];
 	int total;
 	float average;
 }student;
 student allstudents[100];
 int allstudentscount = 0;
-#define TEST 1
+#define TEST 0
+int ascending = 1;
 //字符串转整数
 int toint(char *s)
 {
@@ -40,7 +41,7 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	printf("所有%d分数如下\r\n", allstudentscount);
+	printf("所有%d位同学分数如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -117,15 +118,24 @@ void readallstudents()
 }
 
 
-//
-//int cmpfunc(const void * a, const void * b)
-//{
-//	return ((student*)a)->total - ((student*)b)->total;
-//}
-//void sorttotal()
-//{
-//	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
-//}
+
+int cmpfunc(const void * a, const void * b)
+{
+	return (((student*)a)->total - ((student*)b)->total)*ascending;
+}
+void sorttotal()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+}
+
+void promptaskascending()
+{
+	int asc;
+	printf("\n请输入升序(1)还是降序(-1)，以回车结束：");
+	scanf("%d", &asc);
+	ascending = asc;
+}
+
 //
 //void writetotal()
 //{
@@ -166,6 +176,7 @@ int main()
 {
 #if TEST
 	readallstudents();
+	sorttotal(-1);
 	displayallstudents();
 #else
 
@@ -174,25 +185,47 @@ int main()
 	readallstudents();
 	printf("\n读文件结束！\n");
 
-	printf("\n开始统计最佳答案...\n");
-	getbestchoices();
-	writebestchoices();
-	printf("\n统计最佳答案结束！\n");
-
-	printf("\n开始计算每位同学总成绩...\n");
-	calctotal();
-	writetotal();
-	printf("\n计算每位同学总成绩结束！\n");
-
-	printf("\n开始统计所有成绩...\n");
-	writeanalysis();
-	printf("\n统计所有成绩结束！\n");
-
 	while (choice != 0)
 	{
-		printf("\n\t---分数查询，输入q结束查询---\n");
-		choice = promptsearchtotalbyname();
-}
+		printf("\n\t 学生成绩读入统计");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 按学生总分升降序输出");
+		//printf("\n\t 2. 按某门课程分数升降序输出");
+		//printf("\n\t 3. 按某门课程平均分升降序输出");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
+		choice = getchar();
+		switch (choice)
+		{
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
+			system("pause");
+			exit(0);
+			break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			promptaskascending();
+			sorttotal();
+			displayallstudents();
+			break;
+			//case '2':
+			//	printf("\n\n你选择了 2\n");
+			//	calcanddisplaytotalandaverage();
+			//	break;
+			//case '3':
+			//	printf("\n\n你选择了 3\n");
+			//	sortanddisplaybytotal();
+			//	break;
+
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
+		}
+	}
+
+
+
 #endif
 	system("pause");
 	return 0;
