@@ -21,8 +21,10 @@ typedef struct student
 }student;
 student allstudents[100];
 int allstudentscount = 0;
+
 #define TEST 0
 int ascending = 1;
+int cmpcourseindex;
 //字符串转整数
 int toint(char *s)
 {
@@ -46,6 +48,21 @@ void displayallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		displaystudent(allstudents[i]);
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
+
+void displayonecourseorder()
+{
+	int i;
+	printf("第%d科目分数如下\r\n", cmpcourseindex + 1);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		printf("\r\n");
+		student stu = allstudents[i];
+		printf("%s\t\%d\n", stu.name,
+			stu.score[cmpcourseindex]);
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
@@ -119,13 +136,23 @@ void readallstudents()
 
 
 
-int cmpfunc(const void * a, const void * b)
+int cmptotalfunc(const void * a, const void * b)
 {
 	return (((student*)a)->total - ((student*)b)->total)*ascending;
 }
 void sorttotal()
 {
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
+}
+
+
+int cmponecoursefunc(const void * a, const void * b)
+{
+	return (((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex])*ascending;
+}
+void sortonecourse()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
 }
 
 void promptaskascending()
@@ -136,48 +163,25 @@ void promptaskascending()
 	ascending = asc;
 }
 
-//
-//void writetotal()
-//{
-//	int i;
-//	FILE *fp;
-//	fp = fopen(FILE_SCORES, "wb");
-//	if (fp == NULL)
-//	{
-//		printf("\n打开文件%s失败!", FILE_SCORES);
-//		getchar();
-//		exit(1);
-//	}
-//	sorttotal();
-//	for (i = 0; i < allstudentscount; i++)
-//	{
-//		printf("%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-//		fprintf(fp, "%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-//	}
-//	fclose(fp);
-//}
-//
-// 
-//float ave()
-//{
-//	int i;
-//	float sum = 0;
-//	for (i = 0; i < allstudentscount; i++)
-//		sum += allstudents[i].total;
-//	return sum / (float)allstudentscount;
-//}
-
-
-
-
+void promptaskcmpcourseindex()
+{
+	int courseid;
+	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
+	scanf("%d", &courseid);
+	cmpcourseindex = courseid - 1;
+}
 
 
 int main()
 {
 #if TEST
 	readallstudents();
-	sorttotal(-1);
-	displayallstudents();
+	//sorttotal();
+	//displayallstudents();
+	ascending = -1;
+	cmpcourseindex = 4;
+	sortonecourse();
+	displayonecourseorder();
 #else
 
 	int choice = -1;
@@ -190,7 +194,7 @@ int main()
 		printf("\n\t 学生成绩读入统计");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 按学生总分升降序输出");
-		//printf("\n\t 2. 按某门课程分数升降序输出");
+		printf("\n\t 2. 按某门课程分数升降序输出");
 		//printf("\n\t 3. 按某门课程平均分升降序输出");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
@@ -209,10 +213,13 @@ int main()
 			sorttotal();
 			displayallstudents();
 			break;
-			//case '2':
-			//	printf("\n\n你选择了 2\n");
-			//	calcanddisplaytotalandaverage();
-			//	break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			promptaskcmpcourseindex();
+			promptaskascending();
+			sortonecourse();
+			displayonecourseorder();
+			break;
 			//case '3':
 			//	printf("\n\n你选择了 3\n");
 			//	sortanddisplaybytotal();
