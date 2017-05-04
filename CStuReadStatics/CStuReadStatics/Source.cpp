@@ -8,43 +8,91 @@
 #define FILE_ANALYSIS "analysis.txt"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
+#define COURSES_COUNT 5
 
 char best[QUESTIONS_COUNT];
 typedef struct student
 {
 	char name[MAX_STRLEN];
-	char choice[QUESTIONS_COUNT];
+	//char choice[QUESTIONS_COUNT];
+	int score[COURSES_COUNT];
 	int total;
+	float average;
 }student;
 student allstudents[100];
 int allstudentscount = 0;
+#define TEST 1
+//字符串转整数
+int toint(char *s)
+{
+	char *end;
+	return (int)strtol(s, &end, 10);
+}
+
+void displaystudent(student stu)
+{
+	printf("\r\n");
+	printf("%s\t\%d\t\%d\t\%d\t\%d\t\%d\t%.1f\n", stu.name,
+		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
+		stu.average);
+}
+
+void displayallstudents()
+{
+	int i;
+	printf("所有%d分数如下\r\n", allstudentscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		displaystudent(allstudents[i]);
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
 
 student getstudentfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	student rec;
-	rec.total = 0;
-	part = strtok(line, ",");
+	student stu;
+	part = strtok(line, "\t");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
+			strcpy(stu.name, part);
 			break;
 		case 2:
-			strcpy(rec.name, part);
-			break;
 		case 3:
-			strcpy(rec.choice, part);
+		case 4:
+		case 5:
+		case 6:
+			stu.score[index - 2] = toint(part);
 			break;
+
 		default:
 			break;
 		}
-		part = strtok(NULL, ",");
+		part = strtok(NULL, "\t");
 	}
-	return rec;
+	return stu;
 }
+
+void calctotalandave()
+{
+	int i, j;
+	float sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		allstudents[i].total = 0;
+		for (j = 0; j < COURSES_COUNT; j++)
+		{
+			allstudents[i].total += allstudents[i].score[j];
+		}
+		allstudents[i].average = allstudents[i].total / (float)COURSES_COUNT;
+	}
+}
+
 
 void readallstudents()
 {
@@ -65,203 +113,62 @@ void readallstudents()
 		++allstudentscount;
 		allstudents[allstudentscount - 1] = getstudentfromline(line);
 	}
+	calctotalandave();
 }
 
-void getbestchoices()
-{
-	int i, j, t, cnt[100] = { 0 };
-	char c, b;
-	for (i = 0; i < QUESTIONS_COUNT; i++)
-	{
-		for (c = 'A'; c <= 'D'; c++)
-			cnt[c] = 0;
-		for (j = 0; j < allstudentscount; j++)
-			cnt[allstudents[j].choice[i]]++;
-		t = 0;
-		for (c = 'A'; c <= 'D'; c++)
-			if (cnt[c] > t)
-			{
-				t = cnt[c];
-				b = c;
-			}
-		best[i] = b;
-	}
-}
 
-void writebestchoices()
-{
-	int i;
-	FILE *fp = fopen(FILE_BEST, "wb");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_BEST);
-		getchar();
-		exit(1);
-	}
-	for (i = 0; i < QUESTIONS_COUNT; i++)
-	{
-		printf("%d\t%c\r\n", i + 1, best[i]);
-		fprintf(fp, "%d\t%c\r\n", i + 1, best[i]);
-	}
-	fclose(fp);
-}
+//
+//int cmpfunc(const void * a, const void * b)
+//{
+//	return ((student*)a)->total - ((student*)b)->total;
+//}
+//void sorttotal()
+//{
+//	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+//}
+//
+//void writetotal()
+//{
+//	int i;
+//	FILE *fp;
+//	fp = fopen(FILE_SCORES, "wb");
+//	if (fp == NULL)
+//	{
+//		printf("\n打开文件%s失败!", FILE_SCORES);
+//		getchar();
+//		exit(1);
+//	}
+//	sorttotal();
+//	for (i = 0; i < allstudentscount; i++)
+//	{
+//		printf("%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
+//		fprintf(fp, "%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
+//	}
+//	fclose(fp);
+//}
+//
+// 
+//float ave()
+//{
+//	int i;
+//	float sum = 0;
+//	for (i = 0; i < allstudentscount; i++)
+//		sum += allstudents[i].total;
+//	return sum / (float)allstudentscount;
+//}
 
-void calctotal()
-{
-	int i, q, sum;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		sum = 0;
-		for (q = 0; q < QUESTIONS_COUNT; q++)
-		{
-			if (allstudents[i].choice[q] == best[q])
-			{
-				if (q < 15)
-					sum += 2;
-				else if (q < 25)
-					sum += 3;
-				else
-					sum += 4;
-			}
-		}
-		allstudents[i].total = sum;
-	}
-}
 
-int cmpfunc(const void * a, const void * b)
-{
-	return ((student*)a)->total - ((student*)b)->total;
-}
-void sorttotal()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
-}
 
-void writetotal()
-{
-	int i;
-	FILE *fp;
-	fp = fopen(FILE_SCORES, "wb");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_SCORES);
-		getchar();
-		exit(1);
-	}
-	sorttotal();
-	for (i = 0; i < allstudentscount; i++)
-	{
-		printf("%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-		fprintf(fp, "%s\t%d\r\n", allstudents[i].name, allstudents[i].total);
-	}
-	fclose(fp);
-}
 
-int below60()
-{
-	int i, c = 0;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		if (allstudents[i].total < 60)
-			c++;
-	}
-	return c;
-}
 
-int below60_80()
-{
-	int i, c = 0;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		if (allstudents[i].total >= 60 && allstudents[i].total < 80)
-			c++;
-	}
-	return c;
-}
-
-int above80()
-{
-	int i, c = 0;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		if (allstudents[i].total >= 80)
-			c++;
-	}
-	return c;
-}
-
-float ave()
-{
-	int i;
-	float sum = 0;
-	for (i = 0; i < allstudentscount; i++)
-		sum += allstudents[i].total;
-	return sum / (float)allstudentscount;
-}
-
-void writeanalysis()
-{
-	int i;
-	FILE *fp;
-	fp = fopen(FILE_ANALYSIS, "wb");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_ANALYSIS);
-		getchar();
-		exit(1);
-	}
-	printf("%s\t%d\r\n", "<60", below60());
-	printf("%s\t%d\r\n", "60~80", below60_80());
-	printf("%s\t%d\r\n", ">80", above80());
-	printf("%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
-	printf("%s\t%d\r\n", "最低", allstudents[0].total);
-	printf("%s\t%f\r\n", "平均", ave());
-	printf("%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
-
-	fprintf(fp, "%s\t%d\r\n", "<60", below60());
-	fprintf(fp, "%s\t%d\r\n", "60~80", below60_80());
-	fprintf(fp, "%s\t%d\r\n", ">80", above80());
-	fprintf(fp, "%s\t%d\r\n", "最高", allstudents[allstudentscount - 1].total);
-	fprintf(fp, "%s\t%d\r\n", "最低", allstudents[0].total);
-	fprintf(fp, "%s\t%f\r\n", "平均", ave());
-	fprintf(fp, "%s\t百分之%d\r\n", "及格率", (int)(100 * (float)(below60_80() + above80()) / (float)allstudentscount));
-	fclose(fp);
-}
-
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名,输入q退出查询:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
-}
-
-int searchtotalbyname(char *name)
-{
-	int i;
-	for (i = 0; i < allstudentscount; i++)
-		if (strcmp(name, allstudents[i].name) == 0)
-			return allstudents[i].total;
-	printf("没找到对应学生的信息。\r\n");
-	return 0;
-}
-
-int promptsearchtotalbyname()
-{
-	char name[MAX_STRLEN] = "";
-	inputstring(name);
-	printf("学生%s的成绩为%d：", name, searchtotalbyname(name));
-	return strcmp(name, "q");
-}
 
 int main()
 {
+#if TEST
+	readallstudents();
+	displayallstudents();
+#else
+
 	int choice = -1;
 	printf("\n开始读文件...\n");
 	readallstudents();
@@ -285,8 +192,8 @@ int main()
 	{
 		printf("\n\t---分数查询，输入q结束查询---\n");
 		choice = promptsearchtotalbyname();
-	}
-
+}
+#endif
 	system("pause");
 	return 0;
 }
