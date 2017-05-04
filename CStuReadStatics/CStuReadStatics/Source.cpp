@@ -2,15 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
-//#define FILE_INPUT "sample.txt"
-#define FILE_BEST "best.txt"
-#define FILE_SCORES "scores.txt"
-#define FILE_ANALYSIS "analysis.txt"
 #define MAX_STRLEN 20
-#define QUESTIONS_COUNT 35
 #define COURSES_COUNT 5
-
-char best[QUESTIONS_COUNT];
 
 typedef struct student
 {
@@ -21,6 +14,14 @@ typedef struct student
 }student;
 student allstudents[100];
 int allstudentscount = 0;
+
+typedef struct course
+{
+	int oldindex;
+	float average;
+}course;
+course allcourses[COURSES_COUNT];
+
 
 #define TEST 0
 int ascending = 1;
@@ -63,6 +64,21 @@ void displayonecourseorder()
 		student stu = allstudents[i];
 		printf("%s\t\%d\n", stu.name,
 			stu.score[cmpcourseindex]);
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
+
+void displayallcoursesaveorder()
+{
+	int i;
+	printf("所有科目平均分排序如下\r\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < COURSES_COUNT; i++)
+	{
+		printf("\r\n");
+		course cou = allcourses[i];
+		printf("第%d科\t\%.1f\n", cou.oldindex + 1,
+			cou.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
@@ -155,6 +171,31 @@ void sortonecourse()
 	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
 }
 
+void calceachcourseave()
+{
+	int i, j;
+	float sum;
+	for (j = 0; j < COURSES_COUNT; j++)
+	{
+		sum = 0;
+		for (i = 0; i < allstudentscount; i++)
+		{
+			sum += allstudents[i].score[j];
+		}
+		allcourses[j].oldindex = j;
+		allcourses[j].average = sum / (float)COURSES_COUNT;
+	}
+}
+
+int cmpcoursesavefunc(const void * a, const void * b)
+{
+	return (((course*)a)->average - ((course*)b)->average)*ascending;
+}
+void sortcoursesave()
+{
+	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
+}
+
 void promptaskascending()
 {
 	int asc;
@@ -195,7 +236,7 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 按学生总分升降序输出");
 		printf("\n\t 2. 按某门课程分数升降序输出");
-		//printf("\n\t 3. 按某门课程平均分升降序输出");
+		printf("\n\t 3. 按所有课程平均分升降序输出");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -220,19 +261,19 @@ int main()
 			sortonecourse();
 			displayonecourseorder();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	sortanddisplaybytotal();
-			//	break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			calceachcourseave();
+			promptaskascending();
+			sortcoursesave();
+			displayallcoursesaveorder();
+			break;
 
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
 	}
-
-
-
 #endif
 	system("pause");
 	return 0;
