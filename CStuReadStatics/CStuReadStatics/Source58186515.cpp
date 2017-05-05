@@ -3,6 +3,7 @@
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
 #define FILE_ALLOUTPUT "alloutput.txt"
+#define FILE_GRADES "grades.txt"
 #define MAX_STRLEN 20
 #define COURSES_COUNT 5
 #define GRADES_COUNT 5
@@ -196,49 +197,65 @@ void sortstuave()
 	}
 }
 
-
-int cmponecoursefunc(const void * a, const void * b)
+void countbygradesforonecourse(int courseindex)
 {
-	return (((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex]);
-}
-void sortonecourse()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
-}
-
-void calceachcourseave()
-{
-	int i, j;
-	float sum;
-	for (j = 0; j < COURSES_COUNT; j++)
+	int i, t;
+	for (i = 0; i < allstudentscount; i++)
 	{
-		sum = 0;
-		for (i = 0; i < allstudentscount; i++)
-		{
-			sum += allstudents[i].score[j];
-		}
-		allcourses[j].oldindex = j;
-		allcourses[j].average = sum / (float)COURSES_COUNT;
+		t = allstudents[i].score[courseindex];
+		if (t < 60)
+			allcourses[courseindex].countingrade[0]++;
+		else if (t >= 60 && t <= 69)
+			allcourses[courseindex].countingrade[1]++;
+		else if (t >= 70 && t <= 79)
+			allcourses[courseindex].countingrade[2]++;
+		else if (t >= 80 && t <= 89)
+			allcourses[courseindex].countingrade[3]++;
+		else if (t >= 90)
+			allcourses[courseindex].countingrade[4]++;
 	}
 }
 
-int cmpcoursesavefunc(const void * a, const void * b)
+void countbygradesforallcourses()
 {
-	return (((course*)a)->average - ((course*)b)->average);
-}
-void sortcoursesave()
-{
-	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
-}
-
-void promptaskcmpcourseindex()
-{
-	int courseid;
-	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
-	scanf("%d", &courseid);
-	cmpcourseindex = courseid - 1;
+	int i;
+	for (i = 0; i < COURSES_COUNT; i++)
+	{
+		countbygradesforonecourse(i);
+	}
 }
 
+
+void writeandprintgradescount()
+{
+	int i, j;
+	char *grades[GRADES_COUNT] = { "<60","60~69", "70~79", "80~89", ">=90", };
+	FILE *fp;
+	fp = fopen(FILE_GRADES, "w");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_GRADES);
+		getchar();
+		exit(1);
+	}
+	printf("分数段\t科目1\t科目2\t科目3\t科目4\t科目5\n");
+	fprintf(fp, "分数段\t科目1\t科目2\t科目3\t科目4\t科目5\n");
+	for (i = 0; i < GRADES_COUNT; i++)
+	{
+		printf("%s", grades[i]);
+		fprintf(fp, "%s", grades[i]);
+		for (j = 0; j < COURSES_COUNT; j++)
+		{
+			course cou = allcourses[j];
+			printf("\t%d", cou.countingrade[i]);
+			fprintf(fp, "\t%d", cou.countingrade[i]);
+		}
+		printf("\n");
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+	printf("分数段已输出到文件%s\n", FILE_GRADES);
+}
 
 int main()
 {
@@ -261,9 +278,9 @@ int main()
 	{
 		printf("\n\t 学生成绩读入统计");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 按学生总分升降序输出");
-		printf("\n\t 2. 按某门课程分数升降序输出");
-		printf("\n\t 3. 按所有课程平均分升降序输出");
+		printf("\n\t 1. 综合成绩名次计算输出");
+		printf("\n\t 2. 课程分段人数输出");
+		//printf("\n\t 3. 按所有课程平均分升降序输出");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -283,16 +300,15 @@ int main()
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptaskcmpcourseindex();
-			sortonecourse();
-			displayonecourseorder();
+			countbygradesforallcourses();
+			writeandprintgradescount();
 			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			calceachcourseave();
-			sortcoursesave();
-			displayallcoursesaveorder();
-			break;
+			/*case '3':
+				printf("\n\n你选择了 3\n");
+				calceachcourseave();
+				sortcoursesave();
+				displayallcoursesaveorder();
+				break;*/
 
 		default:
 			printf("\n\n输入有误，请重选\n");
