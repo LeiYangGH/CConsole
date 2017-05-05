@@ -257,6 +257,26 @@ void writeandprintgradescount()
 	printf("分数段已输出到文件%s\n", FILE_GRADES);
 }
 
+void displayallbelow60()
+{
+	int i, j, t;
+	printf("所有不及格信息如下\r\n");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		for (j = 0; j < COURSES_COUNT; j++)
+		{
+			t = allstudents[i].score[j];
+			if (t < 60)
+			{
+				printf("%s\t科目%d\t%d分\n",
+					allstudents[i].name, j + 1, t);
+			}
+		}
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
+
 int main()
 {
 #if TEST
@@ -280,7 +300,7 @@ int main()
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 综合成绩名次计算输出");
 		printf("\n\t 2. 课程分段人数输出");
-		//printf("\n\t 3. 按所有课程平均分升降序输出");
+		printf("\n\t 3. 输出所有不及格");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -303,13 +323,10 @@ int main()
 			countbygradesforallcourses();
 			writeandprintgradescount();
 			break;
-			/*case '3':
-				printf("\n\n你选择了 3\n");
-				calceachcourseave();
-				sortcoursesave();
-				displayallcoursesaveorder();
-				break;*/
-
+		case '3':
+			printf("\n\n你选择了 3\n");
+			displayallbelow60();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
