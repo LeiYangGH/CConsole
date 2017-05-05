@@ -37,15 +37,16 @@ int toint(char *s)
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf("%s\t\%d\t\%d\t\%d\t\%d\t\%d\t%.1f\n", stu.name,
+	printf("%s\t%d\t%d\t%d\t%d\t%d\t%.1f\t%d\n", stu.name,
 		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
-		stu.average);
+		stu.average, stu.order);
 }
 
 void displayallstudents()
 {
 	int i;
 	printf("所有%d位同学分数如下\r\n", allstudentscount);
+	printf("姓名\t科目1\t科目2\t科目3\t科目4\t科目5\t平均\t排名\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -153,13 +154,22 @@ void readallstudents()
 
 
 
-int cmptotalfunc(const void * a, const void * b)
+int cmpstuavefunc(const void * a, const void * b)
 {
 	return (((student*)a)->average - ((student*)b)->average);
 }
-void sorttotal()
+void sortstuave()
 {
-	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
+	int i;
+	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
+	allstudents[0].order = 1;
+	for (i = 1; i < allstudentscount; i++)
+	{
+		if (allstudents[i].average == allstudents[i - 1].average)
+			allstudents[i].order = allstudents[i - 1].order;
+		else
+			allstudents[i].order = allstudents[i - 1].order + 1;
+	}
 }
 
 
@@ -243,7 +253,7 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			sorttotal();
+			sortstuave();
 			displayallstudents();
 			break;
 		case '2':
