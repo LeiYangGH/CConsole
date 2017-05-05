@@ -1,3 +1,8 @@
+// CProj.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,7 +30,7 @@ course allcourses[COURSES_COUNT];//5门课程
 
 int ascending = 1;//升序还是降序
 int cmpcourseindex;//排序的课程下标（0～4）
-//字符串转整数
+				   //字符串转整数
 int toint(char *s)
 {
 	char *end;
@@ -35,7 +40,7 @@ int toint(char *s)
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf("%s\t\%d\t\%d\t\%d\t\%d\t\%d\t%.1f\n", stu.name,
+	printf("%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n", stu.name,
 		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
 		stu.average);
 }
@@ -62,7 +67,7 @@ void displayonecourseorder()
 	{
 		printf("\r\n");
 		student stu = allstudents[i];
-		printf("%s\t\%d\n", stu.name,
+		printf("%s\t%d\n", stu.name,
 			stu.score[cmpcourseindex]);
 	}
 	printf("\r\n--------------------------------------------\r\n");
@@ -79,7 +84,7 @@ void displayallcoursesaveorder()
 	{
 		printf("\r\n");
 		course cou = allcourses[i];
-		printf("第%d科\t\%.1f\n", cou.oldindex + 1,
+		printf("第%d科\t%.1f\n", cou.oldindex + 1,
 			cou.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
@@ -193,7 +198,7 @@ void calceachcourseave()
 //科目平均分排序
 int cmpcoursesavefunc(const void * a, const void * b)
 {
-	return (((course*)a)->average - ((course*)b)->average)*ascending;
+	return (int)(((course*)a)->average - ((course*)b)->average)*ascending;
 }
 void sortcoursesave()
 {
@@ -274,3 +279,4 @@ int main()
 	system("pause");
 	return 0;
 }
+
