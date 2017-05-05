@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
+#define FILE_ALLOUTPUT "alloutput.txt"
 #define MAX_STRLEN 20
 #define COURSES_COUNT 5
 #define GRADES_COUNT 5
@@ -83,6 +84,29 @@ void displayallcoursesaveorder()
 			cou.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
+}
+
+void writestudentsaveorder()
+{
+	int i;
+	FILE *fp;
+	fp = fopen(FILE_ALLOUTPUT, "w");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_ALLOUTPUT);
+		getchar();
+		exit(1);
+	}
+	fprintf(fp, "姓名\t科目1\t科目2\t科目3\t科目4\t科目5\t平均\t排名\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		student stu = allstudents[i];
+		fprintf(fp, "%s\t%d\t%d\t%d\t%d\t%d\t%.1f\t%d\n", stu.name,
+			stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
+			stu.average, stu.order);
+	}
+	fclose(fp);
+	printf("学生综合成绩已输出到文件%s\n", FILE_ALLOUTPUT);
 }
 
 student getstudentfromline(char *line)
@@ -255,6 +279,7 @@ int main()
 			printf("\n\n你选择了 1\n");
 			sortstuave();
 			displayallstudents();
+			writestudentsaveorder();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
