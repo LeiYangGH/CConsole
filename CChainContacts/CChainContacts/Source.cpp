@@ -1,11 +1,10 @@
 #include "stdlib.h"  
 #include "string.h"  
 #include "stdio.h"  
-#include "ctype.h"  
 
 #define NULL 0  
 #define LEN sizeof(person)  
-#define TEST 1
+#define TEST 0
 
 typedef struct person
 {
@@ -13,6 +12,7 @@ typedef struct person
 	char tel[20];          //分数，其他信息可以继续在下面增加字段  
 	person *next;       //指向下一节点的指针  
 }person;
+person *head;
 
 int n;  //节点总数   
 		/*
@@ -105,7 +105,7 @@ void print(person *head)
 返回：指向链表表头的指针
 ==========================
 */
-person *deleteperson(person *head, char *num)
+person *deleteperson(person *head, char *name)
 {
 	person *p1;     //p1保存当前需要检查的节点的地址  
 	person *p2;     //p2保存当前检查过的节点的地址  
@@ -117,13 +117,13 @@ person *deleteperson(person *head, char *num)
 
 	//定位要删除的节点  
 	p1 = head;
-	while (strcmp(p1->name, num) != 0 && p1->next != NULL)    //p1指向的节点不是所要查找的，并且它不是最后一个节点，就继续往下找  
+	while (strcmp(p1->name, name) != 0 && p1->next != NULL)    //p1指向的节点不是所要查找的，并且它不是最后一个节点，就继续往下找  
 	{
 		p2 = p1;            //保存当前节点的地址  
 		p1 = p1->next;       //后移一个节点  
 	}
 
-	if (strcmp(p1->name, num) == 0)     //找到了。（结合图4、5理解）  
+	if (strcmp(p1->name, name) == 0)     //找到了。（结合图4、5理解）  
 	{
 		if (p1 == head)     //如果要删除的节点是第一个节点  
 		{
@@ -141,7 +141,7 @@ person *deleteperson(person *head, char *num)
 	}
 	else                //没有找到  
 	{
-		printf("\n%ld not been found!\n", num);
+		printf("\n%ld not been found!\n", name);
 	}
 
 	return head;
@@ -204,18 +204,27 @@ person *insertafter(person *head, char *name, person *node)
 
 void executeinsert(char *name, char *tel, char *nameafter)
 {
-	printf("\nexecuteinsert %s %s %s\n", name, tel, nameafter);
+	//printf("\nexecuteinsert %s %s %s\n", name, tel, nameafter);
+
+	//person *head;
+	person *per;
+	per = (person *)malloc(LEN);
+	strcpy(per->name, name);
+	strcpy(per->tel, tel);
+	head = insertafter(head, nameafter, per);
 }
 
 void executeprint()
 {
-	printf("\nexecuteprint\n");
+	//printf("\nexecuteprint\n");
+	print(head);
 
 }
 
 void executedelete(char *name)
 {
-	printf("\nexecutedelete %s\n", name);
+	//printf("\nexecutedelete %s\n", name);
+	head = deleteperson(head, name);
 
 }
 
@@ -251,18 +260,11 @@ bool executecommand(char *cmd)
 int main(void)
 {
 	char cmd[80] = "Print";
-	person *head;
 	person *per;
 
 	head = create();
-	print(head);
+	//print(head);
 #if TEST
-
-	while (executecommand(cmd))
-	{
-		printf("\?\n");
-		fgets(cmd, 80, stdin);
-	}
 	printf("\ninsert\n");
 	per = (person *)malloc(LEN);
 	strcpy(per->name, "n2");
@@ -288,7 +290,11 @@ int main(void)
 	deleteperson(head, "n2");
 	print(head);
 #else
-
+	while (executecommand(cmd))
+	{
+		//printf("\?\n");
+		fgets(cmd, 80, stdin);
+	}
 #endif
 	destroylist(head);
 	system("pause");
