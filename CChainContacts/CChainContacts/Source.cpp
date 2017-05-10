@@ -2,18 +2,19 @@
 #include "string.h"
 #include "stdio.h"
 
-//#define NULL 0
 #define LEN sizeof(person)
 #define TEST 0
 
 typedef struct person
 {
-	char name[20];              //学号
-	char tel[20];          //分数，其他信息可以继续在下面增加字段
-	struct person *next;       //指向下一节点的指针
+	char name[20];
+	char tel[20];
+	struct person *next;
 }person;
 person *head;
 
+//链表操作参考：
+//http://blog.csdn.net/hackbuteer1/article/details/6591486/#
 int n;  //节点总数
 		/*
 		==========================
