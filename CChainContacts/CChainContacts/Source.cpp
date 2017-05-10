@@ -80,7 +80,7 @@ person *create()
 void print(person *head)
 {
 	person *p;
-	printf("\nNow , These %d records are:\n", n);
+	//printf("\nNow , These %d records are:\n", n);
 	p = head;
 	if (head != NULL)        //只要不是空链表，就输出链表中所有节点  
 	{
@@ -92,7 +92,7 @@ void print(person *head)
 			这样输出便于读者形象看到一个单向链表在计算机中的存储结构，和我们
 			设计的图示是一模一样的。
 			*/
-			printf("%s   %s\n", p->name, p->tel);
+			printf("%s %s\n", p->name, p->tel);
 			p = p->next;     //移到下一个节点  
 		} while (p != NULL);
 	}
@@ -136,7 +136,7 @@ person *deleteperson(person *head, char *num)
 
 		free(p1);      //释放当前节点  
 		p1 = NULL;
-		printf("\ndelete %ld success!\n", num);
+		//printf("\ndelete %ld success!\n", num);
 		n -= 1;         //节点总数减1个  
 	}
 	else                //没有找到  
