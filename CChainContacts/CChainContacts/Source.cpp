@@ -181,9 +181,17 @@ person *insertafter(person *head, char *name, person *node)
 
 	if (strcmp(p1->name, name) == 0)        //找到了（结合图示8理解）  
 	{
-		node->next = p1->next;    //显然node的下一节点是原p1的next  
-		p1->next = node;     //插入后，原p1的下一节点就是要插入的node  
-		n += 1;         //节点总数增加1个  
+		if (strcmp(p1->name, node->name) == 0)
+		{
+			strcpy(p1->tel, node->tel);
+		}
+		else
+		{
+			node->next = p1->next;    //显然node的下一节点是原p1的next  
+			p1->next = node;     //插入后，原p1的下一节点就是要插入的node  
+			n += 1;
+		}
+		//节点总数增加1个  
 	}
 	else
 	{
@@ -208,6 +216,12 @@ int main(void)
 	strcpy(per->tel, "t2");
 
 	head = insertafter(head, "n1", per);
+	print(head);
+
+	per = (person *)malloc(LEN);
+	strcpy(per->name, "n2");
+	strcpy(per->tel, "t22222222");
+	head = insertafter(head, "n2", per);
 	print(head);
 
 	deleteperson(head, "n2");
