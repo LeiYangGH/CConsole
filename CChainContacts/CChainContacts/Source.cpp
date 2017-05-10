@@ -1,524 +1,249 @@
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <conio.h>
-#define FORMAT3DSD "%d\t%s\t%d\r\n"
+#include "stdlib.h"  
+#include "stdio.h"  
 
-typedef struct student
+#define NULL 0  
+#define LEN sizeof(struct student)  
+
+struct student
 {
-	int no;
-	char name[50];
-	int score;
-	student *next;
-}student;
+	int num;              //学号   
+	int score;          //分数，其他信息可以继续在下面增加字段  
+	struct student *next;       //指向下一节点的指针  
+};
 
-char *scoresfile = "scores.txt";
-student *head;
-
-//字符串转整数
-int toint(char *s)
+int n;  //节点总数   
+		/*
+		==========================
+		功能：创建n个节点的链表
+		返回：指向链表表头的指针
+		==========================
+		*/
+struct student *Create()
 {
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
+	int nn = 1;
+	struct student *head;       //头节点  
+	struct student *p1 = NULL;  //p1保存创建的新节点的地址  
+	struct student *p2 = NULL;  //p2保存原链表最后一个节点的地址  
 
-//从一行文本拆分出成绩
-void getstudentfromline(char *line, student *stu)
-{
-	char * part;
-	int index = 0;
+	n = 0;          //创建前链表的节点总数为0：空链表  
+	p1 = (struct student *) malloc(LEN);   //开辟一个新节点  
+	p2 = p1;            //如果节点开辟成功，则p2先把它的指针保存下来以备后用  
 
-	part = strtok(line, "\t");
-	while (part != NULL)
+	if (p1 == NULL)        //节点开辟不成功  
 	{
-		switch (++index)
+		printf("\nCann't create it, try it again in a moment!\n");
+		return NULL;
+	}
+	else                //节点开辟成功  
+	{
+		head = NULL;        //开始head指向NULL  
+		//printf("Please input %d node -- num,score: ", n + 1);
+		//scanf("%d %f", &(p1->num), &(p1->score));    //录入数据 
+		p1->num = 1;
+		p1->score = 11;
+	}
+	//while (p1->num != 0)      //只要学号不为0，就继续录入下一个节点  
+	while (nn < 5)      //只要学号不为0，就继续录入下一个节点  
+	{
+		n += 1;         //节点总数增加1个  
+		if (n == 1)      //如果节点总数是1，则head指向刚创建的节点p1  
 		{
-		case 1:
-			stu->no = toint(part);
-			break;
-		case 2:
-			strcpy(stu->name, part);
-			break;
-		case 3:
-			stu->score = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-}
-
-
-//显示一个成绩
-void displaystudent(student stu)
-{
-	printf(FORMAT3DSD, stu.no, stu.name, stu.score);
-	printf("---------------------");
-	printf("\r\n");
-}
-
-//读取所有成绩到链表
-void readallstudents()
-{
-	char line[200];
-	student *p1, *p2;
-	FILE *fp = fopen(scoresfile, "r");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		fp = fopen(scoresfile, "a+");
-		getchar();
-	}
-
-	p1 = p2 = (student *)malloc(sizeof(student));
-	head = p1;
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			break;
-		//读进来的行去掉末尾换行符，重要
-		//http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input
-		strtok(line, "\n");
-		getstudentfromline(line, p1);
-		if (head == NULL)
 			head = p1;
+			p2->next = NULL;  //此时的p2就是p1,也就是p1->next指向NULL。  
+		}
 		else
-			p2->next = p1;
-		p2 = p1;
-		p1 = (student*)malloc(sizeof(student));
+		{
+			p2->next = p1;   //指向上次下面刚刚开辟的新节点  
+		}
+
+		p2 = p1;            //把p1的地址给p2保留，然后p1产生新的节点  
+
+		p1 = (struct student *) malloc(LEN);
+		//printf("Please input %d node -- num,score: ", n + 1);
+		//scanf("%d %f", &(p1->num), &(p1->score));
+
+		++nn;
+		p1->num = nn * 2;
+		p1->score = nn * 22;
 	}
-	p2->next = NULL;
+	p2->next = NULL;     //此句就是根据单向链表的最后一个节点要指向NULL  
+
+	free(p1);           //p1->num为0的时候跳出了while循环，并且释放p1  
+	p1 = NULL;          //特别不要忘记把释放的变量清空置为NULL,否则就变成"野指针"，即地址不确定的指针  
+	return head;        //返回创建链表的头指针   
 }
 
 
-//保存所有成绩
-void writeallstudents()
+/*
+===========================
+功能：输出节点
+返回： void
+===========================
+*/
+void Print(struct student *head)
 {
-	student *p;
-	FILE *fp = fopen(scoresfile, "wb");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-
+	struct student *p;
+	printf("\nNow , These %d records are:\n", n);
 	p = head;
-
-	while (p != NULL)
+	if (head != NULL)        //只要不是空链表，就输出链表中所有节点  
 	{
-		student stu = *p;
-
-		fprintf(fp, FORMAT3DSD, stu.no, stu.name, stu.score);
-		p = p->next;
+		//printf("head is %o\n", head);    //输出头指针指向的地址  
+		do
+		{
+			/*
+			输出相应的值：当前节点地址、各字段值、当前节点的下一节点地址。
+			这样输出便于读者形象看到一个单向链表在计算机中的存储结构，和我们
+			设计的图示是一模一样的。
+			*/
+			//printf("%o   %d   %5.1f   %o\n", p, p->num, p->score, p->next);
+			printf("%d   %d\n", p->num, p->score);
+			p = p->next;     //移到下一个节点  
+		} while (p != NULL);
 	}
-	fclose(fp);
-	printf("已保存到文件。");
 }
 
-
-//输入成绩信息
-void inputname(char str[])
+/*
+==========================
+功能：删除指定节点
+(此例中是删除指定学号的节点)
+返回：指向链表表头的指针
+==========================
+*/
+struct student *Del(struct student *head, int num)
 {
-	printf("请输入姓名:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \r\n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
+	struct student *p1;     //p1保存当前需要检查的节点的地址  
+	struct student *p2;     //p2保存当前检查过的节点的地址  
+	if (head == NULL)       //是空链表（结合图3理解）  
 	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
+		printf("\nList is null!\n");
+		return head;
 	}
-	return n;
-}
-//获取一个新的学生信息
-int getnewno(student **tail)
-{
-	int newno = 0;
-	student *p = head;
-	if (head->no > newno)
-		newno = head->no;
-	while (p->next != NULL)
+
+	//定位要删除的节点  
+	p1 = head;
+	while (p1->num != num && p1->next != NULL)    //p1指向的节点不是所要查找的，并且它不是最后一个节点，就继续往下找  
 	{
-		if (p->no > newno)
-			newno = p->no;
-		p = p->next;
+		p2 = p1;            //保存当前节点的地址  
+		p1 = p1->next;       //后移一个节点  
 	}
-	if (p->no > newno)
-		newno = p->no;
-	newno++;
-	*tail = p;
-	return newno;
-}
 
-//新增成绩
-void addstudent()
-{
-	int newno = 0, score;//新成绩编号，当前最大+1
-	student *p = head;
-	student *n;
-	char name[50] = "";
-
-	inputname(name);
-
-	newno = getnewno(&p);
-
-	n = (student *)malloc(sizeof(student));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	score = inputscore();
-	n->score = score;
-
-	p->next = n;
-	n->next = NULL;
-	printf("\n%s成绩%d添加成功!\n", name, score);
-}
-
-
-bool insert(student *pHead, int front, char *name, int score)
-{
-	int i = 0, newno;
-	student *_node = pHead;
-	student *pSwap;
-	student *pNew;
-	student *x;
-	newno = getnewno(&x);
-	if ((front < 1) && (NULL != _node))
+	if (p1->num == num)     //找到了。（结合图4、5理解）  
 	{
-		return false;
-	}
-	while (i < front - 1)
-	{
-		_node = _node->next;
-		++i;
-	}
-	pNew = (student*)malloc(sizeof(student));
-
-	pNew->no = newno;
-	strcpy(pNew->name, name);
-	pNew->score = score;
-	pSwap = _node->next;
-	_node->next = pNew;
-	pNew->next = pSwap;
-	return true;
-
-}
-
-
-
-//http://blog.csdn.net/iwm_next/article/details/7450734
-void deletestudent(char * name)  //删除成绩
-{
-	student *p1 = head, *p2;
-	if (head == NULL)
-	{
-		printf("\n成绩为空!\n");
-		return;
-	}
-	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
-	{
-		p2 = p1;
-		p1 = p1->next;
-	}
-	if (strcmp(p1->name, name) == 0)
-	{
-
-		if (p1 == head)
-			head = p1->next;
-		else
+		if (p1 == head)     //如果要删除的节点是第一个节点  
+		{
+			head = p1->next; //头指针指向第一个节点的后一个节点，也就是第二个节点。这样第一个节点就不在链表中，即删除  
+		}
+		else            //如果是其它节点，则让原来指向当前节点的指针，指向它的下一个节点，完成删除  
 		{
 			p2->next = p1->next;
-			free(p1);
-			printf("已删除姓名为%s的学生的成绩。\r\n", name);
 		}
+
+		free(p1);      //释放当前节点  
+		p1 = NULL;
+		printf("\ndelete %ld success!\n", num);
+		n -= 1;         //节点总数减1个  
+	}
+	else                //没有找到  
+	{
+		printf("\n%ld not been found!\n", num);
+	}
+
+	return head;
+}
+
+//销毁链表  
+int DestroyList(struct student *head)
+{
+	struct student *p;
+	if (head == NULL)
+		return 0;
+	while (head)
+	{
+		p = head->next;
+		free(head);
+		head = p;
+	}
+	return 1;
+}
+
+/*
+==========================
+功能：插入指定节点的后面
+(此例中是指定学号的节点)
+返回：指向链表表头的指针
+==========================
+*/
+struct student *Insert(struct student *head, int num, struct student *node)
+{
+	struct student *p1;     //p1保存当前需要检查的节点的地址  
+	if (head == NULL)       //（结合图示7理解）  
+	{
+		head = node;
+		node->next = NULL;
+		n += 1;
+		return head;
+	}
+
+	p1 = head;
+	while (p1->num != num && p1->next != NULL)  //p1指向的节点不是所要查找的，并且它不是最后一个节点，继续往下找  
+	{
+		p1 = p1->next;       //后移一个节点  
+	}
+
+	if (p1->num == num)        //找到了（结合图示8理解）  
+	{
+		node->next = p1->next;    //显然node的下一节点是原p1的next  
+		p1->next = node;     //插入后，原p1的下一节点就是要插入的node  
+		n += 1;         //节点总数增加1个  
 	}
 	else
-		printf("没找到姓名为%s的学生!\r\n", name);
-}
-
-
-
-void viewstudent(char * name)  //按姓名输出
-{
-	int found = 0;
-	student *p = head;
-
-	while (p != NULL)
 	{
-		if (strcmp(p->name, name) == 0)
-		{
-			found = 1;
-			printf("%s的成绩如下\r\n", name);
-
-			printf("序号    姓名    成绩\n");
-
-			displaystudent(*p);
-		}
-		p = p->next;
+		printf("\n%ld not been found!\n", num);
 	}
-	if (!found)
-		printf("没找到名为%s的学生\r\n", name);
-}
-
-void addstudent(char * name)  //追加学生信息
-{
-	int found = 0;
-	student *p = head;
-
-	while (p != NULL)
-	{
-		if (strcmp(p->name, name) == 0)
-		{
-			found = 1;
-			printf("%s的成绩如下\r\n", name);
-
-			printf("序号    姓名    成绩\n");
-
-			displaystudent(*p);
-			printf("更改学生成绩为：");
-			getchar();
-			scanf("%d", &p->score);
-			printf("修改成功，更改后的学生成绩是：%d。\n", p->score);
-		}
-		p = p->next;
-	}
-	if (!found)
-		printf("没找到名为%s的学生\r\n", name);
-}
-
-//********************其实可以考虑作为一个通用函数，但我懒得改其他函数了
-void searchbyname(char * name, student **f)  //根据名字查找学生
-{
-	int found = 0;
-	student *p = head;
-
-	while (p != NULL)
-	{
-		if (strcmp(p->name, name) == 0)
-		{
-			*f = p;
-			return;
-		}
-		p = p->next;
-	}
-	if (!found)
-	{
-		printf("没找到名为%s的学生\r\n", name);
-		*f = NULL;
-	}
-}
-
-void viewallstudents()  //输出所有学生信息
-{
-	//student *p = head->next;
-	student *p = head;
-
-	printf("所有学生成绩如下\r\n");
-	printf("序号    姓名    成绩\n");
-	while (p != NULL)
-	{
-		displaystudent(*p);
-		p = p->next;
-	}
+	return head;
 }
 
 
 
-int cmpfunc(const void * a, const void * b)   //成绩比较
+/*
+以上函数的测试程序：
+提示：根据测试函数的不同注释相应的程序段，这也是一种测试方法。
+*/
+int main(void)
 {
-	return ((student*)a)->score - ((student*)b)->score;
-}
+	struct student *head;
+	struct student *stu;
+	int thenumber;
+
+	// 测试Create()、Print()   
+	head = Create();
+	Print(head);
+
+	//测试Del()  
+	/*printf("\nWhich one delete: ");
+	scanf("%d", &thenumber);
+	head = Del(head, thenumber);
+	Print(head);*/
+
+	//测试Insert()  
+	stu = (struct student *)malloc(LEN);
+	//printf("\nPlease input insert node -- num,score: ");
+	//scanf("%d%d", &stu->num, &stu->score);
+	stu->num = 3;
+	stu->score = 33;
+	//printf("\nInsert behind num: ");
+	//scanf("%d", &thenumber);
+	thenumber = 1;
+	head = Insert(head, thenumber, stu);
+	Print(head);
+
+	Del(head, 3);
+	Print(head);
 
 
+	//销毁链表  
+	DestroyList(head);
 
-void sortandviewall()  //按升序输出
-{
-	int i, cnt = 0;
-	student all[50];
-	student *p = head;
-
-	printf("所有学生成绩升序排序输出如下\r\n");
-	while (p != NULL)
-	{
-		student stu;
-		stu.no = p->no;
-		strcpy(stu.name, p->name);
-		stu.score = p->score;
-		all[cnt++] = stu;
-		p = p->next;
-	}
-	qsort(all, cnt, sizeof(student), cmpfunc);//快速排序
-
-	printf("序号    姓名    成绩\n");
-	for (i = 1; i < cnt; i++)
-	{
-		if (all[i].score < 60)
-			displaystudent(all[i]);
-	}
-}
-
-
-
-void copyallstudents()  //拷贝学生信息
-{
-	student *p;
-	FILE *fp = fopen("copy_score.txt", "w");
-	if (fp == NULL)
-	{
-		printf("\nerror on open file!");
-		getchar();
-		exit(1);
-	}
-
-	p = head;
-
-	while (p != NULL)
-	{
-		student stu = *p;
-
-		fprintf(fp, FORMAT3DSD, stu.no, stu.name, stu.score);
-		p = p->next;
-	}
-	fclose(fp);
-	printf("已拷贝到文件。\n");
-}
-
-
-
-void promptinsertbeforeno()  //按编号插入
-{
-	int no, score;
-	char name[50] = "";
-	printf("\n请输入要在哪个编号的学生之后插入?\n");
-	scanf("%d", &no);
-
-	inputname(name);
-	score = inputscore();
-	if (insert(head, no, name, score))
-		printf("\n插入成功！\n");
-}
-
-
-
-void promptsearchtotalbyname()  //按姓名查找
-{
-	char name[50] = "";
-	inputname(name);
-	viewstudent(name);
-}
-
-
-
-void promptdeletebyname()  //按姓名删除
-{
-	char name[50] = "";
-	inputname(name);
-	deletestudent(name);
-}
-
-void promptmodifyscorebyname()  //按姓名更改分数
-{
-	int newscore;
-	student *stu;
-	char name[50] = "";
-	inputname(name);
-	searchbyname(name, &stu);
-	if (stu != NULL)
-	{
-		printf("更改学生成绩为：");
-		getchar();
-		scanf("%d", &newscore);
-		stu->score = newscore;
-		printf("修改成功，更改后的学生成绩是：%d。\n", stu->score);
-	}
-}
-
-
-int main()
-{
-	int choice = -1;
-
-	//createsamplestudents();
-
-	readallstudents();
-
-	while (choice != 0)
-	{
-		printf("\n\t ★☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆★ ");
-		printf("\n\t ☆            学生成绩管理系统          ☆ ");
-		printf("\n\t ☆            0. 退出操作系统           ☆ ");
-		printf("\n\t ☆            1. 添加学生信息           ☆ ");
-		printf("\n\t ☆            2. 删除学生信息           ☆ ");
-		printf("\n\t ☆            3. 查看学生所有           ☆ ");
-		printf("\n\t ☆            4. 姓名查找单个           ☆ ");
-		printf("\n\t ☆            9. 追加学生信息           ☆ ");
-		printf("\n\t ☆            5. 成绩不及格的           ☆ ");
-		printf("\n\t ☆            6. 插入学生信息           ☆ ");
-		printf("\n\t ☆            7. 保存学生信息           ☆ ");
-		printf("\n\t ☆            8. 拷贝学生信息           ☆ ");
-		printf("\n\t ★☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆★");
-		printf("\n\n  请选择: ");
-		scanf("%1[0123456789]d%*c", &choice);
-		choice = getche();
-		switch (choice)
-		{
-		case '0':
-			//writeallstudents();
-			printf("\n\n 你选择了退出: ");
-			fseek(stdin, 0, SEEK_END);
-			system("pause");
-			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			addstudent();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			promptdeletebyname();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			viewallstudents();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptsearchtotalbyname();
-			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			sortandviewall();
-			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
-			promptinsertbeforeno();
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			writeallstudents();
-			break;
-		case '8':
-			printf("\n\n你选择了 8\n");
-			copyallstudents();
-			break;
-		case '9':
-			printf("\n\n你选择了 9\n");
-			promptmodifyscorebyname();
-			break;
-		default:
-			printf("\n\n输入有误，请重选\n");
-			break;
-		}
-		getch();
-	}
-	fseek(stdin, 0, SEEK_END);
+	printf("\n");
 	system("pause");
-	return 0;
 }
