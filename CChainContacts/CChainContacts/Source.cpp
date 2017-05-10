@@ -3,12 +3,12 @@
 #include "stdio.h"
 
 #define LEN sizeof(person)
-#define TEST 0
+#define TEST 1
 
 typedef struct person
 {
-	char name[20];
-	char tel[20];
+	char name[21];
+	char tel[21];
 	struct person *next;
 }person;
 person *head;
@@ -24,7 +24,11 @@ int n;  //节点总数
 		*/
 person *create()
 {
-	//int nn = 1;
+#if TEST
+	int nn = 1;
+	char name[21] = "n";
+	char tel[21] = "t";
+#endif
 	person *head;       //头节点
 	person *p1 = NULL;  //p1保存创建的新节点的地址
 	person *p2 = NULL;  //p2保存原链表最后一个节点的地址
@@ -227,7 +231,7 @@ void executedelete(char *name)
 
 }
 
-void splitcmdintoparts(char *cmd, char parts[6][20])
+void splitcmdintoparts(char *cmd, char parts[6][21])
 {
 	char *part;
 	int index = 0;
@@ -241,7 +245,7 @@ void splitcmdintoparts(char *cmd, char parts[6][20])
 
 int executecommand(char *cmd)
 {
-	char parts[6][20] = { "","","","","" };
+	char parts[6][21] = { "","","","","" };
 	splitcmdintoparts(cmd, parts);
 	if (strcmp(cmd, "End") == 0)
 		return 0;
@@ -259,7 +263,9 @@ int executecommand(char *cmd)
 int main(void)
 {
 	char cmd[80] = "Print";
-
+#if TEST
+	person *per;
+#endif
 	head = create();
 	//print(head);
 #if TEST
@@ -292,7 +298,7 @@ int main(void)
 	{
 		//printf("\?\n");
 		fgets(cmd, 80, stdin);
-	}
+}
 #endif
 	destroylist(head);
 	system("pause");
