@@ -202,8 +202,55 @@ person *insertafter(person *head, char *name, person *node)
 	return head;
 }
 
+void executeinsert(char *name, char *tel, char *nameafter)
+{
+	printf("\nexecuteinsert %s %s %s\n", name, tel, nameafter);
+}
+
+void executeprint()
+{
+	printf("\nexecuteprint\n");
+
+}
+
+void executedelete(char *name)
+{
+	printf("\nexecutedelete %s\n", name);
+
+}
+
+void splitcmdintoparts(char *cmd, char parts[6][20])
+{
+	char *part;
+	int index = 0;
+	part = strtok(cmd, " \n");
+	while (part != NULL)
+	{
+		strcpy(parts[index++], part);
+		part = strtok(NULL, " \n");
+	}
+}
+
+bool executecommand(char *cmd)
+{
+	char parts[6][20] = { "","","","","" };
+	splitcmdintoparts(cmd, parts);
+	if (strcmp(cmd, "End") == 0)
+		return false;
+	if (strcmp(parts[0], "Insert") == 0)
+		executeinsert(parts[1], parts[2], parts[4]);
+	else if (strcmp(parts[0], "Print") == 0)
+		executeprint();
+	else if (strcmp(parts[0], "Delete") == 0)
+		executedelete(parts[1]);
+	else
+		printf("invalid command");
+	return true;
+}
+
 int main(void)
 {
+	char cmd[80] = "Print";
 	person *head;
 	person *per;
 
@@ -211,6 +258,11 @@ int main(void)
 	print(head);
 #if TEST
 
+	while (executecommand(cmd))
+	{
+		printf("\?\n");
+		fgets(cmd, 80, stdin);
+	}
 	printf("\ninsert\n");
 	per = (person *)malloc(LEN);
 	strcpy(per->name, "n2");
