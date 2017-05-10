@@ -1,14 +1,16 @@
 #include "stdlib.h"  
+#include "string.h"  
 #include "stdio.h"  
+#include "ctype.h"  
 
 #define NULL 0  
-#define LEN sizeof(struct student)  
+#define LEN sizeof(struct person)  
 
-struct student
+struct person
 {
-	int num;              //学号   
-	int score;          //分数，其他信息可以继续在下面增加字段  
-	struct student *next;       //指向下一节点的指针  
+	char name[20];              //学号   
+	char tel[20];          //分数，其他信息可以继续在下面增加字段  
+	struct person *next;       //指向下一节点的指针  
 };
 
 int n;  //节点总数   
@@ -18,15 +20,19 @@ int n;  //节点总数
 		返回：指向链表表头的指针
 		==========================
 		*/
-struct student *Create()
+struct person *Create()
 {
 	int nn = 1;
-	struct student *head;       //头节点  
-	struct student *p1 = NULL;  //p1保存创建的新节点的地址  
-	struct student *p2 = NULL;  //p2保存原链表最后一个节点的地址  
+	//char name[] = "n";
+	//char tel[] = "t";
+	char name[20];
+	char tel[20];
+	struct person *head;       //头节点  
+	struct person *p1 = NULL;  //p1保存创建的新节点的地址  
+	struct person *p2 = NULL;  //p2保存原链表最后一个节点的地址  
 
 	n = 0;          //创建前链表的节点总数为0：空链表  
-	p1 = (struct student *) malloc(LEN);   //开辟一个新节点  
+	p1 = (struct person *) malloc(LEN);   //开辟一个新节点  
 	p2 = p1;            //如果节点开辟成功，则p2先把它的指针保存下来以备后用  
 
 	if (p1 == NULL)        //节点开辟不成功  
@@ -39,8 +45,10 @@ struct student *Create()
 		head = NULL;        //开始head指向NULL  
 		//printf("Please input %d node -- num,score: ", n + 1);
 		//scanf("%d %f", &(p1->num), &(p1->score));    //录入数据 
-		p1->num = 1;
-		p1->score = 11;
+		//p1->name = 1;
+		//p1->tel = 11;
+		strcpy(p1->name, "n1");
+		strcpy(p1->tel, "111");
 	}
 	//while (p1->num != 0)      //只要学号不为0，就继续录入下一个节点  
 	while (nn < 5)      //只要学号不为0，就继续录入下一个节点  
@@ -58,13 +66,17 @@ struct student *Create()
 
 		p2 = p1;            //把p1的地址给p2保留，然后p1产生新的节点  
 
-		p1 = (struct student *) malloc(LEN);
+		p1 = (struct person *) malloc(LEN);
 		//printf("Please input %d node -- num,score: ", n + 1);
 		//scanf("%d %f", &(p1->num), &(p1->score));
 
 		++nn;
-		p1->num = nn * 2;
-		p1->score = nn * 22;
+		//p1->name = nn * 2;
+		//p1->tel = nn * 22;
+		sprintf(name, "n%d", nn * 2);
+		sprintf(tel, "t%d", nn * 22);
+		strcpy(p1->name, name);
+		strcpy(p1->tel, tel);
 	}
 	p2->next = NULL;     //此句就是根据单向链表的最后一个节点要指向NULL  
 
@@ -80,9 +92,9 @@ struct student *Create()
 返回： void
 ===========================
 */
-void Print(struct student *head)
+void Print(struct person *head)
 {
-	struct student *p;
+	struct person *p;
 	printf("\nNow , These %d records are:\n", n);
 	p = head;
 	if (head != NULL)        //只要不是空链表，就输出链表中所有节点  
@@ -96,7 +108,7 @@ void Print(struct student *head)
 			设计的图示是一模一样的。
 			*/
 			//printf("%o   %d   %5.1f   %o\n", p, p->num, p->score, p->next);
-			printf("%d   %d\n", p->num, p->score);
+			printf("%s   %s\n", p->name, p->tel);
 			p = p->next;     //移到下一个节点  
 		} while (p != NULL);
 	}
@@ -109,10 +121,10 @@ void Print(struct student *head)
 返回：指向链表表头的指针
 ==========================
 */
-struct student *Del(struct student *head, int num)
+struct person *Del(struct person *head, char *num)
 {
-	struct student *p1;     //p1保存当前需要检查的节点的地址  
-	struct student *p2;     //p2保存当前检查过的节点的地址  
+	struct person *p1;     //p1保存当前需要检查的节点的地址  
+	struct person *p2;     //p2保存当前检查过的节点的地址  
 	if (head == NULL)       //是空链表（结合图3理解）  
 	{
 		printf("\nList is null!\n");
@@ -121,13 +133,13 @@ struct student *Del(struct student *head, int num)
 
 	//定位要删除的节点  
 	p1 = head;
-	while (p1->num != num && p1->next != NULL)    //p1指向的节点不是所要查找的，并且它不是最后一个节点，就继续往下找  
+	while (strcmp(p1->name, num) != 0 && p1->next != NULL)    //p1指向的节点不是所要查找的，并且它不是最后一个节点，就继续往下找  
 	{
 		p2 = p1;            //保存当前节点的地址  
 		p1 = p1->next;       //后移一个节点  
 	}
 
-	if (p1->num == num)     //找到了。（结合图4、5理解）  
+	if (strcmp(p1->name, num) == 0)     //找到了。（结合图4、5理解）  
 	{
 		if (p1 == head)     //如果要删除的节点是第一个节点  
 		{
@@ -152,9 +164,9 @@ struct student *Del(struct student *head, int num)
 }
 
 //销毁链表  
-int DestroyList(struct student *head)
+int DestroyList(struct person *head)
 {
-	struct student *p;
+	struct person *p;
 	if (head == NULL)
 		return 0;
 	while (head)
@@ -173,9 +185,9 @@ int DestroyList(struct student *head)
 返回：指向链表表头的指针
 ==========================
 */
-struct student *Insert(struct student *head, int num, struct student *node)
+struct person *Insert(struct person *head, char *num, struct person *node)
 {
-	struct student *p1;     //p1保存当前需要检查的节点的地址  
+	struct person *p1;     //p1保存当前需要检查的节点的地址  
 	if (head == NULL)       //（结合图示7理解）  
 	{
 		head = node;
@@ -185,12 +197,12 @@ struct student *Insert(struct student *head, int num, struct student *node)
 	}
 
 	p1 = head;
-	while (p1->num != num && p1->next != NULL)  //p1指向的节点不是所要查找的，并且它不是最后一个节点，继续往下找  
+	while (strcmp(p1->name, num) != 0 && p1->next != NULL)  //p1指向的节点不是所要查找的，并且它不是最后一个节点，继续往下找  
 	{
 		p1 = p1->next;       //后移一个节点  
 	}
 
-	if (p1->num == num)        //找到了（结合图示8理解）  
+	if (strcmp(p1->name, num) == 0)        //找到了（结合图示8理解）  
 	{
 		node->next = p1->next;    //显然node的下一节点是原p1的next  
 		p1->next = node;     //插入后，原p1的下一节点就是要插入的node  
@@ -211,8 +223,8 @@ struct student *Insert(struct student *head, int num, struct student *node)
 */
 int main(void)
 {
-	struct student *head;
-	struct student *stu;
+	struct person *head;
+	struct person *per;
 	int thenumber;
 
 	// 测试Create()、Print()   
@@ -226,18 +238,20 @@ int main(void)
 	Print(head);*/
 
 	//测试Insert()  
-	stu = (struct student *)malloc(LEN);
+	per = (struct person *)malloc(LEN);
 	//printf("\nPlease input insert node -- num,score: ");
-	//scanf("%d%d", &stu->num, &stu->score);
-	stu->num = 3;
-	stu->score = 33;
+	//scanf("%d%d", stu->name, stu->tel);
+	strcpy(per->name, "n2");
+	strcpy(per->tel, "t2");
+	//stu->name = 3;
+	//stu->tel = 33;
 	//printf("\nInsert behind num: ");
 	//scanf("%d", &thenumber);
-	thenumber = 1;
-	head = Insert(head, thenumber, stu);
+	//thenumber = 1;
+	head = Insert(head, "n1", per);
 	Print(head);
 
-	Del(head, 3);
+	Del(head, "n2");
 	Print(head);
 
 
