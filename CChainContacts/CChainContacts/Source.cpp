@@ -5,6 +5,7 @@
 
 #define NULL 0  
 #define LEN sizeof(person)  
+#define TEST 1
 
 typedef struct person
 {
@@ -23,8 +24,6 @@ int n;  //节点总数
 person *create()
 {
 	int nn = 1;
-	//char name[] = "n";
-	//char tel[] = "t";
 	char name[20];
 	char tel[20];
 	person *head;       //头节点  
@@ -46,7 +45,7 @@ person *create()
 		strcpy(p1->name, "n1");
 		strcpy(p1->tel, "111");
 	}
-	//while (p1->num != 0)      //只要学号不为0，就继续录入下一个节点  
+#if TEST
 	while (nn < 5)      //只要学号不为0，就继续录入下一个节点  
 	{
 		n += 1;         //节点总数增加1个  
@@ -70,6 +69,7 @@ person *create()
 		strcpy(p1->name, name);
 		strcpy(p1->tel, tel);
 	}
+#endif
 	p2->next = NULL;     //此句就是根据单向链表的最后一个节点要指向NULL  
 
 	free(p1);           //p1->num为0的时候跳出了while循环，并且释放p1  
@@ -195,7 +195,9 @@ person *insertafter(person *head, char *name, person *node)
 	}
 	else
 	{
-		printf("\n%ld not been found!\n", name);
+		//printf("\n%ld not been found!\n", name);
+		node->next = head;
+		head = node;
 	}
 	return head;
 }
@@ -204,30 +206,38 @@ int main(void)
 {
 	person *head;
 	person *per;
-	int thenumber;
 
 	head = create();
 	print(head);
+#if TEST
 
-
-	//测试Insert()  
+	printf("\ninsert\n");
 	per = (person *)malloc(LEN);
 	strcpy(per->name, "n2");
 	strcpy(per->tel, "t2");
-
 	head = insertafter(head, "n1", per);
 	print(head);
 
+	printf("\ninsertnobody\n");
+	per = (person *)malloc(LEN);
+	strcpy(per->name, "n0");
+	strcpy(per->tel, "t0");
+	head = insertafter(head, "nobody", per);
+	print(head);
+
+	printf("\nreplace\n");
 	per = (person *)malloc(LEN);
 	strcpy(per->name, "n2");
 	strcpy(per->tel, "t22222222");
 	head = insertafter(head, "n2", per);
 	print(head);
 
+	printf("\ndelete\n");
 	deleteperson(head, "n2");
 	print(head);
+#else
 
+#endif
 	destroylist(head);
-
 	system("pause");
 }
