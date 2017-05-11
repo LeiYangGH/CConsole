@@ -223,6 +223,55 @@ void promptaskcmpcourseindex()
 	cmpcourseindex = courseid - 1;
 }
 
+void writeallstudents()
+{
+	int i;
+	student stu;
+	FILE *fp = fopen(FILE_INPUT, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_INPUT);
+		getchar();
+		exit(1);
+	}
+
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		stu = allstudents[i];
+		fprintf(fp, "%s\t%d\t%d\t%d\t%d\t%d\r\n", stu.name,
+			stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4]);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
+void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
+{
+	student stu;
+	strcpy(stu.name, name);
+	stu.score[0] = s0;
+	stu.score[1] = s1;
+	stu.score[2] = s2;
+	stu.score[3] = s3;
+	stu.score[4] = s4;
+	allstudents[allstudentscount++] = stu;
+	calctotalandave();
+	writeallstudents();
+}
+
+void promptaddstudent()
+{
+	char no[MAX_STRLEN];
+	char name[MAX_STRLEN] = "";
+	int s1, s2, s3, s4, s5;
+	printf("\n请输入学生姓名\n");
+	scanf("%s", name);
+	printf("\n请输入5科成绩（整数），空格隔开\n");
+	scanf("%d%d%d%d%d", &s1, &s2, &s3, &s4, &s5);
+	addstudent(no, name, s1, s2, s3, s4, s5);
+	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
+}
 
 int main()
 {
@@ -238,6 +287,7 @@ int main()
 		printf("\n\t 1. 按学生总分升降序输出");
 		printf("\n\t 2. 按某门课程分数升降序输出");
 		printf("\n\t 3. 按所有课程平均分升降序输出");
+		printf("\n\t 4. 添加学生成绩");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -269,7 +319,10 @@ int main()
 			sortcoursesave();
 			displayallcoursesaveorder();
 			break;
-
+		case '4':
+			printf("\n\n你选择了 4\n");
+			promptaddstudent();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
