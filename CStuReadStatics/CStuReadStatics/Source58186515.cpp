@@ -179,7 +179,7 @@ void readallstudents()
 
 
 
-int cmpstuavefunc(const void * a, const void * b)
+int cmpstuavefunc(const void * b, const void * a)
 {
 	return (((student*)a)->average - ((student*)b)->average);
 }
