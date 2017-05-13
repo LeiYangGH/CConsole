@@ -107,10 +107,31 @@ void sortstudentsbyscore()
 	qsort(allstudents, allstudentscount, sizeof(student), cmpstuscorefunc);
 }
 
+int login()
+{
+	int trytimes = 3;
+	char username[20] = "";
+	char password[20] = "";
+	while (trytimes > 0)
+	{
+		printf("\n还有%d次机会\n", trytimes--);
+		printf("\n请输入用户名:");
+		scanf("%s", &username);
+		printf("\n请输入密码:");
+		scanf("%s", &password);
+		if (strcmp(username, "admin") == 0
+			&& strcmp(password, "123456") == 0)
+			return 1;
+	}
+	return 0;
+}
 
 int main()
 {
 #if TEST
+	if (!login())
+		return 0;
+
 	readallstudents();
 	//sorttotal();
 	displayallstudents();
@@ -166,7 +187,7 @@ int main()
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-		}
+}
 	}
 #endif
 	system("pause");
