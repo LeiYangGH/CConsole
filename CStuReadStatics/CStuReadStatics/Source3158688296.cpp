@@ -13,7 +13,7 @@ student allstudents[100];
 int allstudentscount = 0;
 
 
-#define TEST 1
+#define TEST 0
 int cmpcourseindex;
 //字符串转整数
 int toint(char *s)
@@ -135,20 +135,14 @@ int login()
 int main()
 {
 #if TEST
-	//if (!login())
-	//	return 0;
-
 	readallstudents();
 	//sortstudentsbyscore();
 	//sortstudentsbyname();
 	displayallstudents();
 	displayhighest();
-	//ascending = -1;
-	//cmpcourseindex = 4;
-	//sortonecourse();
-	//displayonecourseorder();
 #else
-
+	if (!login())
+		return 0;
 	int choice = -1;
 	printf("\n开始读文件...\n");
 	readallstudents();
@@ -158,10 +152,9 @@ int main()
 	{
 		printf("\n\t 学生成绩读入统计");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 综合成绩名次计算输出");
-		printf("\n\t 2. 课程分段人数输出");
-		printf("\n\t 3. 输出所有不及格");
-		printf("\n\t 4. 添加学生成绩");
+		printf("\n\t 1. 成绩排序");
+		printf("\n\t 2. 姓名排序");
+		printf("\n\t 3. 成绩最高分");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -175,27 +168,22 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			sortstuave();
+			sortstudentsbyscore();
 			displayallstudents();
-			writestudentsaveorder();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			countbygradesforallcourses();
-			writeandprintgradescount();
+			sortstudentsbyname();
+			displayallstudents();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			displayallbelow60();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptaddstudent();
+			displayhighest();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
-}
+		}
 	}
 #endif
 	system("pause");
