@@ -2,9 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
-#define MAX_STRLEN 20
-#define COURSES_COUNT 5
-#define GRADES_COUNT 5
 
 typedef struct student
 {
@@ -44,8 +41,6 @@ void displayallstudents()
 	printf("\r\n--------------------------------------------\r\n");
 }
 
-
-
 student getstudentfromline(char *line)
 {
 	char *part;
@@ -72,9 +67,6 @@ student getstudentfromline(char *line)
 	return stu;
 }
 
-
-
-
 void readallstudents()
 {
 	char line[200];
@@ -96,15 +88,29 @@ void readallstudents()
 	}
 }
 
-
-
-int cmpstuscorefunc(const void * b, const void * a)
+int cmpstuscorefunc(const void * a, const void * b)
 {
-	return (((student*)a)->score - ((student*)b)->score);
+	return ((student*)a)->score - ((student*)b)->score;
 }
 void sortstudentsbyscore()
 {
 	qsort(allstudents, allstudentscount, sizeof(student), cmpstuscorefunc);
+}
+
+int cmpstunamefunc(const void * a, const void * b)
+{
+	return strcmp(((student*)a)->name, ((student*)b)->name);
+}
+void sortstudentsbyname()
+{
+	qsort(allstudents, allstudentscount, sizeof(student), cmpstunamefunc);
+}
+
+void displayhighest()
+{
+	sortstudentsbyscore();
+	printf("\n最高分学生为\n");
+	displaystudent(allstudents[allstudentscount - 1]);
 }
 
 int login()
@@ -129,12 +135,14 @@ int login()
 int main()
 {
 #if TEST
-	if (!login())
-		return 0;
+	//if (!login())
+	//	return 0;
 
 	readallstudents();
-	//sorttotal();
+	//sortstudentsbyscore();
+	//sortstudentsbyname();
 	displayallstudents();
+	displayhighest();
 	//ascending = -1;
 	//cmpcourseindex = 4;
 	//sortonecourse();
