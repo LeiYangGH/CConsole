@@ -154,31 +154,28 @@ void addstudent(char name[], int i1, int i2, int i3, float f)
 	writeallstudents();
 }
 
-int promptaddstudent()
+void promptaddstudent()
 {
 	char name[MAX_STRLEN] = "";
-	int   i1, i2, i3;
+	int   a, b, c;
 	float f;
-	printf("\n请输入姓名(end结束):");
-	scanf("%s", name);
-	if (strcmp(name, "end") == 0)
-		return 0;
-	else
-	{
-		printf("\n请输入4项数据，空格隔开，回车结束\n");
-		scanf("%d%d%d%f", &i1, &i2, &i3, &f);
-
-		addstudent(name, i1, i2, i3, f);
-		printf("完成第%d个球星成绩录入!\r\n", allstudentscount);
-		return 1;
-	}
+	printf("\n请输入球员姓名 参与场次数 进球数 助攻数，空格隔开，回车结束\n");
+	scanf("%s%d%d%d", name, &a, &b, &c);
+	f = (float)(b + c) / (float)a;
+	addstudent(name, a, b, c, f);
+	printf("完成第%d个球星成绩录入!\r\n", allstudentscount);
 }
 
 
 void promptaddstudentsfirsttime()
 {
-	if (allstudentscount == 0)
-		while (promptaddstudent());
+	int i, n;
+	if (allstudentscount > 0)
+		return;
+	printf("\n请先指定要输入多少个球星的数据:");
+	scanf("%d", &n);
+	for (i = 0; i < n; i++)
+		promptaddstudent();
 }
 void searchtotalbyname(char *name)
 {
@@ -212,10 +209,12 @@ int main()
 	//addstudent("s", 1, 2, 3, 4.4);
 	//sorttotal();
 	//searchtotalbyname("x1");
-	displayallstudents();
+	//displayallstudents();
 	//promptsearchtotalbyname();
 	//promptaddstudent();
-	//displayallstudents();
+	//addstudent("ronaldo", 171, 131, 41, 0.99);
+
+	displayallstudents();
 
 
 
@@ -229,12 +228,19 @@ int main()
 
 	while (choice != 0)
 	{
-		printf("\n\t 球星成绩读入统计");
-		printf("\n\t 1. 查看进球榜单");
-		printf("\n\t 2. 查找");
-		printf("\n\t 3. 增加");
-		printf("\n\t 4. 退出");
-		printf("\n\n  请选择: ");
+		//printf("\n\t 球星成绩读入统计");
+		//printf("\n\t 1. 查看进球榜单");
+		//printf("\n\t 2. 查找");
+		//printf("\n\t 3. 增加");
+		//printf("\n\t 4. 退出");
+		//printf("\n\n  请选择: ");
+		printf("\n欢迎使用欧洲足球联赛进球数据榜操作系统\n");
+		printf("****************************************\n");
+		printf("\t 1.查看进球榜单\n");
+		printf("\t 2.查找您喜爱的球员数据\n");
+		printf("\t 3.添加球员赛季进球数据\n");
+		printf("\t 4.退出系统\n");
+		printf("请输入您的指令代号：\n");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
@@ -253,7 +259,7 @@ int main()
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			printf("\n\n 你选择了退出。");
+			printf("\n\n感谢您使用本系统，期待与您的下次再会。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
