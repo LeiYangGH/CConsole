@@ -11,9 +11,9 @@
 typedef struct student
 {
 	char name[MAX_STRLEN];
-	int i1;
-	int i2;
-	int i3;
+	int a;
+	int b;
+	int c;
 	float f;
 }student;
 student allstudents[100];
@@ -44,7 +44,7 @@ float tofloat(char *s)
 void displaystudent(student stu)
 {
 	printf("\r\n");
-	printf("%16s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.i1, stu.i2, stu.i3, stu.f);
+	printf("%16s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.a, stu.b, stu.c, stu.f);
 }
 
 void displayallstudents()
@@ -79,13 +79,13 @@ student getstudentfromline(char *line)
 			strcpy(stu.name, part);
 			break;
 		case 2:
-			stu.i1 = toint(part);
+			stu.a = toint(part);
 			break;
 		case 3:
-			stu.i2 = toint(part);
+			stu.b = toint(part);
 			break;
 		case 4:
-			stu.i3 = toint(part);
+			stu.c = toint(part);
 			break;
 		case 5:
 			stu.f = tofloat(part);
@@ -100,7 +100,7 @@ student getstudentfromline(char *line)
 
 int cmpstuavefunc(const void * b, const void * a)
 {
-	return (((student*)a)->i2 - ((student*)b)->i2);
+	return (((student*)a)->b - ((student*)b)->b);
 }
 void sortbyi2()
 {
@@ -152,7 +152,7 @@ void writeallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		fprintf(fp, "%s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.i1, stu.i2, stu.i3, stu.f);
+		fprintf(fp, "%s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.a, stu.b, stu.c, stu.f);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -162,27 +162,27 @@ void addstudent(char name[], int i1, int i2, int i3, float f)
 {
 	student stu;
 	strcpy(stu.name, name);
-	stu.i1 = i1;
-	stu.i2 = i2;
-	stu.i3 = i3;
+	stu.a = i1;
+	stu.b = i2;
+	stu.c = i3;
 	stu.f = f;
 	allstudents[allstudentscount++] = stu;
 	sortbyi2();
 	writeallstudents();
 }
 
-//void promptaddstudent()
-//{
-//	char no[MAX_STRLEN];
-//	char name[MAX_STRLEN] = "";
-//	int s1, s2, s3, s4, s5;
-//	printf("\n请输入学生姓名\n");
-//	scanf("%s", name);
-//	printf("\n请输入5科成绩（整数），空格隔开\n");
-//	scanf("%d%d%d%d%d", &s1, &s2, &s3, &s4, &s5);
-//	addstudent(no, name, s1, s2, s3, s4, s5);
-//	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
-//}
+void promptaddstudent()
+{
+	char name[MAX_STRLEN] = "";
+	int   i1, i2, i3;
+	float f;
+	printf("\n请输入学生姓名\n");
+	scanf("%s", name);
+	printf("\n请输入3科成绩（整数），空格隔开\n");
+	scanf("%d%d%d%f", &i1, &i2, &i3, &f);
+	addstudent(name, i1, i2, i3, f);
+	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
+}
 
 int main()
 {
@@ -190,9 +190,12 @@ int main()
 #if TEST
 
 	readallstudents();
-	addstudent("s", 1, 2, 3, 4.4);
+	//addstudent("s", 1, 2, 3, 4.4);
 	//sorttotal();
 	displayallstudents();
+	promptaddstudent();
+	displayallstudents();
+
 	//ascending = -1;
 	//cmpcourseindex = 4;
 	//sortonecourse();
