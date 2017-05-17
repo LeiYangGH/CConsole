@@ -2,12 +2,9 @@
 #include <string.h>
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
-//#define FILE_ALLOUTPUT "alloutput.txt"
-//#define FILE_GRADES "grades.txt"
 #define MAX_STRLEN 20
-//#define COURSES_COUNT 5
-//#define GRADES_COUNT 5
-#define TEST 1
+
+#define TEST 0
 typedef struct student
 {
 	char name[MAX_STRLEN];
@@ -19,16 +16,6 @@ typedef struct student
 student allstudents[100];
 int allstudentscount = 0;
 
-//typedef struct course
-//{
-//	int oldindex;
-//	float average;
-//	int countingrade[GRADES_COUNT];
-//}course;
-//course allcourses[COURSES_COUNT];
-
-
-int cmpcourseindex;
 int toint(char *s)
 {
 	char *end;
@@ -50,8 +37,8 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	printf("所有%d位同学分数如下\r\n", allstudentscount);
-	printf("%16s\t科目1\t科目2\t科目3\t科目4\n", "姓名");
+	printf("所有%d位球星分数如下\r\n", allstudentscount);
+	printf("%16s\t场次1\t进球\t助攻\t效率4\n", "姓名");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -114,26 +101,22 @@ void readallstudents()
 	FILE *fp = fopen(FILE_INPUT, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_INPUT);
+		printf("\n打开文件%s失败(按回车键开始输入数据)!", FILE_INPUT);
 		getchar();
-		exit(1);
 	}
-	allstudentscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
+	else
 	{
-		if (strlen(line) < 5)
-			continue;
-		++allstudentscount;
-		allstudents[allstudentscount - 1] = getstudentfromline(line);
+		allstudentscount = 0;
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 5)
+				continue;
+			++allstudentscount;
+			allstudents[allstudentscount - 1] = getstudentfromline(line);
+		}
+		sortbyi2();
 	}
-	sortbyi2();
 }
-
-
-
-
-
 
 
 void writeallstudents()
@@ -171,17 +154,52 @@ void addstudent(char name[], int i1, int i2, int i3, float f)
 	writeallstudents();
 }
 
-void promptaddstudent()
+int promptaddstudent()
 {
 	char name[MAX_STRLEN] = "";
 	int   i1, i2, i3;
 	float f;
-	printf("\n请输入学生姓名\n");
+	printf("\n请输入姓名(end结束):");
 	scanf("%s", name);
-	printf("\n请输入3科成绩（整数），空格隔开\n");
-	scanf("%d%d%d%f", &i1, &i2, &i3, &f);
-	addstudent(name, i1, i2, i3, f);
-	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
+	if (strcmp(name, "end") == 0)
+		return 0;
+	else
+	{
+		printf("\n请输入4项数据，空格隔开，回车结束\n");
+		scanf("%d%d%d%f", &i1, &i2, &i3, &f);
+
+		addstudent(name, i1, i2, i3, f);
+		printf("完成第%d个球星成绩录入!\r\n", allstudentscount);
+		return 1;
+	}
+}
+
+
+void promptaddstudentsfirsttime()
+{
+	if (allstudentscount == 0)
+		while (promptaddstudent());
+}
+void searchtotalbyname(char *name)
+{
+	int i;
+	//先按总分排序
+	for (i = 0; i < allstudentscount; i++)
+		if (strcmp(name, allstudents[i].name) == 0)
+		{
+			printf("%s,第%d名, 详细如下\n", name, allstudentscount - i);
+			displaystudent(allstudents[i]);
+			return;
+		}
+	printf("没找到对应球星的信息。\r\n");
+}
+
+void promptsearchtotalbyname()
+{
+	char name[MAX_STRLEN] = "";
+	printf("请输入要查询的球星姓名:");
+	scanf("%s", &name);
+	searchtotalbyname(name);
 }
 
 int main()
@@ -190,60 +208,55 @@ int main()
 #if TEST
 
 	readallstudents();
+	promptaddstudentsfirsttime();
 	//addstudent("s", 1, 2, 3, 4.4);
 	//sorttotal();
+	//searchtotalbyname("x1");
 	displayallstudents();
-	promptaddstudent();
-	displayallstudents();
+	//promptsearchtotalbyname();
+	//promptaddstudent();
+	//displayallstudents();
 
-	//ascending = -1;
-	//cmpcourseindex = 4;
-	//sortonecourse();
+
 
 #else
 
 	int choice = -1;
 	printf("\n开始读文件...\n");
 	readallstudents();
+	promptaddstudentsfirsttime();
 	printf("\n读文件结束！\n");
 
 	while (choice != 0)
 	{
-		printf("\n\t 学生成绩读入统计");
-		printf("\n\t 0. 退出");
-		printf("\n\t 1. 综合成绩名次计算输出");
-		printf("\n\t 2. 课程分段人数输出");
-		printf("\n\t 3. 输出所有不及格");
-		printf("\n\t 4. 添加学生成绩");
+		printf("\n\t 球星成绩读入统计");
+		printf("\n\t 1. 查看进球榜单");
+		printf("\n\t 2. 查找");
+		printf("\n\t 3. 增加");
+		printf("\n\t 4. 退出");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
-		case '0':
+		case '1':
+			printf("\n\n你选择了 1\n");
+			displayallstudents();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			promptsearchtotalbyname();
+			break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			promptaddstudent();
+			break;
+		case '4':
+			printf("\n\n你选择了 4\n");
 			printf("\n\n 你选择了退出。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			sortstuave();
-			displayallstudents();
-			writestudentsaveorder();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			countbygradesforallcourses();
-			writeandprintgradescount();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			displayallbelow60();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptaddstudent();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
