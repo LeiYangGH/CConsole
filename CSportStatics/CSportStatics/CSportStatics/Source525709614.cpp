@@ -190,6 +190,7 @@ int main()
 #if TEST
 
 	readallstudents();
+	addstudent("s", 1, 2, 3, 4.4);
 	//sorttotal();
 	displayallstudents();
 	//ascending = -1;
