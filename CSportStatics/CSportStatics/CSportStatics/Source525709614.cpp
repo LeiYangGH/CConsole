@@ -4,17 +4,16 @@
 #define FILE_INPUT "input.txt"
 #define MAX_STRLEN 20
 
-#define TEST 0
-typedef struct student
+typedef struct player
 {
 	char name[MAX_STRLEN];
 	int a;
 	int b;
 	int c;
 	float f;
-}student;
-student allstudents[100];
-int allstudentscount = 0;
+}player;
+player allplayers[100];
+int allplayerscount = 0;
 
 int toint(char *s)
 {
@@ -28,74 +27,69 @@ float tofloat(char *s)
 	return atof(s);
 }
 
-void displaystudent(student stu)
+void displayplayer(player p)
 {
 	printf("\r\n");
-	printf("%16s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.a, stu.b, stu.c, stu.f);
+	printf("%16s\t%d\t%d\t%d\t%.2f\n", p.name, p.a, p.b, p.c, p.f);
 }
 
-void displayallstudents()
+void displayallplayers()
 {
 	int i;
-	printf("所有%d位球星分数如下\r\n", allstudentscount);
+	printf("所有%d位球星分数如下\r\n", allplayerscount);
 	printf("%16s\t场次1\t进球\t助攻\t效率4\n", "姓名");
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allplayerscount; i++)
 	{
-		displaystudent(allstudents[i]);
+		displayplayer(allplayers[i]);
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
 
 
-
-
-
-
-student getstudentfromline(char *line)
+player getplayerfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	student stu;
+	player p;
 	part = strtok(line, "\t\n");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
-			strcpy(stu.name, part);
+			strcpy(p.name, part);
 			break;
 		case 2:
-			stu.a = toint(part);
+			p.a = toint(part);
 			break;
 		case 3:
-			stu.b = toint(part);
+			p.b = toint(part);
 			break;
 		case 4:
-			stu.c = toint(part);
+			p.c = toint(part);
 			break;
 		case 5:
-			stu.f = tofloat(part);
+			p.f = tofloat(part);
 			break;
 		default:
 			break;
 		}
 		part = strtok(NULL, "\t\n");
 	}
-	return stu;
+	return p;
 }
 
 int cmpstuavefunc(const void * b, const void * a)
 {
-	return (((student*)a)->b - ((student*)b)->b);
+	return (((player*)a)->b - ((player*)b)->b);
 }
-void sortbyi2()
+void sortbyb()
 {
-	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
-
+	qsort(allplayers, allplayerscount, sizeof(player), cmpstuavefunc);
 }
 
-void readallstudents()
+void readallplayers()
 {
 	char line[200];
 	FILE *fp = fopen(FILE_INPUT, "r");
@@ -106,23 +100,22 @@ void readallstudents()
 	}
 	else
 	{
-		allstudentscount = 0;
+		allplayerscount = 0;
 		while (fgets(line, 1024, fp) != NULL)
 		{
 			if (strlen(line) < 5)
 				continue;
-			++allstudentscount;
-			allstudents[allstudentscount - 1] = getstudentfromline(line);
+			++allplayerscount;
+			allplayers[allplayerscount - 1] = getplayerfromline(line);
 		}
-		sortbyi2();
+		sortbyb();
 	}
 }
 
-
-void writeallstudents()
+void writeallplayers()
 {
 	int i;
-	student stu;
+	player p;
 	FILE *fp = fopen(FILE_INPUT, "w+");
 	if (fp == NULL)
 	{
@@ -130,31 +123,29 @@ void writeallstudents()
 		getchar();
 		exit(1);
 	}
-
-
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allplayerscount; i++)
 	{
-		stu = allstudents[i];
-		fprintf(fp, "%s\t%d\t%d\t%d\t%.2f\n", stu.name, stu.a, stu.b, stu.c, stu.f);
+		p = allplayers[i];
+		fprintf(fp, "%s\t%d\t%d\t%d\t%.2f\n", p.name, p.a, p.b, p.c, p.f);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
-void addstudent(char name[], int i1, int i2, int i3, float f)
+void addplayer(char name[], int i1, int i2, int i3, float f)
 {
-	student stu;
-	strcpy(stu.name, name);
-	stu.a = i1;
-	stu.b = i2;
-	stu.c = i3;
-	stu.f = f;
-	allstudents[allstudentscount++] = stu;
-	sortbyi2();
-	writeallstudents();
+	player p;
+	strcpy(p.name, name);
+	p.a = i1;
+	p.b = i2;
+	p.c = i3;
+	p.f = f;
+	allplayers[allplayerscount++] = p;
+	sortbyb();
+	writeallplayers();
 }
 
-void promptaddstudent()
+void promptaddplayer()
 {
 	char name[MAX_STRLEN] = "";
 	int   a, b, c;
@@ -162,30 +153,29 @@ void promptaddstudent()
 	printf("\n请输入球员姓名 参与场次数 进球数 助攻数，空格隔开，回车结束\n");
 	scanf("%s%d%d%d", name, &a, &b, &c);
 	f = (float)(b + c) / (float)a;
-	addstudent(name, a, b, c, f);
-	printf("完成第%d个球星成绩录入!\r\n", allstudentscount);
+	addplayer(name, a, b, c, f);
+	printf("完成第%d个球星成绩录入!\r\n", allplayerscount);
 }
 
 
-void promptaddstudentsfirsttime()
+void promptaddplayersfirsttime()
 {
 	int i, n;
-	if (allstudentscount > 0)
+	if (allplayerscount > 0)
 		return;
 	printf("\n请先指定要输入多少个球星的数据:");
 	scanf("%d", &n);
 	for (i = 0; i < n; i++)
-		promptaddstudent();
+		promptaddplayer();
 }
 void searchtotalbyname(char *name)
 {
 	int i;
-	//先按总分排序
-	for (i = 0; i < allstudentscount; i++)
-		if (strcmp(name, allstudents[i].name) == 0)
+	for (i = 0; i < allplayerscount; i++)
+		if (strcmp(name, allplayers[i].name) == 0)
 		{
-			printf("%s,第%d名, 详细如下\n", name, allstudentscount - i);
-			displaystudent(allstudents[i]);
+			printf("%s,第%d名, 详细如下\n", name, allplayerscount - i);
+			displayplayer(allplayers[i]);
 			return;
 		}
 	printf("没找到对应球星的信息。\r\n");
@@ -201,39 +191,14 @@ void promptsearchtotalbyname()
 
 int main()
 {
-
-#if TEST
-
-	readallstudents();
-	promptaddstudentsfirsttime();
-	//addstudent("s", 1, 2, 3, 4.4);
-	//sorttotal();
-	//searchtotalbyname("x1");
-	//displayallstudents();
-	//promptsearchtotalbyname();
-	//promptaddstudent();
-	//addstudent("ronaldo", 171, 131, 41, 0.99);
-
-	displayallstudents();
-
-
-
-#else
-
 	int choice = -1;
 	printf("\n开始读文件...\n");
-	readallstudents();
-	promptaddstudentsfirsttime();
+	readallplayers();
+	promptaddplayersfirsttime();
 	printf("\n读文件结束！\n");
 
 	while (choice != 0)
 	{
-		//printf("\n\t 球星成绩读入统计");
-		//printf("\n\t 1. 查看进球榜单");
-		//printf("\n\t 2. 查找");
-		//printf("\n\t 3. 增加");
-		//printf("\n\t 4. 退出");
-		//printf("\n\n  请选择: ");
 		printf("\n欢迎使用欧洲足球联赛进球数据榜操作系统\n");
 		printf("****************************************\n");
 		printf("\t 1.查看进球榜单\n");
@@ -247,7 +212,7 @@ int main()
 		{
 		case '1':
 			printf("\n\n你选择了 1\n");
-			displayallstudents();
+			displayallplayers();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
@@ -255,7 +220,7 @@ int main()
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptaddstudent();
+			promptaddplayer();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
@@ -269,7 +234,6 @@ int main()
 			break;
 		}
 	}
-#endif
 	system("pause");
 	return 0;
 }
