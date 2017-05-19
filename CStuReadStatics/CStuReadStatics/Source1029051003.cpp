@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #define FILE_INPUT "stuin.txt"
-#define FILE_ALLOUTPUT "alloutput.txt"
-#define FILE_GRADES "grades.txt"
+#define FILE_ALLOUTPUT "stuout.txt"
 #define MAX_STRLEN 20
 #define GRADES_COUNT 5
 
@@ -12,14 +11,14 @@ typedef struct student
 	char no[MAX_STRLEN];
 	char name[MAX_STRLEN];
 	int score;
-	//int order;
 }student;
+
 student allstudents[1005];
 int allstudentscount = 0;
+
 float averagescore = 0;
 
-
-#define TEST 1
+FILE *outfile;
 
 //字符串转整数
 int toint(char *s)
@@ -30,8 +29,8 @@ int toint(char *s)
 
 void displaystudent(student stu)
 {
-	printf("\r\n");
 	printf("%s\t%s\t%d\n", stu.no, stu.name, stu.score);
+	fprintf(outfile, "%s\t%s\t%d\n", stu.no, stu.name, stu.score);
 }
 
 void displayallstudents()
@@ -41,36 +40,9 @@ void displayallstudents()
 	printf("学号\t姓名\t成绩\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
-	{
 		displaystudent(allstudents[i]);
-	}
-	printf("\r\n--------------------------------------------\r\n");
+	printf("--------------------------------------------\r\n");
 }
-
-
-
-//void writestudentsaveorder()
-//{
-//	int i;
-//	FILE *fp;
-//	fp = fopen(FILE_ALLOUTPUT, "w");
-//	if (fp == NULL)
-//	{
-//		printf("\n打开文件%s失败!", FILE_ALLOUTPUT);
-//		getchar();
-//		exit(1);
-//	}
-//	fprintf(fp, "姓名\t科目1\t科目2\t科目3\t科目4\t科目5\t平均\t排名\n");
-//	for (i = 0; i < allstudentscount; i++)
-//	{
-//		student stu = allstudents[i];
-//		fprintf(fp, "%s\t%d\t%d\t%d\t%d\t%d\t%.1f\t%d\n", stu.name,
-//			stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
-//			stu.average, stu.order);
-//	}
-//	fclose(fp);
-//	printf("学生综合成绩已输出到文件%s\n", FILE_ALLOUTPUT);
-//}
 
 student getstudentfromline(char *line)
 {
@@ -131,8 +103,6 @@ void readallstudents()
 	}
 }
 
-
-
 int cmpstuavefunc(const void * b, const void * a)
 {
 	return (((student*)a)->score - ((student*)b)->score);
@@ -145,16 +115,18 @@ void sortstudetsbyscore()
 void displayhigheststudents()
 {
 	int i = 0;
-	printf("最高分同学如下\r\n");
+	printf("\n最高分同学如下\r\n");
+	fprintf(outfile, "最高分同学如下\r\n");
 	sortstudetsbyscore();
 	printf("学号\t姓名\t成绩\n");
+	fprintf(outfile, "学号\t姓名\t成绩\n");
 	printf("--------------------------------------------\r\n");
 	while (allstudents[i].score == allstudents[0].score)
 		displaystudent(allstudents[i++]);
-	printf("\r\n--------------------------------------------\r\n");
+	printf("--------------------------------------------\r\n");
 }
 
-void countanddisplaybycompareaverage()
+void countanddisplaycompareaveragecount()
 {
 	int i, t, low = 0, eq = 0, high = 0;
 	calctotalandave();
@@ -168,133 +140,60 @@ void countanddisplaybycompareaverage()
 		else if (t > averagescore)
 			high++;
 	}
-	printf("平均成绩：%.2f\n", averagescore);
-	printf("平均成绩高于平均成绩的人数：%d\n", high);
+	//printf("\n平均成绩：%.2f\n", averagescore);
+	printf("\n平均成绩高于平均成绩的人数：%d\n", high);
+	fprintf(outfile, "平均成绩高于平均成绩的人数：%d\n", high);
 	printf("平均成绩低于平均成绩的人数：%d\n", low);
-	printf("平均成绩等于平均成绩的人数：%d\n", eq);
-	printf("\n");
+	fprintf(outfile, "平均成绩低于平均成绩的人数：%d\n", low);
+	printf("平均成绩等于平均成绩的人数：%d\n\n", eq);
+	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n\n", eq);
 }
 
-
-
-
-void writeandprintgradescount()
+void countanddisplaygradescountandpercent()
 {
-	//int i, j;
-	//char *grades[GRADES_COUNT] = { "<60","60~69", "70~79", "80~89", ">=90", };
-	//FILE *fp;
-	//fp = fopen(FILE_GRADES, "w");
-	//if (fp == NULL)
-	//{
-	//	printf("\n打开文件%s失败!", FILE_GRADES);
-	//	getchar();
-	//	exit(1);
-	//}
-	//printf("分数段\t科目1\t科目2\t科目3\t科目4\t科目5\n");
-	//fprintf(fp, "分数段\t科目1\t科目2\t科目3\t科目4\t科目5\n");
-	//for (i = 0; i < GRADES_COUNT; i++)
-	//{
-	//	printf("%s", grades[i]);
-	//	fprintf(fp, "%s", grades[i]);
-	//	for (j = 0; j < COURSES_COUNT; j++)
-	//	{
-	//		course cou = allcourses[j];
-	//		printf("\t%d", cou.countingrade[i]);
-	//		fprintf(fp, "\t%d", cou.countingrade[i]);
-	//	}
-	//	printf("\n");
-	//	fprintf(fp, "\n");
-	//}
-	//fclose(fp);
-	//printf("分数段已输出到文件%s\n", FILE_GRADES);
+	int i, t;
+	int count[GRADES_COUNT] = { 0 };
+	char *grades[GRADES_COUNT] = { "不及格(0～59)","及格(60～69)", "中等(70～79)", "良好(80～89)", "优秀(90～100)", };
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].score;
+		if (t < 60)
+			count[0]++;
+		else if (t >= 60 && t <= 69)
+			count[1]++;
+		else if (t >= 70 && t <= 79)
+			count[2]++;
+		else if (t >= 80 && t <= 89)
+			count[3]++;
+		else if (t >= 90)
+			count[4]++;
+	}
+	printf("分数段\t人数\t百分比\n");
+	fprintf(outfile, "分数段\t人数\t百分比\n");
+	for (i = 0; i < GRADES_COUNT; i++)
+	{
+		printf("%s\t%d\t%d%%\n", grades[i], count[i], (int)(count[i] * 100 / (float)allstudentscount));
+		fprintf(outfile, "%s\t%d\t%d%%\n", grades[i], count[i], (int)(count[i] * 100 / (float)allstudentscount));
+	}
 }
-
-
-//void writeallstudents()
-//{
-//	int i;
-//	student stu;
-//	FILE *fp = fopen(FILE_INPUT, "w+");
-//	if (fp == NULL)
-//	{
-//		printf("\n打开文件%s失败!", FILE_INPUT);
-//		getchar();
-//		exit(1);
-//	}
-//
-//
-//	for (i = 0; i < allstudentscount; i++)
-//	{
-//		stu = allstudents[i];
-//		fprintf(fp, "%s\t%d\t%d\t%d\t%d\t%d\r\n", stu.name,
-//			stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4]);
-//	}
-//	fclose(fp);
-//	printf("已保存记录到文件。");
-//}
 
 
 int main()
 {
-#if TEST
-	readallstudents();
-	//calctotalandave();
-	displayallstudents();
-	countanddisplaybycompareaverage();
-	//sorttotal();
-	displayhigheststudents();
-
-#else
-
-	int choice = -1;
-	printf("\n开始读文件...\n");
-	readallstudents();
-	printf("\n读文件结束！\n");
-
-	while (choice != 0)
+	outfile = fopen(FILE_ALLOUTPUT, "a+");
+	if (outfile == NULL)
 	{
-		printf("\n\t 学生成绩读入统计");
-		printf("\n\t 0. 退出");
-		printf("\n\t 1. 综合成绩名次计算输出");
-		printf("\n\t 2. 课程分段人数输出");
-		printf("\n\t 3. 输出所有不及格");
-		printf("\n\t 4. 添加学生成绩");
-		printf("\n\n  请选择: ");
-		fseek(stdin, 0, SEEK_END);
-		choice = getchar();
-		switch (choice)
-		{
-		case '0':
-			printf("\n\n 你选择了退出。");
-			fseek(stdin, 0, SEEK_END);
-			system("pause");
-			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			sortstuave();
-			displayallstudents();
-			writestudentsaveorder();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			countbygradesforallcourses();
-			writeandprintgradescount();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			displayallbelow60();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptaddstudent();
-			break;
-		default:
-			printf("\n\n输入有误，请重选\n");
-			break;
-		}
+		printf("\n打开文件%s失败!", FILE_ALLOUTPUT);
+		getchar();
+		exit(1);
 	}
-#endif
+	readallstudents();
+	//displayallstudents();
+	displayhigheststudents();
+	countanddisplaycompareaveragecount();
+	countanddisplaygradescountandpercent();
+	fclose(outfile);
+	printf("数据已输出到文件%s\n", FILE_ALLOUTPUT);
 	system("pause");
 	return 0;
 }
