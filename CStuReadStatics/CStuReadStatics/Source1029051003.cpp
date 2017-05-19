@@ -16,7 +16,7 @@ typedef struct student
 }student;
 student allstudents[1005];
 int allstudentscount = 0;
-int averagescore = 0;
+float averagescore = 0;
 
 
 #define TEST 1
@@ -154,23 +154,25 @@ void displayhigheststudents()
 	printf("\r\n--------------------------------------------\r\n");
 }
 
-void countbygradesforonecourse(int courseindex)
+void countanddisplaybycompareaverage()
 {
-	//int i, t;
-	//for (i = 0; i < allstudentscount; i++)
-	//{
-	//	t = allstudents[i].score[courseindex];
-	//	if (t < 60)
-	//		allcourses[courseindex].countingrade[0]++;
-	//	else if (t >= 60 && t <= 69)
-	//		allcourses[courseindex].countingrade[1]++;
-	//	else if (t >= 70 && t <= 79)
-	//		allcourses[courseindex].countingrade[2]++;
-	//	else if (t >= 80 && t <= 89)
-	//		allcourses[courseindex].countingrade[3]++;
-	//	else if (t >= 90)
-	//		allcourses[courseindex].countingrade[4]++;
-	//}
+	int i, t, low = 0, eq = 0, high = 0;
+	calctotalandave();
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].score;
+		if (t < averagescore)
+			low++;
+		else if (t == averagescore)
+			eq++;
+		else if (t > averagescore)
+			high++;
+	}
+	printf("平均成绩：%.2f\n", averagescore);
+	printf("平均成绩高于平均成绩的人数：%d\n", high);
+	printf("平均成绩低于平均成绩的人数：%d\n", low);
+	printf("平均成绩等于平均成绩的人数：%d\n", eq);
+	printf("\n");
 }
 
 
@@ -238,7 +240,7 @@ int main()
 	readallstudents();
 	//calctotalandave();
 	displayallstudents();
-
+	countanddisplaybycompareaverage();
 	//sorttotal();
 	displayhigheststudents();
 
@@ -291,7 +293,7 @@ int main()
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-}
+	}
 #endif
 	system("pause");
 	return 0;
