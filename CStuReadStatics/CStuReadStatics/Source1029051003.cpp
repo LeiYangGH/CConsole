@@ -142,7 +142,7 @@ void countanddisplaycompareaveragecount()
 	}
 	//printf("\n平均成绩：%.2f\n", averagescore);
 	printf("\n平均成绩高于平均成绩的人数：%d\n", high);
-	fprintf(outfile, "平均成绩高于平均成绩的人数：%d\n", high);
+	fprintf(outfile, "\n平均成绩高于平均成绩的人数：%d\n", high);
 	printf("平均成绩低于平均成绩的人数：%d\n", low);
 	fprintf(outfile, "平均成绩低于平均成绩的人数：%d\n", low);
 	printf("平均成绩等于平均成绩的人数：%d\n\n", eq);
