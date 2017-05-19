@@ -48,6 +48,7 @@ void displayallstudents()
 }
 
 
+
 //void writestudentsaveorder()
 //{
 //	int i;
@@ -141,6 +142,18 @@ void sortstudetsbyscore()
 	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
 }
 
+void displayhigheststudents()
+{
+	int i = 0;
+	printf("最高分同学如下\r\n");
+	sortstudetsbyscore();
+	printf("学号\t姓名\t成绩\n");
+	printf("--------------------------------------------\r\n");
+	while (allstudents[i].score == allstudents[0].score)
+		displaystudent(allstudents[i++]);
+	printf("\r\n--------------------------------------------\r\n");
+}
+
 void countbygradesforonecourse(int courseindex)
 {
 	//int i, t;
@@ -224,9 +237,10 @@ int main()
 #if TEST
 	readallstudents();
 	//calctotalandave();
+	displayallstudents();
 
 	//sorttotal();
-	displayallstudents();
+	displayhigheststudents();
 
 #else
 
@@ -277,7 +291,7 @@ int main()
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-	}
+}
 #endif
 	system("pause");
 	return 0;
