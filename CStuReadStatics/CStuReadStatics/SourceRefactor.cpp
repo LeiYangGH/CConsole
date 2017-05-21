@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #define FILE_INPUT "stuin.txt"
 #define FILE_ALLOUTPUT "stuout.txt"
 #define MAX_STRLEN 20
@@ -20,11 +21,11 @@ float averagescore = 0;
 
 FILE *outfile;
 
-//字符串转整数
-int toint(char *s)
+void f2printf(char *fmt, ...)
 {
-	char *end;
-	return (int)strtol(s, &end, 10);
+	va_list argp;
+	va_start(argp, fmt); vfprintf(stdout, fmt, argp); va_end(argp);
+	va_start(argp, fmt); vfprintf(outfile, fmt, argp); va_end(argp);
 }
 
 void displaystudent(student stu)
@@ -49,7 +50,7 @@ void readallstudents()
 	char line[50];
 	FILE *fp = fopen(FILE_INPUT, "r");
 	student stu;
-	allstudentscount = 0;
+	allstudentscount = 0;//
 	while (fgets(line, 80, fp) != NULL)
 	{
 		++allstudentscount;
@@ -66,15 +67,16 @@ int cmpstuavefunc(const void * b, const void * a)
 void displayhigheststudents()
 {
 	int i = 0;
-	printf("\n最高分同学如下\r\n");
-	fprintf(outfile, "最高分同学如下\r\n");
+	printf("\n最高分同学:\n");
+	fprintf(outfile, "最高分同学:\n");
 	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
-	printf("学号\t姓名\t成绩\n");
-	fprintf(outfile, "学号\t姓名\t成绩\n");
-	printf("--------------------------------------------\r\n");
 	while (allstudents[i].score == allstudents[0].score)
-		displaystudent(allstudents[i++]);
-	printf("--------------------------------------------\r\n");
+	{
+		f2printf("学号:%s 姓名:%s 分数:%d\n", allstudents[i].no, allstudents[i].name, allstudents[i].score);
+		//printf("学号:%s 姓名:%s 分数:%d\n", allstudents[i].no, allstudents[i].name, allstudents[i].score);
+	//fprintf(outfile, "学号:%s 姓名:%s 分数:%d\n", allstudents[i].no, allstudents[i].name, allstudents[i].score);
+		i++;
+	}
 }
 
 void countanddisplaycompareaveragecount()
@@ -92,40 +94,45 @@ void countanddisplaycompareaveragecount()
 		else if (t > averagescore)
 			high++;
 	}
-	printf("\n平均成绩高于平均成绩的人数：%d\n", high);
-	fprintf(outfile, "\n平均成绩高于平均成绩的人数：%d\n", high);
+	printf("平均成绩高于平均成绩的人数：%d\n", high);
+	fprintf(outfile, "平均成绩高于平均成绩的人数：%d\n", high);
 	printf("平均成绩低于平均成绩的人数：%d\n", low);
 	fprintf(outfile, "平均成绩低于平均成绩的人数：%d\n", low);
-	printf("平均成绩等于平均成绩的人数：%d\n\n", allstudentscount - (high + low));
-	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n\n", allstudentscount - (high + low));
+	printf("平均成绩等于平均成绩的人数：%d\n", allstudentscount - (high + low));
+	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n", allstudentscount - (high + low));
+}
+
+int calcpercent(int g)
+{
+	return (int)(g * 100 / (float)allstudentscount);
 }
 
 void countanddisplaygradescountandpercent()
 {
-	int i, t;
-	int count[GRADES_COUNT] = { 0 };
-	char *grades[GRADES_COUNT] = { "不及格(0～59)","及格(60～69)", "中等(70～79)", "良好(80～89)", "优秀(90～100)", };
+	int i, g5 = 0, g6 = 0, g7 = 0, g8 = 0, g9 = 0;
 	for (i = 0; i < allstudentscount; i++)
 	{
-		t = allstudents[i].score;
-		if (t < 60)
-			count[0]++;
-		else if (t >= 60 && t <= 69)
-			count[1]++;
-		else if (t >= 70 && t <= 79)
-			count[2]++;
-		else if (t >= 80 && t <= 89)
-			count[3]++;
-		else if (t >= 90)
-			count[4]++;
+		if (allstudents[i].score < 60)
+			g5++;
+		else if (allstudents[i].score >= 60 && allstudents[i].score <= 69)
+			g6++;
+		else if (allstudents[i].score >= 70 && allstudents[i].score <= 79)
+			g7++;
+		else if (allstudents[i].score >= 80 && allstudents[i].score <= 89)
+			g8++;
+		else if (allstudents[i].score >= 90)
+			g9++;
 	}
-	printf("分数段\t人数\t百分比\n");
-	fprintf(outfile, "分数段\t人数\t百分比\n");
-	for (i = 0; i < GRADES_COUNT; i++)
-	{
-		printf("%s\t%d\t%d%%\n", grades[i], count[i], (int)(count[i] * 100 / (float)allstudentscount));
-		fprintf(outfile, "%s\t%d\t%d%%\n", grades[i], count[i], (int)(count[i] * 100 / (float)allstudentscount));
-	}
+	printf("不及格(0～59)的%d人，占%d%%\n", g5, calcpercent(g5));
+	fprintf(outfile, "不及格(0～59)的%d人，占%d%%\n", g5, calcpercent(g5));
+	printf("及格(60～69)的%d人，占%d%%\n", g6, calcpercent(g6));
+	fprintf(outfile, "及格(60～69)的%d人，占%d%%\n", g6, calcpercent(g6));
+	printf("中等(70～79)的%d人，占%d%%\n", g7, calcpercent(g7));
+	fprintf(outfile, "中等(70～79)的%d人，占%d%%\n", g7, calcpercent(g7));
+	printf("良好(80～89)的%d人，占%d%%\n", g8, calcpercent(g8));
+	fprintf(outfile, "良好(80～89)的%d人，占%d%%\n", g8, calcpercent(g8));
+	printf("优秀(90～100)的%d人，占%d%%\n", g9, calcpercent(g9));
+	fprintf(outfile, "优秀(90～100)的%d人，占%d%%\n", g9, calcpercent(g9));
 }
 
 
