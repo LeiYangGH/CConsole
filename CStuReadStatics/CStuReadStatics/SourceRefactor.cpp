@@ -44,16 +44,10 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
-void calctotalandave()
-{
-	int i, j;
-	float sum = 0;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		sum += allstudents[i].score;
-	}
-	averagescore = sum / (float)allstudentscount;
-}
+//void calctotalandave()
+//{
+//
+//}
 
 
 void readallstudents()
@@ -95,25 +89,25 @@ void displayhigheststudents()
 
 void countanddisplaycompareaveragecount()
 {
-	int i, t, low = 0, eq = 0, high = 0;
-	calctotalandave();
+	int i, t, low = 0, high = 0;
+	float sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+		sum += allstudents[i].score;
+	averagescore = sum / (float)allstudentscount;
 	for (i = 0; i < allstudentscount; i++)
 	{
 		t = allstudents[i].score;
 		if (t < averagescore)
 			low++;
-		else if (t == averagescore)
-			eq++;
 		else if (t > averagescore)
 			high++;
 	}
-	//printf("\n平均成绩：%.2f\n", averagescore);
 	printf("\n平均成绩高于平均成绩的人数：%d\n", high);
 	fprintf(outfile, "\n平均成绩高于平均成绩的人数：%d\n", high);
 	printf("平均成绩低于平均成绩的人数：%d\n", low);
 	fprintf(outfile, "平均成绩低于平均成绩的人数：%d\n", low);
-	printf("平均成绩等于平均成绩的人数：%d\n\n", eq);
-	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n\n", eq);
+	printf("平均成绩等于平均成绩的人数：%d\n\n", allstudentscount - (high + low));
+	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n\n", allstudentscount - (high + low));
 }
 
 void countanddisplaygradescountandpercent()
@@ -156,9 +150,9 @@ int main()
 	}
 	readallstudents();
 	displayallstudents();
-	//displayhigheststudents();
-	//countanddisplaycompareaveragecount();
-	//countanddisplaygradescountandpercent();
+	displayhigheststudents();
+	countanddisplaycompareaveragecount();
+	countanddisplaygradescountandpercent();
 	fclose(outfile);
 	//printf("数据已输出到文件%s\n", FILE_ALLOUTPUT);
 	system("pause");
