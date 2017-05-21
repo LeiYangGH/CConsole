@@ -44,12 +44,6 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
-//void calctotalandave()
-//{
-//
-//}
-
-
 void readallstudents()
 {
 	char line[50];
@@ -68,17 +62,13 @@ int cmpstuavefunc(const void * b, const void * a)
 {
 	return (((student*)a)->score - ((student*)b)->score);
 }
-void sortstudetsbyscore()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
-}
 
 void displayhigheststudents()
 {
 	int i = 0;
 	printf("\n最高分同学如下\r\n");
 	fprintf(outfile, "最高分同学如下\r\n");
-	sortstudetsbyscore();
+	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
 	printf("学号\t姓名\t成绩\n");
 	fprintf(outfile, "学号\t姓名\t成绩\n");
 	printf("--------------------------------------------\r\n");
