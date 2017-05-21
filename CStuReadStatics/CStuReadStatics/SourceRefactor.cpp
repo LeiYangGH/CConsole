@@ -44,32 +44,6 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
-student getstudentfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	student stu;
-	part = strtok(line, " \n");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			strcpy(stu.no, part);
-			break;
-		case 2:
-			strcpy(stu.name, part);
-			break;
-		case 3:
-			stu.score = toint(part);
-		default:
-			break;
-		}
-		part = strtok(NULL, " \n");
-	}
-	return stu;
-}
-
 void calctotalandave()
 {
 	int i, j;
@@ -84,22 +58,15 @@ void calctotalandave()
 
 void readallstudents()
 {
-	char line[200];
+	char line[50];
 	FILE *fp = fopen(FILE_INPUT, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_INPUT);
-		getchar();
-		exit(1);
-	}
+	student stu;
 	allstudentscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
+	while (fgets(line, 80, fp) != NULL)
 	{
-		if (strlen(line) < 5)
-			continue;
 		++allstudentscount;
-		allstudents[allstudentscount - 1] = getstudentfromline(line);
+		sscanf(line, "%s%s%d", stu.no, stu.name, &stu.score);
+		allstudents[allstudentscount - 1] = stu;
 	}
 }
 
@@ -188,12 +155,12 @@ int main()
 		exit(1);
 	}
 	readallstudents();
-	//displayallstudents();
-	displayhigheststudents();
-	countanddisplaycompareaveragecount();
-	countanddisplaygradescountandpercent();
+	displayallstudents();
+	//displayhigheststudents();
+	//countanddisplaycompareaveragecount();
+	//countanddisplaygradescountandpercent();
 	fclose(outfile);
-	printf("数据已输出到文件%s\n", FILE_ALLOUTPUT);
+	//printf("数据已输出到文件%s\n", FILE_ALLOUTPUT);
 	system("pause");
 	return 0;
 }
