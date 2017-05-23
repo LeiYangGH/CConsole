@@ -54,9 +54,15 @@ void displaystudent(student stu)
 	printf("%s\t%s\t%d\n", stu.no, stu.name, stu.age);
 }
 
+int cmpstubyno(const void * a, const void * b)
+{
+	return ((student*)a)->no - ((student*)b)->no;
+}
+
 void displayallstudents()
 {
 	int i;
+	qsort(allstudents, allstudentscount, sizeof(student), cmpstubyno);//快速排序
 	printf("所有%d分数如下\r\n", allstudentscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
@@ -115,27 +121,8 @@ void readallstudents()
 
 }
 
-int cmpfunc(const void * a, const void * b)
-{
-	return ((student*)a)->no - ((student*)b)->no;
-}
-void sorttotal()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
-}
 
-void sortanddisplay()
-{
-	int i;
-	sorttotal();
-	printf("排序后如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		displaystudent(sortstudents[i]);
-	}
-	printf("--------------------------------------------\r\n");
-}
+
 
 void inputstring(char str[])
 {
@@ -170,8 +157,6 @@ int promptsearchbyname()
 	searcbyname(name);
 	return strcmp(name, "q");
 }
-
-
 
 void searchbyno(char no[20])
 {
@@ -212,24 +197,37 @@ int inputscore()
 	return n;
 }
 
-void removestudent(int no)
+void removestudent(char no[20])
 {
-	int i;
-	int index;
-	//index = getstudentidexbyid(no);
-	for (i = index; i < allstudentscount - 1; i++)
-		allstudents[i] = allstudents[i + 1];
-	allstudentscount--;
-	printf("删除完毕，剩下%d个。\r\n", allstudentscount);
+	int i, index, found = 0;
+	for (index = 0; index < allstudentscount; index++)
+	{
+		if (streq(allstudents[index].no, no))
+		{
+			found = 1;
+			break;
+		}
+	}
+	if (found)
+	{
+		for (i = index; i < allstudentscount - 1; i++)
+			allstudents[i] = allstudents[i + 1];
+		allstudentscount--;
+		printf("删除完毕，剩下%d个。\n", allstudentscount);
+	}
+	else
+	{
+		printf("没找到，无法删除\n");
 
+	}
 }
 
 void promptremovestudent()
 {
-	int no;
-	printf("请输入要删除的学号:");
-	scanf("%d", &no);
-	removestudent(no);
+	//int no;
+	//printf("请输入要删除的学号:");
+	//scanf("%d", &no);
+	//removestudent(no);
 }
 
 
@@ -298,16 +296,12 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-
+	removestudent("03");
+	displayallstudents();
 	//searcbyname("name2");
-	searchbyno("033");
+	//searchbyno("033");
 	//writeallstudents();
 
-	//calcanddisplaytotalandaverage();
-	//sortanddisplay();
-	//calcanddisplayallsubjects();
-
-	//countbygrades();
 #else
 	while (choice != 0)
 	{
@@ -362,12 +356,12 @@ int main()
 			break;
 		}
 		getch();
-}
+	}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	printf("\n\n按任意键退出\n");
 	system("pause");
 
 	return 0;
-}
+	}
 
