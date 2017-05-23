@@ -1,8 +1,6 @@
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
 #define FILE_STU "stu.txt"
 typedef struct student
 {
@@ -16,10 +14,10 @@ typedef struct student
 	char email[20];
 }student;
 
-student allstudents[100];
-student sortstudents[100];
-int allstudentscount = 0;
+student allstudents[100];//所有数据库存储在这里没
+int allstudentscount = 0;//学生个数
 
+//字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
@@ -33,41 +31,20 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+//显示一个学生
 void displaystudent(student stu)
 {
 	printf("%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n", stu.no, stu.name, stu.age, stu.sex,
 		stu.birthday, stu.address, stu.telephone, stu.email);
-	//printf("%s\t%s\t%d\n", stu.no, stu.name, stu.age);
 }
 
-void writeallstudents()
-{
-	int i;
-	student stu;
-	FILE *fp = fopen(FILE_STU, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_STU);
-		getchar();
-		exit(1);
-	}
-
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		stu = allstudents[i];
-		fprintf(fp, "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\r\n", stu.no, stu.name, stu.age, stu.sex,
-			stu.birthday, stu.address, stu.telephone, stu.email);
-	}
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
-
+//快速排序用到的
 int cmpstubyno(const void * a, const void * b)
 {
 	return ((student*)a)->no - ((student*)b)->no;
 }
 
+//显示所有学生
 void displayallstudents()
 {
 	int i;
@@ -80,12 +57,37 @@ void displayallstudents()
 	}
 	printf("--------------------------------------------\r\n");
 }
+//把所有学生写入文件
+void writeallstudents()
+{
+	int i;
+	student stu;
+	FILE *fp = fopen(FILE_STU, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+	for (i = 0; i < allstudentscount; i++)
+	{
+		stu = allstudents[i];
+		fprintf(fp, "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\r\n", stu.no, stu.name, stu.age, stu.sex,
+			stu.birthday, stu.address, stu.telephone, stu.email);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
 
+
+
+//从一行文本拆分出字段并组合成一个学生
 student getstudentfromline(char *line)
 {
 	char *part;
 	int index = 0;
 	student stu;
+	//strtok \t 是根据Tab拆分
 	part = strtok(line, "\t");
 	while (part != NULL)
 	{
@@ -123,6 +125,7 @@ student getstudentfromline(char *line)
 	return stu;
 }
 
+//读文件
 void readallstudents()
 {
 	char line[200];
@@ -131,25 +134,18 @@ void readallstudents()
 		return;
 	else
 	{
-
 		allstudentscount = 0;
-
 		while (fgets(line, 1024, fp) != NULL)
 		{
-			if (strlen(line) < 5)
+			if (strlen(line) < 5)//空行不管
 				continue;
 			allstudents[allstudentscount++] = getstudentfromline(line);
 		}
 		printf("\n已读入文件!", FILE_STU);
 	}
-
 }
 
-
-
-
-
-
+//查找姓名
 void searcbyname(char *name)
 {
 	int i;
@@ -161,7 +157,7 @@ void searcbyname(char *name)
 		}
 	printf("没找到对应学生的信息。\r\n");
 }
-
+//用户输入并查找姓名
 void promptsearchbyname()
 {
 	char name[20];
@@ -169,7 +165,7 @@ void promptsearchbyname()
 	scanf("%s", name);
 	searcbyname(name);
 }
-
+//查找学号
 void searchbyno(char no[20])
 {
 	int i;
@@ -181,7 +177,7 @@ void searchbyno(char no[20])
 		}
 	printf("没找到对应学生的信息。\r\n");
 }
-
+//用户输入并查找学号
 void promptsearchbyno()
 {
 	char no[20];
@@ -190,28 +186,11 @@ void promptsearchbyno()
 	searchbyno(no);
 }
 
-//输入成绩信息
-void inputname(char str[])
-{
-	printf("请输入姓名(2-45个字符)，不能带空格、Tab或回车符:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \r\n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
-}
-
+//根据学号删除学生
 void removestudent(char no[20])
 {
 	int i, index, found = 0;
+	//找到学号相同的下标index
 	for (index = 0; index < allstudentscount; index++)
 	{
 		if (streq(allstudents[index].no, no))
@@ -222,6 +201,7 @@ void removestudent(char no[20])
 	}
 	if (found)
 	{
+		//如果找到，就把后面的都往前移动一位（相当于删除index所在的学生）
 		for (i = index; i < allstudentscount - 1; i++)
 			allstudents[i] = allstudents[i + 1];
 		allstudentscount--;
@@ -232,6 +212,7 @@ void removestudent(char no[20])
 		printf("没找到，无法删除\n");
 }
 
+//用户输入学号并删除
 void promptremove()
 {
 	char no[20];
@@ -240,10 +221,7 @@ void promptremove()
 	removestudent(no);
 }
 
-
-
-
-
+//添加学生
 void addstudent(char no[20], char name[], int age, char sex[5],
 	char birthday[20], char address[20], char telephone[20], char email[20])
 {
@@ -260,7 +238,7 @@ void addstudent(char no[20], char name[], int age, char sex[5],
 	writeallstudents();
 }
 
-
+//用户输入并添加学生
 void promptaddstudent()
 {
 	char no[20];
@@ -271,8 +249,6 @@ void promptaddstudent()
 	char address[20];
 	char telephone[20];
 	char email[20];
-
-
 	printf("\n请输入学号，姓名，年龄，性别，出生年月，地址，电话，E-mail，空格隔开，回车结束\n");
 	scanf("%s%s%d%s%s%s%s%s", no, name, &age, sex, birthday, address, telephone, email);
 	addstudent(no, name, age, sex, birthday, address, telephone, email);
@@ -284,7 +260,6 @@ int main()
 {
 	int choice = -1;
 	readallstudents();
-
 #if 0
 
 	//addstudent("01", "name1", 1, "F", "b1", "add1", "tel1111", "1dsfsfs@ssss");
@@ -319,7 +294,7 @@ int main()
 		printf("\n\t 4. 按姓名查询");
 		printf("\n\t 5. 按学号删除");
 		printf("\n\n  请选择: ");
-		fseek(stdin, 0, SEEK_END);
+		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
 		choice = getchar();
 		switch (choice)
 		{
