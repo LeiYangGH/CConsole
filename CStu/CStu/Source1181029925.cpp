@@ -260,30 +260,6 @@ int main()
 {
 	int choice = -1;
 	readallstudents();
-#if 0
-
-	//addstudent("01", "name1", 1, "F", "b1", "add1", "tel1111", "1dsfsfs@ssss");
-	//addstudent("03", "name3", 3, "F", "b3", "add3", "tel1333", "3dsfsfs@ssss");
-	//addstudent("02", "name2", 2, "M", "b2", "add2", "tel2222", "2ddfdsfs@fsss");
-
-	//displayallstudents();
-	//promptaddstudent();
-
-	///*promptremovestudent();
-	////promptsearchtotalbyname();
-	////promptsearchtotalbyno();
-
-	displayallstudents();
-	//removestudent("03");
-	//promptremovestudent();
-	//promptsearchbyname();
-	//promptsearchbyno();
-	//displayallstudents();
-	//searcbyname("name2");
-	//searchbyno("033");
-	//writeallstudents();
-
-#else
 	while (choice != 0)
 	{
 		printf("\n\t 学生信息管理系统");
@@ -329,7 +305,6 @@ int main()
 			break;
 		}
 	}
-#endif
 	printf("\n\n按任意键退出\n");
 	system("pause");
 
