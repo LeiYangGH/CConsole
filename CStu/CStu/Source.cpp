@@ -458,7 +458,7 @@ void promptaddstudent()
 }
 
 
-int main0()
+int main()
 {
 	int choice = -1;
 
