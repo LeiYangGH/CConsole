@@ -40,6 +40,29 @@ void displaystudent(student stu)
 	//printf("%s\t%s\t%d\n", stu.no, stu.name, stu.age);
 }
 
+void writeallstudents()
+{
+	int i;
+	student stu;
+	FILE *fp = fopen(FILE_STU, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_STU);
+		getchar();
+		exit(1);
+	}
+
+
+	for (i = 0; i < allstudentscount; i++)
+	{
+		stu = allstudents[i];
+		fprintf(fp, "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\r\n", stu.no, stu.name, stu.age, stu.sex,
+			stu.birthday, stu.address, stu.telephone, stu.email);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
 int cmpstubyno(const void * a, const void * b)
 {
 	return ((student*)a)->no - ((student*)b)->no;
@@ -202,13 +225,11 @@ void removestudent(char no[20])
 		for (i = index; i < allstudentscount - 1; i++)
 			allstudents[i] = allstudents[i + 1];
 		allstudentscount--;
+		writeallstudents();
 		printf("删除完毕，剩下%d个。\n", allstudentscount);
 	}
 	else
-	{
 		printf("没找到，无法删除\n");
-
-	}
 }
 
 void promptremove()
@@ -220,29 +241,7 @@ void promptremove()
 }
 
 
-void writeallstudents()
-{
-	int i;
-	student stu;
-	FILE *fp = fopen(FILE_STU, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_STU);
-		getchar();
-		exit(1);
-	}
 
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		stu = allstudents[i];
-		//fprintf(fp, "%s\t%s\t%d\n", stu.no, stu.name, stu.age);
-		fprintf(fp, "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\r\n", stu.no, stu.name, stu.age, stu.sex,
-			stu.birthday, stu.address, stu.telephone, stu.email);
-	}
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
 
 
 void addstudent(char no[20], char name[], int age, char sex[5],
@@ -258,6 +257,7 @@ void addstudent(char no[20], char name[], int age, char sex[5],
 	strcpy(stu.telephone, telephone);
 	strcpy(stu.email, email);
 	allstudents[allstudentscount++] = stu;
+	writeallstudents();
 }
 
 
