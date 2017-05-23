@@ -151,7 +151,7 @@ void inputstring(char str[])
 	strcpy(str, input);
 }
 
-void searchtotalbyname(char *name)
+void searcbyname(char *name)
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
@@ -163,17 +163,17 @@ void searchtotalbyname(char *name)
 	printf("没找到对应学生的信息。\r\n");
 }
 
-int promptsearchtotalbyname()
+int promptsearchbyname()
 {
 	char name[MAX_STRLEN] = "";
 	inputstring(name);
-	searchtotalbyname(name);
+	searcbyname(name);
 	return strcmp(name, "q");
 }
 
 
 
-void searchtotalbyno(char no[20])
+void searchbyno(char no[20])
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
@@ -185,12 +185,12 @@ void searchtotalbyno(char no[20])
 	printf("没找到对应学生的信息。\r\n");
 }
 
-void promptsearchtotalbyno()
+void promptsearchbyno()
 {
 	char no[20];
 	printf("请输入要查询的学号:");
 	scanf("%d", &no);
-	searchtotalbyno(no);
+	searchbyno(no);
 }
 
 //输入成绩信息
@@ -298,6 +298,9 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
+
+	//searcbyname("name2");
+	searchbyno("033");
 	//writeallstudents();
 
 	//calcanddisplaytotalandaverage();
@@ -359,7 +362,7 @@ int main()
 			break;
 		}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	printf("\n\n按任意键退出\n");
