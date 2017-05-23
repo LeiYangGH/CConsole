@@ -124,19 +124,7 @@ void readallstudents()
 
 
 
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
-}
+
 
 void searcbyname(char *name)
 {
@@ -150,12 +138,12 @@ void searcbyname(char *name)
 	printf("没找到对应学生的信息。\r\n");
 }
 
-int promptsearchbyname()
+void promptsearchbyname()
 {
-	char name[MAX_STRLEN] = "";
-	inputstring(name);
+	char name[20];
+	printf("请输入姓名:");
+	scanf("%s", name);
 	searcbyname(name);
-	return strcmp(name, "q");
 }
 
 void searchbyno(char no[20])
@@ -174,7 +162,7 @@ void promptsearchbyno()
 {
 	char no[20];
 	printf("请输入要查询的学号:");
-	scanf("%d", &no);
+	scanf("%s", no);
 	searchbyno(no);
 }
 
@@ -224,10 +212,10 @@ void removestudent(char no[20])
 
 void promptremovestudent()
 {
-	//int no;
-	//printf("请输入要删除的学号:");
-	//scanf("%d", &no);
-	//removestudent(no);
+	char no[20];
+	printf("请输入要删除的学号:");
+	scanf("%s", no);
+	removestudent(no);
 }
 
 
@@ -296,7 +284,10 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-	removestudent("03");
+	//removestudent("03");
+	//promptremovestudent();
+	//promptsearchbyname();
+	promptsearchbyno();
 	displayallstudents();
 	//searcbyname("name2");
 	//searchbyno("033");
@@ -356,12 +347,12 @@ int main()
 			break;
 		}
 		getch();
-	}
+}
 	fseek(stdin, 0, SEEK_END);
 #endif
 	printf("\n\n按任意键退出\n");
 	system("pause");
 
 	return 0;
-	}
+}
 
