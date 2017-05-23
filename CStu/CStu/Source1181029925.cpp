@@ -4,22 +4,16 @@
 #include <stdio.h>
 #include <conio.h>
 #define FILE_STU "stu.txt"
-#define FORMATFULL "%d\t%s\t%d\t%d\t%d\t%d\t%d\t%.1f\r\n"
-#define FORMATNET "%d\t%s\t%d\t%d\t%d\t%d\r\n"
-#define MAX_STRLEN 20
-#define QUESTIONS_COUNT 35
-#define STU_MEMBERS_FULL stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c, stu.total, stu.average
-#define STU_MEMBERS_NET stu.no, stu.name,  stu.math, stu.english, stu.chinese, stu.c
 typedef struct student
 {
 	char no[20];
 	char name[20];
 	int age;
-	//char sex;
-	//char birthday[20];
-	//char address[20];
-	//char telephone[20];
-	//char email[20];
+	char sex[5];
+	char birthday[20];
+	char address[20];
+	char telephone[20];
+	char email[20];
 }student;
 
 student allstudents[100];
@@ -31,8 +25,6 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-//char *FILE_STU = "stu.txt";
-student *head;
 
 //字符串转整数
 int toint(char *s)
@@ -41,17 +33,11 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-int tofloat(char *s)
-{
-	char *end;
-	return (float)strtol(s, &end, 10);
-}
-
 void displaystudent(student stu)
 {
-	//printf("%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n", stu.no, stu.name, stu.age, stu.sex,
-	//	stu.birthday, stu.address, stu.telephone, stu.email);
-	printf("%s\t%s\t%d\n", stu.no, stu.name, stu.age);
+	printf("%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\n", stu.no, stu.name, stu.age, stu.sex,
+		stu.birthday, stu.address, stu.telephone, stu.email);
+	//printf("%s\t%s\t%d\n", stu.no, stu.name, stu.age);
 }
 
 int cmpstubyno(const void * a, const void * b)
@@ -90,6 +76,21 @@ student getstudentfromline(char *line)
 			break;
 		case 3:
 			stu.age = toint(part);
+			break;
+		case 4:
+			strcpy(stu.sex, part);
+			break;
+		case 5:
+			strcpy(stu.birthday, part);
+			break;
+		case 6:
+			strcpy(stu.address, part);
+			break;
+		case 7:
+			strcpy(stu.telephone, part);
+			break;
+		case 8:
+			strcpy(stu.email, part);
 			break;
 		default:
 			break;
@@ -210,7 +211,7 @@ void removestudent(char no[20])
 	}
 }
 
-void promptremovestudent()
+void promptremove()
 {
 	char no[20];
 	printf("请输入要删除的学号:");
@@ -235,50 +236,64 @@ void writeallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		fprintf(fp, "%s\t%s\t%d\n", stu.no, stu.name, stu.age);
+		//fprintf(fp, "%s\t%s\t%d\n", stu.no, stu.name, stu.age);
+		fprintf(fp, "%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\r\n", stu.no, stu.name, stu.age, stu.sex,
+			stu.birthday, stu.address, stu.telephone, stu.email);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
 
-void addstudent(char no[20], char name[], int age)
+void addstudent(char no[20], char name[], int age, char sex[5],
+	char birthday[20], char address[20], char telephone[20], char email[20])
 {
 	student stu;
 	strcpy(stu.no, no);
 	strcpy(stu.name, name);
 	stu.age = age;
+	strcpy(stu.sex, sex);
+	strcpy(stu.birthday, birthday);
+	strcpy(stu.address, address);
+	strcpy(stu.telephone, telephone);
+	strcpy(stu.email, email);
 	allstudents[allstudentscount++] = stu;
 }
 
 
 void promptaddstudent()
 {
-	//int no; char name[MAX_STRLEN] = ""; int math; int english; int chinese; int c;
-	//printf("\n请输入学号\n");
-	//scanf("%d", &no);
-	//printf("\n请输入用户名\n");
-	//scanf("%s", name);
-	//printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
-	//scanf("%d%d%d%d", &math, &english, &chinese, &c);
-	//addstudent(no, name, math, english, chinese, c);
-	//printf("完成第%d个入库录入!\r\n", allstudentscount);
+	char no[20];
+	char name[20];
+	int age;
+	char sex[5];
+	char birthday[20];
+	char address[20];
+	char telephone[20];
+	char email[20];
+
+
+	printf("\n请输入学号，姓名，年龄，性别，出生年月，地址，电话，E-mail，空格隔开，回车结束\n");
+	scanf("%s%s%d%s%s%s%s%s", no, name, &age, sex, birthday, address, telephone, email);
+	addstudent(no, name, age, sex, birthday, address, telephone, email);
+	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
 
 int main()
 {
 	int choice = -1;
-
-#if 1
-
 	readallstudents();
-	//addstudent("01", "name1", 1);
-	//addstudent("03", "name3", 3);
-	//addstudent("02", "name2", 2);
-	////printf("\n%d\n", allstudentscount);
-	///*promptaddstudent();
-	//writeallstudents();*/
+
+#if 0
+
+	//addstudent("01", "name1", 1, "F", "b1", "add1", "tel1111", "1dsfsfs@ssss");
+	//addstudent("03", "name3", 3, "F", "b3", "add3", "tel1333", "3dsfsfs@ssss");
+	//addstudent("02", "name2", 2, "M", "b2", "add2", "tel2222", "2ddfdsfs@fsss");
+
+	//displayallstudents();
+	//promptaddstudent();
+
 	///*promptremovestudent();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
@@ -287,8 +302,8 @@ int main()
 	//removestudent("03");
 	//promptremovestudent();
 	//promptsearchbyname();
-	promptsearchbyno();
-	displayallstudents();
+	//promptsearchbyno();
+	//displayallstudents();
 	//searcbyname("name2");
 	//searchbyno("033");
 	//writeallstudents();
@@ -296,59 +311,49 @@ int main()
 #else
 	while (choice != 0)
 	{
-		char *menu = "**********************菜单****************************\n"
-			"按1键：读入学生档案               按6键：学科及格概率\n"
-			"按2键：按照姓名查询               按7键：学生档案排序\n"
-			"按3键：按照学号查询               按8键：保存学生档案\n"
-			"按4键：添加学生档案               按9键 : 查看学生档案\n"
-			"按5键：删除学生档案               按10键：求各科平均分\n"
-			"按0键：退出管理系统";
-		printf("请输入选择数字，并回车\n", menu);
-		printf("%s\n", menu);
-		scanf("%d", &choice);
+		printf("\n\t 学生信息管理系统");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 按学号升序输出所有学生信息");
+		printf("\n\t 2. 添加学生信息");
+		printf("\n\t 3. 按学号查询");
+		printf("\n\t 4. 按姓名查询");
+		printf("\n\t 5. 按学号删除");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
+		choice = getchar();
 		switch (choice)
 		{
-		case 0:
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
 			break;
-		case 1:
-			readallstudents();
+		case '1':
+			printf("\n\n你选择了 1\n");
+			displayallstudents();
 			break;
-		case 2:
-			promptsearchtotalbyname();
-			break;
-		case 3:
-			promptsearchtotalbyno();
-			break;
-		case 4:
+		case '2':
+			printf("\n\n你选择了 2\n");
 			promptaddstudent();
 			break;
-		case 5:
-			promptremovestudent();
+		case '3':
+			printf("\n\n你选择了 3\n");
+			promptsearchbyno();
 			break;
-		case 6:
+		case '4':
+			printf("\n\n你选择了 3\n");
+			promptsearchbyname();
 			break;
-		case 7:
-			sortanddisplay();
-			break;
-		case 8:
-			writeallstudents();
-			break;
-		case 9:
-			sortanddisplay();
-			break;
-		case 10:
-
-
+		case '5':
+			printf("\n\n你选择了 3\n");
+			promptremove();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-		getch();
-}
-	fseek(stdin, 0, SEEK_END);
+	}
 #endif
 	printf("\n\n按任意键退出\n");
 	system("pause");
