@@ -54,8 +54,9 @@ mine map_2[row_2 + 2][col_2 + 2];
 void main()
 {
 	//PlaySound(TEXT("w.wma"), NULL, SND_FILENAME);
-	PlaySound(TEXT("c:\\test\\t.wav"), 
-		NULL, SND_FILENAME | SND_ASYNC);
+	//PlaySound(TEXT("c:\\test\\t.wav"), 
+	//	NULL, SND_FILENAME | SND_ASYNC);
+	PlaySound(TEXT("ForTheWin.wav"), NULL, SND_FILENAME | SND_ASYNC);
 
 	printf("欢迎体验第九组出品的c语言扫雷小游戏\n请选择难度 请输入1或2或3\n级别 1：easy 2：hard 3：crazy mode\n");
 	int m;
