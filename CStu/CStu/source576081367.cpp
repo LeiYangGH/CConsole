@@ -10,6 +10,7 @@
 #define MAX_STRLEN 20
 #define STUDENTS_COUNT 6
 #define COURSES_COUNT 5
+#define GRADES_COUNT 5
 
 typedef struct student
 {
@@ -28,6 +29,7 @@ typedef struct calcstudent
 	int lowest;//总分
 	int total;
 	float average;//平均
+
 }calcstudent;
 calcstudent allcalcstudents[6];//所有学生
 
@@ -115,7 +117,7 @@ void displayallcalcstudents()
 	printf("\r\n--------------------------------------------\r\n");
 }
 
-void calchighlowaveanddisplay()
+void calchighlowave()
 {
 	int i, t, j, h, l, sum;
 	float ave;
@@ -135,6 +137,11 @@ void calchighlowaveanddisplay()
 		allcalcstudents[i].total = sum;
 		allcalcstudents[i].average = ave;
 	}
+}
+
+void calchighlowaveanddisplay()
+{
+	calchighlowave();
 	displayallcalcstudents();
 }
 
@@ -264,6 +271,30 @@ void promptsearchbyname()
 	searcbyname(name);
 }
 
+void displaystudentsgrade()
+{
+	int i, gradeindex;
+	float ave;
+	calchighlowave();
+
+	char *grades[GRADES_COUNT] = { "不及格(0～59)","及格(60～69)", "中等(70～79)", "良好(80～89)", "优秀(90～100)", };
+	for (i = 0; i < allstudentscount; i++)
+	{
+		ave = allstudents[i].average;
+		if (ave < 60)
+			gradeindex = 0;
+		else if (ave >= 60 && ave <= 69)
+			gradeindex = 1;
+		else if (ave >= 70 && ave <= 79)
+			gradeindex = 2;
+		else if (ave >= 80 && ave <= 89)
+			gradeindex = 3;
+		else if (ave >= 90)
+			gradeindex = 4;
+		printf("%s\t%.1f\t%s\n", allstudents[i].name, ave, grades[gradeindex]);
+	}
+}
+
 int main()
 {
 #if 1
@@ -277,7 +308,8 @@ int main()
 	//calchighlowaveanddisplay();
 	//calccoursesanddisplay();
 	//searcbyname("n1");
-	displayonecoursesort();
+	//displayonecoursesort();
+	displaystudentsgrade();
 	system("pause");
 #endif
 	int choice = -1;
