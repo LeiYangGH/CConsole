@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include <iostream> 
 #include <windows.h>
-#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "winmm.lib")//这句也是为了播放
 //#include<bits/stdc++.h>
 #define col_1 10	
 #define row_1 10
@@ -53,11 +53,8 @@ mine map_2[row_2 + 2][col_2 + 2];
 
 void main()
 {
-	//PlaySound(TEXT("w.wma"), NULL, SND_FILENAME);
-	//PlaySound(TEXT("c:\\test\\t.wav"), 
-	//	NULL, SND_FILENAME | SND_ASYNC);
-	PlaySound(TEXT("ForTheWin.wav"), NULL, 
-		SND_FILENAME | SND_ASYNC|SND_LOOP);
+	//系统api
+	PlaySound(TEXT("ForTheWin.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 
 	printf("欢迎体验第九组出品的c语言扫雷小游戏\n请选择难度 请输入1或2或3\n级别 1：easy 2：hard 3：crazy mode\n");
 	int m;
@@ -342,7 +339,7 @@ void print_1()
 	for (i = 0; i < col_1; i++)
 		printf(" %c ", i + 97);
 	printf("\n");
-	for (i = 1; i<col_1 + 1; i++)
+	for (i = 1; i < col_1 + 1; i++)
 	{
 		printf("%2d ", i);
 		for (j = 1; j < row_1 + 1; j++)
@@ -503,7 +500,7 @@ void print_2()
 	for (i = 0; i < col_2; i++)
 		printf(" %c ", i + 97);
 	printf("\n");
-	for (i = 1; i<col_2 + 1; i++)
+	for (i = 1; i < col_2 + 1; i++)
 	{
 		printf("%2d ", i);
 		for (j = 1; j < row_2 + 1; j++)

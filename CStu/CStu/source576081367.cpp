@@ -8,7 +8,7 @@
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
 #define MAX_STRLEN 20
-#define STUDENTS_COUNT 5
+#define STUDENTS_COUNT 6
 #define COURSES_COUNT 5
 
 typedef struct student
@@ -33,8 +33,10 @@ calcstudent allcalcstudents[6];//所有学生
 
 typedef struct course//课程
 {
-	int oldindex;//课程在input.txt里的序号
-	float average;//平均分
+	int highest;//总分
+	int lowest;//总分
+	int total;
+	float average;//平均
 }course;
 course allcourses[COURSES_COUNT];//5门课程
 
@@ -131,17 +133,17 @@ void displayonecourseorder()
 
 
 //显示所有科目平均分排序
-void displayallcoursesaveorder()
+void displayallcourses()
 {
 	int i;
 	printf("所有科目平均分排序如下\r\n");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < COURSES_COUNT; i++)
 	{
-		printf("\r\n");
+
 		course cou = allcourses[i];
-		printf("第%d科\t%.1f\n", cou.oldindex + 1,
-			cou.average);
+		printf("%d\t%d\t%.1f\n",
+			cou.highest, cou.lowest, cou.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
@@ -235,21 +237,44 @@ void sortonecourse()
 }
 
 //计算每个科目的平均分
-void calceachcourseave()
+void calccoursesanddisplay()
 {
-	int i, j;
-	float sum;
+	int i, t, j, h, l, sum;
+	float ave;
 	for (j = 0; j < COURSES_COUNT; j++)
 	{
-		sum = 0;
-		for (i = 0; i < allstudentscount; i++)
+		h = 0, l = 100, sum = 0;
+
+		for (i = 0; i < STUDENTS_COUNT; i++)
 		{
-			sum += allstudents[i].score[j];
+			t = allstudents[i].score[j];
+			h = h < t ? t : h;
+			l = l > t ? t : l;
+			sum += t;
 		}
-		allcourses[j].oldindex = j;
-		allcourses[j].average = sum / (float)COURSES_COUNT;
+		ave = sum / (float)STUDENTS_COUNT;
+		allcourses[j].highest = h;
+		allcourses[j].lowest = l;
+		allcourses[j].total = sum;
+		allcourses[j].average = ave;
 	}
+	displayallcourses();
 }
+//void calceachcourseave()
+//{
+//	int i, j;
+//	float sum;
+//	for (j = 0; j < COURSES_COUNT; j++)
+//	{
+//		sum = 0;
+//		for (i = 0; i < allstudentscount; i++)
+//		{
+//			sum += allstudents[i].score[j];
+//		}
+//		allcourses[j].oldindex = j;
+//		allcourses[j].average = sum / (float)COURSES_COUNT;
+//	}
+//}
 
 //科目平均分排序
 int cmpcoursesavefunc(const void * a, const void * b)
@@ -340,6 +365,7 @@ int main()
 	addstudent("06", "n6", 61, 62, 63, 64, 65);
 	displayallstudents();
 	calchighlowaveanddisplay();
+	calccoursesanddisplay();
 	system("pause");
 #endif
 	int choice = -1;
@@ -381,10 +407,7 @@ int main()
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			calceachcourseave();
-			promptaskascending();
-			sortcoursesave();
-			displayallcoursesaveorder();
+			 
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
