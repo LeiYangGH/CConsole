@@ -8,6 +8,7 @@
 #include <stdio.h>
 #define FILE_INPUT "input.txt"
 #define MAX_STRLEN 20
+#define STUDENTS_COUNT 5
 #define COURSES_COUNT 5
 
 typedef struct student
@@ -17,8 +18,18 @@ typedef struct student
 	int total;//总分
 	float average;//平均
 }student;
-student allstudents[100];//所有学生
+student allstudents[6];//所有学生
 int allstudentscount = 0;//学生数量
+
+typedef struct calcstudent
+{
+	int highest;//总分
+	int lowest;//总分
+	int total;
+	float average;//平均
+}calcstudent;
+calcstudent allcalcstudents[6];//所有学生
+
 
 typedef struct course//课程
 {
@@ -39,7 +50,6 @@ int toint(char *s)
 //显示一个学生成绩
 void displaystudent(student stu)
 {
-	printf("\r\n");
 	printf("%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n", stu.name,
 		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
 		stu.average);
@@ -57,6 +67,52 @@ void displayallstudents()
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
+//1
+//显示一个学生成绩
+void displaycalcstudent(calcstudent stu)
+{
+	printf("%d\t%d\t%.1f\n",
+		stu.highest, stu.lowest, stu.average);
+}
+
+//显示所有学生成绩
+void displayallcalcstudents()
+{
+	int i;
+	printf("所有%d位同学分数如下\r\n", STUDENTS_COUNT);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < STUDENTS_COUNT; i++)
+	{
+		displaycalcstudent(allcalcstudents[i]);
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
+
+void calchighlowaveanddisplay()
+{
+	int i, t, j, h, l, sum;
+	float ave;
+	for (i = 0; i < STUDENTS_COUNT; i++)
+	{
+		h = 0, l = 100, sum = 0;
+		for (j = 0; j < COURSES_COUNT; j++)
+		{
+			t = allstudents[i].score[j];
+			h = h < t ? t : h;
+			l = l > t ? t : l;
+			sum += t;
+		}
+		ave = sum / (float)COURSES_COUNT;
+		allcalcstudents[i].highest = h;
+		allcalcstudents[i].lowest = l;
+		allcalcstudents[i].total = sum;
+		allcalcstudents[i].average = ave;
+	}
+	displayallcalcstudents();
+}
+//2
+
+
 //显示一门课程排序
 void displayonecourseorder()
 {
@@ -275,6 +331,17 @@ void promptaddstudent()
 
 int main()
 {
+#if 1
+	addstudent("01", "n1", 11, 12, 13, 14, 15);
+	addstudent("02", "n2", 21, 22, 23, 24, 25);
+	addstudent("03", "n3", 31, 32, 33, 34, 35);
+	addstudent("04", "n4", 41, 42, 43, 44, 45);
+	addstudent("05", "n5", 51, 52, 53, 54, 55);
+	addstudent("06", "n6", 61, 62, 63, 64, 65);
+	displayallstudents();
+	calchighlowaveanddisplay();
+	system("pause");
+#endif
 	int choice = -1;
 	printf("\n开始读文件...\n");
 	readallstudents();
