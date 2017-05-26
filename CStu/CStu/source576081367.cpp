@@ -13,6 +13,7 @@
 
 typedef struct student
 {
+	char no[MAX_STRLEN];// 
 	char name[MAX_STRLEN];//姓名
 	int score[COURSES_COUNT];//分数
 	int total;//总分
@@ -77,7 +78,7 @@ int cmpstubyonecourse(const void * a, const void * b)
 //1
 void displaystudentonecourse(student stu, int courseid)
 {
-	printf("%s\t%d\n", stu.name, stu.score[courseid]);
+	printf("%s\t%s\t%d\n", stu.no, stu.name, stu.score[courseid]);
 }
 
 //显示所有学生成绩
@@ -218,6 +219,7 @@ void calccoursesanddisplay()
 void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
 {
 	student stu;
+	strcpy(stu.no, no);
 	strcpy(stu.name, name);
 	stu.score[0] = s0;
 	stu.score[1] = s1;
