@@ -41,8 +41,7 @@ typedef struct course//课程
 course allcourses[COURSES_COUNT];//5门课程
 
 
-int ascending = 1;//升序还是降序
-int cmpcourseindex;//排序的课程下标（0～4）
+
 				   //字符串转整数
 int toint(char *s)
 {
@@ -69,7 +68,32 @@ void displayallstudents()
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
+
+//科目平均分排序
+int cmpstubyonecourse(const void * a, const void * b)
+{
+	return (int)(((student*)a)->score[0] - ((student*)b)->score[0]);
+}
 //1
+void displaystudentonecourse(student stu, int courseid)
+{
+	printf("%s\t%d\n", stu.name, stu.score[courseid]);
+}
+
+//显示所有学生成绩
+void displayonecoursesort()
+{
+	int i;
+	printf("所有%d位同学分数如下\r\n", allstudentscount);
+	qsort(allstudents, STUDENTS_COUNT, sizeof(student), cmpstubyonecourse);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allstudentscount; i++)
+	{
+		displaystudentonecourse(allstudents[i], 0);
+	}
+	printf("\r\n--------------------------------------------\r\n");
+}
+//2
 //显示一个学生成绩
 void displaycalcstudent(calcstudent stu)
 {
@@ -112,24 +136,9 @@ void calchighlowaveanddisplay()
 	}
 	displayallcalcstudents();
 }
-//2
 
 
-//显示一门课程排序
-void displayonecourseorder()
-{
-	int i;
-	printf("第%d科目分数如下\r\n", cmpcourseindex + 1);
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		printf("\r\n");
-		student stu = allstudents[i];
-		printf("%s\t%d\n", stu.name,
-			stu.score[cmpcourseindex]);
-	}
-	printf("\r\n--------------------------------------------\r\n");
-}
+
 
 
 //显示所有科目平均分排序
@@ -147,7 +156,7 @@ void displayallcourses()
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
- 
+
 //计算总分和平均分
 void calctotalandave()
 {
@@ -163,26 +172,9 @@ void calctotalandave()
 		allstudents[i].average = allstudents[i].total / (float)COURSES_COUNT;
 	}
 }
- 
-//下面两个函数是快速排序qsort要求的格式，按总分排学生
-int cmptotalfunc(const void * a, const void * b)
-{
-	return (((student*)a)->total - ((student*)b)->total)*ascending;
-}
-void sorttotal()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
-}
 
-//按某科目排所有成绩
-int cmponecoursefunc(const void * a, const void * b)
-{
-	return (((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex])*ascending;
-}
-void sortonecourse()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
-}
+
+
 
 //计算每个科目的平均分
 void calccoursesanddisplay()
@@ -208,27 +200,19 @@ void calccoursesanddisplay()
 	}
 	displayallcourses();
 }
- 
-
-//科目平均分排序
-int cmpcoursesavefunc(const void * a, const void * b)
-{
-	return (int)(((course*)a)->average - ((course*)b)->average)*ascending;
-}
-void sortcoursesave()
-{
-	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
-}
 
 
-//提示输入要排序的科目
-void promptaskcmpcourseindex()
-{
-	int courseid;
-	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
-	scanf("%d", &courseid);
-	cmpcourseindex = courseid - 1;
-}
+
+
+
+////提示输入要排序的科目
+//void promptaskcmpcourseindex()
+//{
+//	int courseid;
+//	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
+//	scanf("%d", &courseid);
+// 
+//}
 
 
 void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
@@ -281,20 +265,21 @@ void promptsearchbyname()
 int main()
 {
 #if 1
+	addstudent("04", "n4", 41, 42, 43, 44, 45);
 	addstudent("01", "n1", 11, 12, 13, 14, 15);
 	addstudent("02", "n2", 21, 22, 23, 24, 25);
-	addstudent("03", "n3", 31, 32, 33, 34, 35);
-	addstudent("04", "n4", 41, 42, 43, 44, 45);
-	addstudent("05", "n5", 51, 52, 53, 54, 55);
 	addstudent("06", "n6", 61, 62, 63, 64, 65);
+	addstudent("03", "n3", 31, 32, 33, 34, 35);
+	addstudent("05", "n5", 51, 52, 53, 54, 55);
 	displayallstudents();
 	//calchighlowaveanddisplay();
 	//calccoursesanddisplay();
-	searcbyname("n1");
+	//searcbyname("n1");
+	displayonecoursesort();
 	system("pause");
 #endif
 	int choice = -1;
- 
+
 
 	while (choice != 0)
 	{
@@ -317,15 +302,15 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
- 
+
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
- 
+
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			 
+
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
