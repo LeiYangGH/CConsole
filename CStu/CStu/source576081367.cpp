@@ -147,35 +147,7 @@ void displayallcourses()
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
-//从一行拆分构造出一个学生
-student getstudentfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	student stu;
-	part = strtok(line, "\t");//通过\t符号拆分不同分数
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			strcpy(stu.name, part);
-			break;
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-			stu.score[index - 2] = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-	return stu;
-}
-
+ 
 //计算总分和平均分
 void calctotalandave()
 {
@@ -191,31 +163,7 @@ void calctotalandave()
 		allstudents[i].average = allstudents[i].total / (float)COURSES_COUNT;
 	}
 }
-
-//读文件到学生数组
-void readallstudents()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_INPUT, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_INPUT);
-		getchar();
-		exit(1);
-	}
-	allstudentscount = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		++allstudentscount;
-		allstudents[allstudentscount - 1] = getstudentfromline(line);
-	}
-	calctotalandave();
-}
-
-
+ 
 //下面两个函数是快速排序qsort要求的格式，按总分排学生
 int cmptotalfunc(const void * a, const void * b)
 {
@@ -260,21 +208,7 @@ void calccoursesanddisplay()
 	}
 	displayallcourses();
 }
-//void calceachcourseave()
-//{
-//	int i, j;
-//	float sum;
-//	for (j = 0; j < COURSES_COUNT; j++)
-//	{
-//		sum = 0;
-//		for (i = 0; i < allstudentscount; i++)
-//		{
-//			sum += allstudents[i].score[j];
-//		}
-//		allcourses[j].oldindex = j;
-//		allcourses[j].average = sum / (float)COURSES_COUNT;
-//	}
-//}
+ 
 
 //科目平均分排序
 int cmpcoursesavefunc(const void * a, const void * b)
@@ -286,14 +220,6 @@ void sortcoursesave()
 	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
 }
 
-//提示选择升序还是降序
-void promptaskascending()
-{
-	int asc;
-	printf("\n请输入升序(1)还是降序(-1)，以回车结束：");
-	scanf("%d", &asc);
-	ascending = asc;
-}
 
 //提示输入要排序的科目
 void promptaskcmpcourseindex()
@@ -304,28 +230,6 @@ void promptaskcmpcourseindex()
 	cmpcourseindex = courseid - 1;
 }
 
-void writeallstudents()
-{
-	int i;
-	student stu;
-	FILE *fp = fopen(FILE_INPUT, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_INPUT);
-		getchar();
-		exit(1);
-	}
-
-
-	for (i = 0; i < allstudentscount; i++)
-	{
-		stu = allstudents[i];
-		fprintf(fp, "%s\t%d\t%d\t%d\t%d\t%d\r\n", stu.name,
-			stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4]);
-	}
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
 
 void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
 {
@@ -338,7 +242,6 @@ void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
 	stu.score[4] = s4;
 	allstudents[allstudentscount++] = stu;
 	calctotalandave();
-	writeallstudents();
 }
 
 void promptaddstudent()
@@ -354,6 +257,27 @@ void promptaddstudent()
 	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
 }
 
+//查找姓名
+void searcbyname(char *name)
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+		if (strcmp(name, allstudents[i].name) == 0)
+		{
+			displaystudent(allstudents[i]);
+			return;
+		}
+	printf("没找到对应学生的信息。\r\n");
+}
+//用户输入并查找姓名
+void promptsearchbyname()
+{
+	char name[20];
+	printf("请输入姓名:");
+	scanf("%s", name);
+	searcbyname(name);
+}
+
 int main()
 {
 #if 1
@@ -364,14 +288,13 @@ int main()
 	addstudent("05", "n5", 51, 52, 53, 54, 55);
 	addstudent("06", "n6", 61, 62, 63, 64, 65);
 	displayallstudents();
-	calchighlowaveanddisplay();
-	calccoursesanddisplay();
+	//calchighlowaveanddisplay();
+	//calccoursesanddisplay();
+	searcbyname("n1");
 	system("pause");
 #endif
 	int choice = -1;
-	printf("\n开始读文件...\n");
-	readallstudents();
-	printf("\n读文件结束！\n");
+ 
 
 	while (choice != 0)
 	{
@@ -394,16 +317,11 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaskascending();
-			sorttotal();
-			displayallstudents();
+ 
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptaskcmpcourseindex();
-			promptaskascending();
-			sortonecourse();
-			displayonecourseorder();
+ 
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
