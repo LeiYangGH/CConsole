@@ -1,8 +1,3 @@
-// CProj.cpp : Defines the entry point for the console application.
-//
-
-//#include "stdafx.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -13,7 +8,7 @@
 
 typedef struct student
 {
-	char no[MAX_STRLEN];// 
+	char no[MAX_STRLEN];// 学号
 	char name[MAX_STRLEN];//姓名
 	int score[COURSES_COUNT];//分数
 	int total;//总分
@@ -24,9 +19,9 @@ int allstudentscount = 0;//学生数量
 
 typedef struct calcstudent
 {
-	int highest;//总分
-	int lowest;//总分
-	int total;
+	int highest;//最高
+	int lowest;//最低
+	int total;//总分
 	float average;//平均
 
 }calcstudent;
@@ -35,10 +30,10 @@ calcstudent allcalcstudents[6];//所有学生
 
 typedef struct course//课程
 {
-	int highest;//总分
-	int lowest;//总分
+	int highest;
+	int lowest;
 	int total;
-	float average;//平均
+	float average;
 }course;
 course allcourses[COURSES_COUNT];//5门课程
 char *coursenames[MAX_STRLEN] = { "语文","数学", "英文", "体育", "艺术" };
@@ -136,10 +131,6 @@ void calchighlowaveanddisplay()
 	displayallcalcstudents();
 }
 
-
-
-
-
 //显示所有科目平均分排序
 void displayallcourses()
 {
@@ -172,9 +163,6 @@ void calctotalandave()
 	}
 }
 
-
-
-
 //计算每个科目的平均分
 void calccoursesanddisplay()
 {
@@ -199,20 +187,6 @@ void calccoursesanddisplay()
 	}
 	displayallcourses();
 }
-
-
-
-
-
-////提示输入要排序的科目
-//void promptaskcmpcourseindex()
-//{
-//	int courseid;
-//	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
-//	scanf("%d", &courseid);
-// 
-//}
-
 
 void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
 {
