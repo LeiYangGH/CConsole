@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_INPUT "input.txt"
 #define MAX_STRLEN 20
 #define STUDENTS_COUNT 6
 #define COURSES_COUNT 5
@@ -42,21 +41,13 @@ typedef struct course//课程
 	float average;//平均
 }course;
 course allcourses[COURSES_COUNT];//5门课程
+char *coursenames[MAX_STRLEN] = { "语文","数学", "英文", "体育", "艺术" };
 
-
-
-				   //字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
 //显示一个学生成绩
 void displaystudent(student stu)
 {
-	printf("%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n", stu.name,
-		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
-		stu.average);
+	printf("%s\t%s\t%d\t%d\t%d\t%d\t%d\n", stu.no, stu.name,
+		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4]);
 }
 
 //显示所有学生成绩
@@ -64,6 +55,7 @@ void displayallstudents()
 {
 	int i;
 	printf("所有%d位同学分数如下\r\n", allstudentscount);
+	printf("%s\t%s\t%s\t%s\t%s\n", "语文", "数学", "英文", "体育", "艺术");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
@@ -87,7 +79,8 @@ void displaystudentonecourse(student stu, int courseid)
 void displayonecoursesort()
 {
 	int i;
-	printf("所有%d位同学分数如下\r\n", allstudentscount);
+	printf("\n\n选取第一科成绩从小到大排序，输出学号，姓名，成绩\r\n", allstudentscount);
+	printf("%s\t%s\t%d\n", "学号", "姓名", "成绩");
 	qsort(allstudents, STUDENTS_COUNT, sizeof(student), cmpstubyonecourse);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
@@ -97,22 +90,20 @@ void displayonecoursesort()
 	printf("\r\n--------------------------------------------\r\n");
 }
 //2
-//显示一个学生成绩
-void displaycalcstudent(calcstudent stu)
-{
-	printf("%d\t%d\t%.1f\n",
-		stu.highest, stu.lowest, stu.average);
-}
+
 
 //显示所有学生成绩
 void displayallcalcstudents()
 {
 	int i;
-	printf("所有%d位同学分数如下\r\n", STUDENTS_COUNT);
+	printf("计算每个人的最高成绩，最低成绩，平均成绩\r\n");
+	printf("%s\t%s\t%s\t%s\n", "姓名", "最高", "最低", "平均");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < STUDENTS_COUNT; i++)
 	{
-		displaycalcstudent(allcalcstudents[i]);
+		calcstudent stu = allcalcstudents[i];
+		printf("%s\t%d\t%d\t%.1f\n", allstudents[i].name,
+			stu.highest, stu.lowest, stu.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
 }
@@ -153,13 +144,13 @@ void calchighlowaveanddisplay()
 void displayallcourses()
 {
 	int i;
-	printf("所有科目平均分排序如下\r\n");
+	printf("计算每科成绩中的最高成绩，最低成绩，平均成绩\r\n");
+	printf("%s\t%s\t%s\t%s\n", "科目", "最高", "最低", "平均");
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < COURSES_COUNT; i++)
 	{
-
 		course cou = allcourses[i];
-		printf("%d\t%d\t%.1f\n",
+		printf("%s\t%d\t%d\t%.1f\n", coursenames[i],
 			cou.highest, cou.lowest, cou.average);
 	}
 	printf("\r\n--------------------------------------------\r\n");
@@ -242,8 +233,8 @@ void promptaddstudent()
 	char no[MAX_STRLEN];
 	char name[MAX_STRLEN] = "";
 	int s1, s2, s3, s4, s5;
-	printf("\n请输入学生姓名\n");
-	scanf("%s", name);
+	printf("\n请输入学生学号、姓名，空格隔开\n");
+	scanf("%s%s", no, name);
 	printf("\n请输入5科成绩（整数），空格隔开\n");
 	scanf("%d%d%d%d%d", &s1, &s2, &s3, &s4, &s5);
 	addstudent(no, name, s1, s2, s3, s4, s5);
@@ -268,6 +259,7 @@ void promptsearchbyname()
 	char name[20];
 	printf("请输入姓名:");
 	scanf("%s", name);
+	printf("%s\t%s\t%s\t%s\t%s\n", "语文", "数学", "英文", "体育", "艺术");
 	searcbyname(name);
 }
 
@@ -278,6 +270,8 @@ void displaystudentsgrade()
 	calchighlowave();
 
 	char *grades[GRADES_COUNT] = { "不及格(0～59)","及格(60～69)", "中等(70～79)", "良好(80～89)", "优秀(90～100)", };
+	printf("按平均成绩计算每人的优，良，中，及格，不及格\r\n");
+	printf("%s\t%s\t%s\n", "姓名", "平均分", "等级");
 	for (i = 0; i < allstudentscount; i++)
 	{
 		ave = allstudents[i].average;
@@ -297,65 +291,35 @@ void displaystudentsgrade()
 
 int main()
 {
-#if 1
+	int choice = -1;
+
 	addstudent("04", "n4", 41, 42, 43, 44, 45);
 	addstudent("01", "n1", 11, 12, 13, 14, 15);
 	addstudent("02", "n2", 21, 22, 23, 24, 25);
 	addstudent("06", "n6", 61, 62, 63, 64, 65);
 	addstudent("03", "n3", 31, 32, 33, 34, 35);
+	//addstudent("05", "n5", 51, 52, 53, 54, 55);
+
+#if 0
 	addstudent("05", "n5", 51, 52, 53, 54, 55);
-	displayallstudents();
+
+	//displayallstudents();
 	//calchighlowaveanddisplay();
 	//calccoursesanddisplay();
 	//searcbyname("n1");
 	//displayonecoursesort();
-	displaystudentsgrade();
-	system("pause");
+	//displaystudentsgrade();
+	//system("pause");
 #endif
-	int choice = -1;
-
-
-	while (choice != 0)
-	{
-		printf("\n\t 学生成绩读入统计");
-		printf("\n\t 0. 退出");
-		printf("\n\t 1. 按学生总分升降序输出");
-		printf("\n\t 2. 按某门课程分数升降序输出");
-		printf("\n\t 3. 按所有课程平均分升降序输出");
-		printf("\n\t 4. 添加学生成绩");
-		printf("\n\n  请选择: ");
-		fseek(stdin, 0, SEEK_END);
-		choice = getchar();
-		switch (choice)
-		{
-		case '0':
-			printf("\n\n 你选择了退出。");
-			fseek(stdin, 0, SEEK_END);
-			system("pause");
-			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptaddstudent();
-			break;
-		default:
-			printf("\n\n输入有误，请重选\n");
-			break;
-		}
-	}
-
+	printf("已自动添加5名学生成绩，请再添加1名学生成绩（为了方便测试，交作业的时候可以修改代码为全部重新输入）\n");
+	promptaddstudent();
+	displayallstudents();
+	calchighlowaveanddisplay();
+	calccoursesanddisplay();
+	displaystudentsgrade();
+	displayonecoursesort();
+	printf("输入（用scanf）查询每个人各项成绩信息\n");
+	promptsearchbyname();
 	system("pause");
 	return 0;
 }
