@@ -15,21 +15,16 @@ typedef struct student
 	int total;
 }student;
 
-//char *coursenames[3] = { "语文","数学", "英语" };
 student allstudents[100];
 int allstudentscount = 0;
 
-float averagechinese;
-float averagemath;
-float averageenglish;
+float averagechinese, averagemath, averageenglish;
 
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
 
-//char *FILE_STU = "stu.txt";
-student *head;
 
 //字符串转整数
 int toint(char *s)
@@ -37,7 +32,6 @@ int toint(char *s)
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
-
 
 
 void displaystudent(student stu)
@@ -82,15 +76,6 @@ student getstudentfromline(char *line)
 		case 5:
 			stu.chinese = toint(part);
 			break;
-			/*case 6:
-				stu.c = toint(part);
-				break;
-			case 7:
-				stu.total = toint(part);
-				break;
-			case 8:
-				stu.average = tofloat(part);
-				break;*/
 		default:
 			break;
 		}
@@ -125,7 +110,7 @@ int cmpfunc(const void * a, const void * b)
 {
 	return ((student*)a)->total - ((student*)b)->total;
 }
-void sorttotal()
+void sortstudentsbytotal()
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
@@ -138,56 +123,12 @@ void sorttotal()
 void sortanddisplay()
 {
 	int i;
-	sorttotal();
-	printf("排序后如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		displaystudent(allstudents[i]);
-	}
-	printf("--------------------------------------------\r\n");
+	sortstudentsbytotal();
+	printf("按每个学生各科平均成绩排序后如下\r\n");
+	displayallstudents();
 }
 
-
-
-
-void inputstring(char str[])
-{
-	int len = -1;
-	char input[50] = "";
-	while (len < 1 || len > MAX_STRLEN)
-	{
-		printf("请输入姓名:");
-		fseek(stdin, 0, SEEK_END);
-		scanf("%s", input);
-		len = strlen(input);
-	}
-	strcpy(str, input);
-}
-
-
-//输入成绩信息
-void inputname(char str[])
-{
-	printf("请输入姓名(2-45个字符)，不能带空格、Tab或回车符:");
-	scanf("%s", str);
-	printf("您输入的姓名为为 %s \r\n", str);
-}
-
-int inputscore()
-{
-	int n = -1;
-	while (n < 1 || n > 100)
-	{
-		printf("请输入分数1～100:");
-		scanf("%d", &n);
-	}
-	return n;
-}
-
-
-
-int getstudentidexbyid(char no[50])
+int getstudentidexbyno(char no[50])
 {
 	int i;
 	for (i = 0; i < allstudentscount; i++)
@@ -201,7 +142,7 @@ int getstudentidexbyid(char no[50])
 void editstudent(char no[50])
 {
 	int i;
-	i = getstudentidexbyid(no);
+	i = getstudentidexbyno(no);
 	if (i >= 0)
 	{
 		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
@@ -223,8 +164,6 @@ void prompteditstudent()
 	editstudent(no);
 }
 
-
-
 void writeallstudents()
 {
 	int i;
@@ -236,8 +175,6 @@ void writeallstudents()
 		getchar();
 		exit(1);
 	}
-
-
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
@@ -246,7 +183,6 @@ void writeallstudents()
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
-
 
 void addstudent(char no[50], char name[], int chinese, int math, int english)
 {
@@ -451,7 +387,7 @@ int main()
 		printf("\n\t    2）显示每门课程的平均成绩");
 		printf("\n\t    3）显示超过某门课程平均成绩的学生人数");
 		printf("\n\t g、退出系统\n\n");
-		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
+		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
