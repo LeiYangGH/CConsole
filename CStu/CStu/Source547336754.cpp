@@ -17,7 +17,6 @@ typedef struct student
 }student;
 
 student allstudents[100];
-student sortstudents[100];
 int allstudentscount = 0;
 
 int streq(char *s1, char *s2)
@@ -127,9 +126,9 @@ void sorttotal()
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 	{
-		sortstudents[i] = allstudents[i];
+		allstudents[i].total = allstudents[i].chinese + allstudents[i].math + allstudents[i].english;
 	}
-	qsort(sortstudents, allstudentscount, sizeof(student), cmpfunc);
+	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
 }
 
 void sortanddisplay()
@@ -140,23 +139,13 @@ void sortanddisplay()
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
-		displaystudent(sortstudents[i]);
+		displaystudent(allstudents[i]);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
 
 
-
-
-float ave()
-{
-	int i;
-	float sum = 0;
-	for (i = 0; i < allstudentscount; i++)
-		sum += allstudents[i].total;
-	return sum / (float)allstudentscount;
-}
 
 void inputstring(char str[])
 {
@@ -226,17 +215,6 @@ void promptremovestudent()
 }
 
 
-int login()
-{
-	char name[50] = "";
-	char pwd[50] = "";
-	printf("\n请输入用户名\n");
-	scanf("%s", name);
-	printf("\n请输入密码\n");
-	scanf("%s", pwd);
-	return streq(name, "username")
-		&& streq(pwd, "password");
-}
 
 void writeallstudents()
 {
@@ -260,15 +238,6 @@ void writeallstudents()
 	printf("已保存记录到文件。");
 }
 
-int calctotal(int math, int english, int chinese, int c)
-{
-	return math + english + chinese + c;
-}
-
-float calcave(int total)
-{
-	return total / 4.0f;
-}
 
 void addstudent(char no[50], char name[], int math, int english, int chinese)
 {
@@ -322,7 +291,7 @@ int main()
 
 	displayallstudents();
 	//calcanddisplaytotalandaverage();
-	//sortanddisplay();
+	sortanddisplay();
 	//calcanddisplayallsubjects();
 
 	//countbygrades();
