@@ -13,11 +13,15 @@ typedef struct student
 	int math;
 	int english;
 	int total;
-	float average;
 }student;
+
 //char *coursenames[3] = { "语文","数学", "英语" };
 student allstudents[100];
 int allstudentscount = 0;
+
+float averagechinese;
+float averagemath;
+float averageenglish;
 
 int streq(char *s1, char *s2)
 {
@@ -317,6 +321,39 @@ void calcanddisplaycoursehighest()
 	printf("英语最高分:%d\t学生:%s\n", h, allstudents[index].name);
 }
 
+void calccoursesaverages()
+{
+	int i, sum;
+	sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		sum += allstudents[i].chinese;
+	}
+	averagechinese = sum / (float)allstudentscount;
+
+	sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		sum += allstudents[i].math;
+	}
+	averagemath = sum / (float)allstudentscount;
+
+	sum = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		sum += allstudents[i].english;
+	}
+	averageenglish = sum / (float)allstudentscount;
+}
+
+void calccoursesaveragesanddisplay()
+{
+	calccoursesaverages();
+	printf("语文平均分:%.1f\n", averagechinese);
+	printf("数学平均分:%.1f\n", averagemath);
+	printf("英语平均分:%.1f\n", averageenglish);
+
+}
 
 int main()
 {
@@ -327,7 +364,7 @@ int main()
 
 	addstudent("04", "n4", 41, 92, 43);
 	addstudent("01", "n1", 11, 12, 13);
-	addstudent("02", "n2", 21, 22, 93);
+	addstudent("02", "n2", 21, 22, 99);
 	addstudent("05", "n5", 51, 52, 53);
 	addstudent("06", "n6", 61, 62, 63);
 	addstudent("03", "n3", 31, 32, 33);
@@ -341,7 +378,8 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-	calcanddisplaycoursehighest();
+	//calcanddisplaycoursehighest();
+	calccoursesaveragesanddisplay();
 	system("pause");
 
 #endif
