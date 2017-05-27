@@ -249,19 +249,16 @@ void writeallstudents()
 }
 
 
-void addstudent(char no[50], char name[], int math, int english, int chinese)
+void addstudent(char no[50], char name[], int chinese, int math, int english)
 {
 	student stu;
 	strcpy(stu.no, no);
 	strcpy(stu.name, name);
+	stu.chinese = chinese;
 	stu.math = math;
 	stu.english = english;
-	stu.chinese = chinese;
 	allstudents[allstudentscount++] = stu;
 }
-
-
-
 
 void promptaddstudent()
 {
@@ -352,7 +349,35 @@ void calccoursesaveragesanddisplay()
 	printf("语文平均分:%.1f\n", averagechinese);
 	printf("数学平均分:%.1f\n", averagemath);
 	printf("英语平均分:%.1f\n", averageenglish);
+}
 
+void calccoursesaveragesbelowcountanddisplay()
+{
+	int i, c;
+	calccoursesaverages();
+	c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].chinese > averagechinese)
+			c++;
+	}
+	printf("超过语文平均成绩的学生人数:%d\n", c);
+
+	c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].math > averagemath)
+			c++;
+	}
+	printf("超过数学平均成绩的学生人数:%d\n", c);
+
+	c = 0;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].english > averageenglish)
+			c++;
+	}
+	printf("超过英语平均成绩的学生人数:%d\n", c);
 }
 
 int main()
@@ -362,12 +387,12 @@ int main()
 #if 1
 	//readallstudents();
 
-	addstudent("04", "n4", 41, 92, 43);
-	addstudent("01", "n1", 11, 12, 13);
+	addstudent("04", "n4", 41, 92, 93);
+	addstudent("01", "n1", 11, 12, 3);
 	addstudent("02", "n2", 21, 22, 99);
-	addstudent("05", "n5", 51, 52, 53);
-	addstudent("06", "n6", 61, 62, 63);
-	addstudent("03", "n3", 31, 32, 33);
+	addstudent("05", "n5", 51, 52, 93);
+	addstudent("06", "n6", 61, 62, 93);
+	addstudent("03", "n3", 31, 32, 93);
 	//editstudent("01");
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
@@ -380,6 +405,7 @@ int main()
 	displayallstudents();
 	//calcanddisplaycoursehighest();
 	calccoursesaveragesanddisplay();
+	calccoursesaveragesbelowcountanddisplay();
 	system("pause");
 
 #endif
