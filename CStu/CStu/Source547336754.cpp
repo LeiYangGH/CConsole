@@ -192,8 +192,7 @@ int getstudentidexbyid(char no[50])
 	int i;
 	for (i = 0; i < allstudentscount; i++)
 	{
-		student b = allstudents[i];
-		if (streq(b.no, no))
+		if (streq(allstudents[i].no, no))
 			return i;
 	}
 	return -1;
@@ -220,7 +219,7 @@ void prompteditstudent()
 {
 	char no[50];
 	printf("请输入要修改的学号:");
-	scanf("%d", &no);
+	scanf("%s", &no);
 	editstudent(no);
 }
 
@@ -264,13 +263,11 @@ void promptaddstudent()
 {
 	char no[50]; char name[MAX_STRLEN] = "";
 	int math; int english; int chinese;
-	printf("\n请输入学号\n");
-	scanf("%d", &no);
-	printf("\n请输入用户名\n");
-	scanf("%s", name);
+	printf("\n请输入学号和姓名，空格隔开\n");
+	scanf("%s%s", no, name);
 	printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-	scanf("%d%d%d%d", &chinese, &math, &english);
-	addstudent(no, name, math, english, chinese);
+	scanf("%d%d%d", &chinese, &math, &english);
+	addstudent(no, name, chinese, math, english);
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
@@ -380,11 +377,42 @@ void calccoursesaveragesbelowcountanddisplay()
 	printf("超过英语平均成绩的学生人数:%d\n", c);
 }
 
-int main()
+
+void menuf()
 {
 	int choice = -1;
+	while (choice != 0)
+	{
+		printf("\n\t    1）显示每门课程成绩最高的学生基本信息");
+		printf("\n\t    2）显示每门课程的平均成绩");
+		printf("\n\t    3）显示超过某门课程平均成绩的学生人数");
+		printf("\n\t  按0返回上级\n");
+		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
+		choice = getchar();
+		switch (choice)
+		{
+		case '1':
+			calcanddisplaycoursehighest();
+			break;
+		case '2':
+			calccoursesaveragesanddisplay();
+			break;
+		case '3':
+			calccoursesaveragesbelowcountanddisplay();
+			break;
+		default:
+			printf("\n\n输入有误!");
+			break;
+		}
+	}
+}
 
-#if 1
+int main()
+{
+	char choice = -1;
+
+
+#if 0
 	//readallstudents();
 
 	addstudent("04", "n4", 41, 92, 93);
@@ -409,62 +437,59 @@ int main()
 	system("pause");
 
 #endif
-	while (choice != 0)
+	readallstudents();
+	while (choice != 'g')
 	{
-		char *menu = "**********************菜单****************************\n"
-			"按1键：读入学生档案               按6键：学科及格概率\n"
-			"按2键：按照姓名查询               按7键：学生档案排序\n"
-			"按3键：按照学号查询               按8键：保存学生档案\n"
-			"按4键：添加学生档案               按9键 : 查看学生档案\n"
-			"按5键：修改学生档案               按10键：求各科平均分\n"
-			"按0键：退出管理系统";
-		printf("请输入选择数字，并回车\n", menu);
-		printf("%s\n", menu);
-		scanf("%d", &choice);
+		printf("\n\t 请选择系统功能项");
+		printf("\n\t a、成绩录入");
+		printf("\n\t b、成绩显示");
+		printf("\n\t c、成绩保存");
+		printf("\n\t d、成绩排序");
+		printf("\n\t e、成绩修改");
+		printf("\n\t f、成绩统计");
+		printf("\n\t    1）显示每门课程成绩最高的学生基本信息");
+		printf("\n\t    2）显示每门课程的平均成绩");
+		printf("\n\t    3）显示超过某门课程平均成绩的学生人数");
+		printf("\n\t g、退出系统\n\n");
+		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
+		choice = getchar();
 		switch (choice)
 		{
-		case 0:
+		case 'a':
+			printf("\n\n你选择了 a\n");
+			promptaddstudent();
+		case 'b':
+			printf("\n\n你选择了 b\n");
+			displayallstudents();
+			break;
+		case 'c':
+			printf("\n\n你选择了 c\n");
+			writeallstudents();
+			break;
+		case 'd':
+			printf("\n\n你选择了 d\n");
+			sortanddisplay();
+			break;
+		case 'e':
+			printf("\n\n你选择了 e\n");
+			prompteditstudent();
+			break;
+		case 'f':
+			printf("\n\n你选择了 f\n");
+			menuf();
+			break;
+		case 'g':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
 			break;
-		case 1:
-			readallstudents();
-			break;
-		case 2:
-
-			break;
-		case 3:
-
-			break;
-		case 4:
-			promptaddstudent();
-			break;
-		case 5:
-			prompteditstudent();
-			break;
-		case 6:
-
-			break;
-		case 7:
-			sortanddisplay();
-			break;
-		case 8:
-			writeallstudents();
-			break;
-		case 9:
-			sortanddisplay();
-			break;
-		case 10:
-
-
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
-		getch();
 	}
-	fseek(stdin, 0, SEEK_END);
 	printf("\n\n按任意键退出\n");
 	system("pause");
 	return 0;
