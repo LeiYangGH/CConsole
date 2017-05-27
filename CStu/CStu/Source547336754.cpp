@@ -15,7 +15,7 @@ typedef struct student
 	int total;
 	float average;
 }student;
-
+//char *coursenames[3] = { "语文","数学", "英语" };
 student allstudents[100];
 int allstudentscount = 0;
 
@@ -38,7 +38,7 @@ int toint(char *s)
 
 void displaystudent(student stu)
 {
-	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.chinese, stu.math, stu.english );
+	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.chinese, stu.math, stu.english);
 }
 
 void displayallstudents()
@@ -202,7 +202,7 @@ void editstudent(char no[50])
 	if (i >= 0)
 	{
 		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english );
+		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
 		printf("修改完毕。\r\n");
 	}
 	else
@@ -273,6 +273,50 @@ void promptaddstudent()
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
+void calcanddisplaycoursehighest()
+{
+	int i, t, index, h;
+
+	h = 0;
+	index = -1;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].chinese;
+		if (h < t)
+		{
+			h = t;
+			index = i;
+		}
+	}
+	printf("语文最高分:%d\t学生:%s\n", h, allstudents[index].name);
+
+	h = 0;
+	index = -1;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].math;
+		if (h < t)
+		{
+			h = t;
+			index = i;
+		}
+	}
+	printf("数学最高分:%d\t学生:%s\n", h, allstudents[index].name);
+
+	h = 0;
+	index = -1;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].english;
+		if (h < t)
+		{
+			h = t;
+			index = i;
+		}
+	}
+	printf("英语最高分:%d\t学生:%s\n", h, allstudents[index].name);
+}
+
 
 int main()
 {
@@ -281,13 +325,13 @@ int main()
 #if 1
 	//readallstudents();
 
-	addstudent("04", "n4", 41, 42, 43);
+	addstudent("04", "n4", 41, 92, 43);
 	addstudent("01", "n1", 11, 12, 13);
-	addstudent("02", "n2", 21, 22, 23);
+	addstudent("02", "n2", 21, 22, 93);
 	addstudent("05", "n5", 51, 52, 53);
 	addstudent("06", "n6", 61, 62, 63);
 	addstudent("03", "n3", 31, 32, 33);
-	editstudent("01");
+	//editstudent("01");
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
 	//writeallstudents();*/
@@ -297,11 +341,7 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-	//calcanddisplaytotalandaverage();
-	//sortanddisplay();
-	//calcanddisplayallsubjects();
-
-	//countbygrades();
+	calcanddisplaycoursehighest();
 	system("pause");
 
 #endif
