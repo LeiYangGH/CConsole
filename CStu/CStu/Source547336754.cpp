@@ -38,7 +38,7 @@ int toint(char *s)
 
 void displaystudent(student stu)
 {
-	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.math, stu.english, stu.chinese);
+	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.chinese, stu.math, stu.english );
 }
 
 void displayallstudents()
@@ -192,26 +192,32 @@ int getstudentidexbyid(char no[50])
 		if (streq(b.no, no))
 			return i;
 	}
+	return -1;
 }
 
-void removestudent(char no[50])
+void editstudent(char no[50])
 {
 	int i;
-	int index;
-	index = getstudentidexbyid(no);
-	for (i = index; i < allstudentscount - 1; i++)
-		allstudents[i] = allstudents[i + 1];
-	allstudentscount--;
-	printf("删除完毕，剩下%d个。\r\n", allstudentscount);
+	i = getstudentidexbyid(no);
+	if (i >= 0)
+	{
+		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
+		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english );
+		printf("修改完毕。\r\n");
+	}
+	else
+	{
+		printf("没找到对应学号的学生。\r\n");
+	}
 
 }
 
-void promptremovestudent()
+void prompteditstudent()
 {
 	char no[50];
-	printf("请输入要删除的学号:");
+	printf("请输入要修改的学号:");
 	scanf("%d", &no);
-	removestudent(no);
+	editstudent(no);
 }
 
 
@@ -255,13 +261,14 @@ void addstudent(char no[50], char name[], int math, int english, int chinese)
 
 void promptaddstudent()
 {
-	char no[50]; char name[MAX_STRLEN] = ""; int math; int english; int chinese;
+	char no[50]; char name[MAX_STRLEN] = "";
+	int math; int english; int chinese;
 	printf("\n请输入学号\n");
 	scanf("%d", &no);
 	printf("\n请输入用户名\n");
 	scanf("%s", name);
-	printf("\n请输入数学、英语、语文、c语言成绩（整数），空格隔开\n");
-	scanf("%d%d%d%d", &math, &english, &chinese);
+	printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
+	scanf("%d%d%d%d", &chinese, &math, &english);
 	addstudent(no, name, math, english, chinese);
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
@@ -280,18 +287,18 @@ int main()
 	addstudent("05", "n5", 51, 52, 53);
 	addstudent("06", "n6", 61, 62, 63);
 	addstudent("03", "n3", 31, 32, 33);
-
+	editstudent("01");
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
 	//writeallstudents();*/
-	///*promptremovestudent();
+	///*prompteditstudent();
 	//writeallstudents();*/
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
 
 	displayallstudents();
 	//calcanddisplaytotalandaverage();
-	sortanddisplay();
+	//sortanddisplay();
 	//calcanddisplayallsubjects();
 
 	//countbygrades();
@@ -305,7 +312,7 @@ int main()
 			"按2键：按照姓名查询               按7键：学生档案排序\n"
 			"按3键：按照学号查询               按8键：保存学生档案\n"
 			"按4键：添加学生档案               按9键 : 查看学生档案\n"
-			"按5键：删除学生档案               按10键：求各科平均分\n"
+			"按5键：修改学生档案               按10键：求各科平均分\n"
 			"按0键：退出管理系统";
 		printf("请输入选择数字，并回车\n", menu);
 		printf("%s\n", menu);
@@ -329,7 +336,7 @@ int main()
 			promptaddstudent();
 			break;
 		case 5:
-			promptremovestudent();
+			prompteditstudent();
 			break;
 		case 6:
 
