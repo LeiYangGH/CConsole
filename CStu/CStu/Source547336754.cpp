@@ -1,8 +1,6 @@
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <conio.h>
 #define FILE_STU "stu.txt"
 #define MAX_STRLEN 20
 typedef struct student
@@ -20,6 +18,7 @@ int allstudentscount = 0;
 
 float averagechinese, averagemath, averageenglish;
 
+//字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
@@ -51,6 +50,7 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
+//从一行文本读入并根据\t符号拆分，组合成一个student
 student getstudentfromline(char *line)
 {
 	char *part;
@@ -106,7 +106,8 @@ void readallstudents()
 	}
 }
 
-int cmpfunc(const void * a, const void * b)
+//qsort是快速排序，要求如下写法，根据total排序
+int cmpfunc(const void * b, const void * a)
 {
 	return ((student*)a)->total - ((student*)b)->total;
 }
@@ -120,7 +121,7 @@ void sortstudentsbytotal()
 	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
 }
 
-void sortanddisplay()
+void sortstudentsbytotalanddisplay()
 {
 	int i;
 	sortstudentsbytotal();
@@ -128,6 +129,7 @@ void sortanddisplay()
 	displayallstudents();
 }
 
+//根据编号查数组里的序号
 int getstudentidexbyno(char no[50])
 {
 	int i;
@@ -136,18 +138,29 @@ int getstudentidexbyno(char no[50])
 		if (streq(allstudents[i].no, no))
 			return i;
 	}
-	return -1;
+	return -1;//没找到
 }
 
 void editstudent(char no[50])
 {
 	int i;
+	char pwd[20] = "";
 	i = getstudentidexbyno(no);
 	if (i >= 0)
 	{
-		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
-		printf("修改完毕。\r\n");
+		printf("\n请输入密码:");
+		scanf("%s", pwd);
+		if (streq(pwd, "admin"))
+		{
+
+			printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
+			scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
+			printf("修改完毕。\r\n");
+		}
+		else
+		{
+			printf("密码错误，取消修改。\r\n");
+		}
 	}
 	else
 	{
@@ -323,10 +336,12 @@ void menuf()
 		printf("\n\t    2）显示每门课程的平均成绩");
 		printf("\n\t    3）显示超过某门课程平均成绩的学生人数");
 		printf("\n\t  按0返回上级\n");
-		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
+		fseek(stdin, 0, SEEK_END);//清除输入缓冲区，以免意外非法输入造成死循环
 		choice = getchar();
 		switch (choice)
 		{
+		case '0':
+			return;
 		case '1':
 			calcanddisplaycoursehighest();
 			break;
@@ -346,9 +361,7 @@ void menuf()
 int main()
 {
 	char choice = -1;
-
-
-#if 0
+#if 0//测试用，if块可删除
 	//readallstudents();
 
 	addstudent("04", "n4", 41, 92, 93);
@@ -394,6 +407,7 @@ int main()
 		case 'a':
 			printf("\n\n你选择了 a\n");
 			promptaddstudent();
+			break;
 		case 'b':
 			printf("\n\n你选择了 b\n");
 			displayallstudents();
@@ -404,7 +418,7 @@ int main()
 			break;
 		case 'd':
 			printf("\n\n你选择了 d\n");
-			sortanddisplay();
+			sortstudentsbytotalanddisplay();
 			break;
 		case 'e':
 			printf("\n\n你选择了 e\n");

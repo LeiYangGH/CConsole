@@ -13,11 +13,11 @@ DWORD WINAPI MyThread1(PVOID pvParam)
 
 	//	Sleep(2000);
 	//}
-	//int i = PlaySound(L"c:\\test\\t.wav", NULL,  SND_FILENAME | SND_SYNC);
+	int i = PlaySound(L"c:\\test\\t.wav", NULL,  SND_FILENAME | SND_SYNC);
 	//PlaySound(TEXT("c:\\test\\vlc.wav"), NULL, SND_FILENAME | SND_SYNC);
 	//PlaySound(TEXT("c:\\test\\ForTheWin.wav"), NULL, SND_FILENAME);
 	//PlaySound(TEXT("c:\\test\\ForTheWin.wav"), NULL, NULL);
-	PlaySound(TEXT("ForTheWin.wav"), NULL, NULL);
+	//PlaySound(TEXT("ForTheWin.wav"), NULL, NULL);
 
 
 	return 0;
