@@ -1,322 +1,136 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define LINE  "\n------------------------\n" 
-typedef struct address
-{
-	int no;
-	char name[30];//定义通讯录联系人姓名
-	char home[30];//定义联系人的家庭住址
-	char tel[30];//定义联系人的电话号码
-	char qq[20];//定义联系人的qq号码
-	char email[30];//定义联系人的邮箱地址
-	address *next;
-}address;
 
-address *head;//头结点
-
-			  //显示一个通讯信息
-void displayaddress(address add)
+typedef struct student
 {
-	printf("%d\t%s\t%s\t%s\t%s\t%s\t\n", add.no, add.name, add.home, add.tel, add.qq, add.email);
+	char no[20];
+	char name[20];
+	char score[3];
+	student *next;
+}student;
+
+int n;
+
+void fillstudent(student *n)
+{
+	printf("请依次输入学生的学号，姓名，3门课程的成绩(整数)，空格隔开，回车结束\n");
+	scanf("%s%s%d%d%d", n->no, n->name, &n->score[0], &n->score[1], &n->score[2]);
+	fseek(stdin, 0, SEEK_END);
+	printf("\n%s的信息添加成功!\n", n->name);
 }
 
-//读取所有通讯信息到链表
-void createheadddresss()
+student *create()
 {
-	char line[200];
-	address *p1, *p2;
+	int max = 3;
+	student *head;       //头节点
+	student *p1 = NULL;  //p1保存创建的新节点的地址
+	student *p2 = NULL;  //p2保存原链表最后一个节点的地址
 
-	p1 = p2 = (address *)malloc(sizeof(address));
-	head = p1;
+	n = 0;          //创建前链表的节点总数为0：空链表
+	p1 = (student *)malloc(sizeof(student));   //开辟一个新节点
+	p2 = p1;            //如果节点开辟成功，则p2先把它的指针保存下来以备后用
 
-	p2->next = NULL;
-}
-
-//输入某种提示的字符串
-void inputstring(char str[], char *description)
-{
-	printf("请输入%s:", description);
-	scanf("%s", str);
-	printf("您输入的%s为 %s \n", description, str);
-}
-
-
-//获取一个新的通讯信息信息
-int getnewno(address **tail)
-{
-	int newno = 0;
-	address *p = head;
-	if (head->no > newno)
-		newno = head->no;
-	while (p->next != NULL)
+	if (p1 == NULL)        //节点开辟不成功
 	{
-		if (p->no > newno)
-			newno = p->no;
-		p = p->next;
+		printf("\nCann't create it, try it again in a moment!\n");
+		return NULL;
 	}
-	if (p->no > newno)
-		newno = p->no;
-	newno++;
-	*tail = p;
-	return newno;
-}
-
-//新增通讯信息
-void addaddress()
-{
-	int newno = 0, score;//新通讯信息编号，当前最大+1
-	char name[30] = "";
-	char home[30] = "";
-	char tel[30] = "";
-	char qq[20] = "";
-	char email[30] = "";
-	address *p = head;
-	address *n;
-
-	inputstring(name, "姓名");
-	inputstring(home, "家庭地址");
-	inputstring(tel, "手机号");
-	inputstring(qq, "qq号");
-	inputstring(email, "邮箱");
-
-	newno = getnewno(&p);
-
-	n = (address *)malloc(sizeof(address));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	strcpy(n->home, home);
-	strcpy(n->tel, tel);
-	strcpy(n->qq, qq);
-	strcpy(n->email, email);
-
-	p->next = n;
-	n->next = NULL;
-	printf("\n%s的信息添加成功!\n", name);
-}
-
-
-bool insert(address *pHead, int front, char *name, char *home, char *tel, char *qq, char *email)
-{
-	int i = 0, newno;
-	address *h = pHead;
-	address *t;
-	address *n;
-	address *x;
-	newno = getnewno(&x);
-	if ((front < 1) && (NULL != h))
+	else                //节点开辟成功
 	{
-		return false;
+		head = NULL;        //开始head指向NULL
+		//strcpy(p1->name, "n1");
+		//strcpy(p1->tel, "111");
+		fillstudent(p1);
 	}
-	while (i < front - 1)
+#if 1
+	while (n < max)      //只要学号不为0，就继续录入下一个节点
 	{
-		h = h->next;
-		++i;
-	}
-	n = (address*)malloc(sizeof(address));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	strcpy(n->home, home);
-	strcpy(n->tel, tel);
-	strcpy(n->qq, qq);
-	strcpy(n->email, email);
-
-	t = h->next;
-	h->next = n;
-	n->next = t;
-	return true;
-
-}
-
-//http://blog.csdn.net/iwm_next/article/details/7450734
-void deleteaddress(char * name)  //删除通讯信息
-{
-	address *p1 = head, *p2;
-	if (head == NULL)
-	{
-		printf("\n通讯信息为空!\n");
-		return;
-	}
-	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
-	{
-		p2 = p1;
-		p1 = p1->next;
-	}
-	if (strcmp(p1->name, name) == 0)
-	{
-
-		if (p1 == head)
-			head = p1->next;
+		n += 1;         //节点总数增加1个
+		if (n == 1)      //如果节点总数是1，则head指向刚创建的节点p1
+		{
+			head = p1;
+			p2->next = NULL;  //此时的p2就是p1,也就是p1->next指向NULL。
+		}
 		else
 		{
-			p2->next = p1->next;
-			free(p1);
-			printf("已删除姓名为%s的通讯信息的通讯信息。\r\n", name);
+			p2->next = p1;   //指向上次下面刚刚开辟的新节点
 		}
+
+		p2 = p1;            //把p1的地址给p2保留，然后p1产生新的节点
+
+		p1 = (student *)malloc(sizeof(student));
+
+		if (n < max)
+			fillstudent(p1);
+		//n++;
+		/*++nn;
+		sprintf(name, "n%d", nn * 2);
+		sprintf(tel, "t%d", nn * 22);
+		strcpy(p1->name, name);
+		strcpy(p1->tel, tel);*/
 	}
-	else
-		printf("没找到姓名为%s的通讯信息!\r\n", name);
+#endif
+	p2->next = NULL;     //此句就是根据单向链表的最后一个节点要指向NULL
+
+	free(p1);           //p1->num为0的时候跳出了while循环，并且释放p1
+	p1 = NULL;          //特别不要忘记把释放的变量清空置为NULL,否则就变成"野指针"，即地址不确定的指针
+	return head;        //返回创建链表的头指针
 }
 
 
-
-void displayaddress(char * name)  //按姓名输出
+void print(student *head)
 {
-	int found = 0;
-	address *p = head;
-
-	while (p != NULL)
+	student *p;
+	//printf("\nNow , These %d records are:\n", n);
+	p = head;
+	//p = head->next;
+	if (head != NULL)        //只要不是空链表，就输出链表中所有节点
 	{
-		if (strcmp(p->name, name) == 0)
+		//printf("head is %o\n", head);    //输出头指针指向的地址
+		do
 		{
-			found = 1;
-			printf("%s的通讯信息如下\r\n", name);
+			/*
+			输出相应的值：当前节点地址、各字段值、当前节点的下一节点地址。
+			这样输出便于读者形象看到一个单向链表在计算机中的存储结构，和我们
+			设计的图示是一模一样的。
+			*/
+			//printf("%s %s\n", p->name, p->tel);
+			student stu = *p;
 
-			printf("序号    姓名    通讯信息\n");
+			printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2]);
 
-			displayaddress(*p);
-		}
-		p = p->next;
-	}
-	if (!found)
-		printf("没找到名为%s的通讯信息\r\n", name);
-}
-
-//根据名字查找通讯信息
-void searchbyname(char * name, address **f)
-{
-	int found = 0;
-	address *p = head;
-
-	while (p != NULL)
-	{
-		if (strcmp(p->name, name) == 0)
-		{
-			*f = p;
-			return;
-		}
-		p = p->next;
-	}
-	if (!found)
-	{
-		printf("没找到名为%s的通讯信息\r\n", name);
-		*f = NULL;
+			p = p->next;     //移到下一个节点
+		} while (p != NULL);
 	}
 }
 
-void displayalladdresss()  //输出所有通讯信息信息
+//显示一个通讯信息
+void displaystudent(student stu)
 {
-	address *p = head->next;
-
-	printf("所有通讯信息通讯信息如下\n");
-	printf(LINE);
-
-	printf("姓名%t住址%t手机号%tqq%t邮箱\n");
-	while (p != NULL)
-	{
-		displayaddress(*p);
-		p = p->next;
-	}
-	printf(LINE);
-}
-
-void promptinsertbeforeno()  //按编号插入
-{
-	int no, score;
-	char name[30] = "";
-	char home[30] = "";
-	char tel[30] = "";
-	char qq[20] = "";
-	char email[30] = "";
-
-	printf("\n请输入要在哪个编号的通讯信息之后插入?\n");
-	scanf("%d", &no);
-
-	inputstring(name, "姓名");
-	inputstring(home, "家庭地址");
-	inputstring(tel, "手机号");
-	inputstring(qq, "qq号");
-	inputstring(email, "邮箱");
-
-	if (insert(head, no, name, home, tel, qq, email))
-		printf("\n插入成功！\n");
+	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2]);
 }
 
 
 
-void promptsearchbyname()  //按姓名查找
-{
-	char name[50] = "";
-	inputstring(name, "要查找记录的姓名");
-	displayaddress(name);
-}
+//新增通讯信息
 
 
 
-void promptdeletebyname()  //按姓名删除
-{
-	char name[50] = "";
-	inputstring(name, "要删除记录的姓名");
-	deleteaddress(name);
-}
 
 
 
 int main()
 {
-	int choice = -1;
+	student *head = create();
 
-	createheadddresss();
 
-	while (choice != 0)
-	{
-		printf("\n\t 通讯录管理");
-		printf("\n\t 0. 退出");
-		printf("\n\t 1. 添加联系人信息");
-		printf("\n\t 2. 查看所有联系人信息");
-		printf("\n\t 3. 删除联系人信息");
-		printf("\n\t 4. 根据联系人名字查找");
-		printf("\n\t 5. 插入联系人信息");
-		printf("\n\n  请选择: ");
-		choice = getchar();//输入一个字符
-		switch (choice)
-		{
-		case '0':
-			printf("\n\n 你选择了退出: ");
-			fseek(stdin, 0, SEEK_END);
-			system("pause");
-			exit(0);
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			addaddress();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			displayalladdresss();
-			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			promptdeletebyname();
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			promptsearchbyname();
-			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			promptinsertbeforeno();
-			break;
+#if 1
 
-		default:
-			printf("\n\n输入有误，请重选\n");
-			break;
-		}
-		fseek(stdin, 0, SEEK_END);
-		system("pause");
-	}
+	print(head);
+#endif
+
+
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
