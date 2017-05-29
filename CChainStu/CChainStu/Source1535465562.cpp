@@ -10,128 +10,133 @@ typedef struct student
 	student *next;
 }student;
 
-int n;
+int count;//实际输入的个数，测试时候可能没有10人
 
 void fillstudent(student *n)
 {
 	printf("请依次输入学生的学号，姓名，3门课程的成绩(整数)，空格隔开，回车结束\n");
 	scanf("%s%s%d%d%d", n->no, n->name, &n->score[0], &n->score[1], &n->score[2]);
 	fseek(stdin, 0, SEEK_END);
-	printf("\n%s的信息添加成功!\n", n->name);
+	printf("%s的信息添加成功!\n", n->name);
 }
 
-student *create()
+student *create(int maxcount)
 {
-	int max = 3;
-	student *head;       //头节点
-	student *p1 = NULL;  //p1保存创建的新节点的地址
-	student *p2 = NULL;  //p2保存原链表最后一个节点的地址
+	student *head;
+	student *p1 = NULL;
+	student *p2 = NULL;
 
-	n = 0;          //创建前链表的节点总数为0：空链表
-	p1 = (student *)malloc(sizeof(student));   //开辟一个新节点
-	p2 = p1;            //如果节点开辟成功，则p2先把它的指针保存下来以备后用
+	count = 0;
+	p1 = (student *)malloc(sizeof(student));
+	p2 = p1;
 
-	if (p1 == NULL)        //节点开辟不成功
+	if (p1 == NULL)
 	{
 		printf("\nCann't create it, try it again in a moment!\n");
 		return NULL;
 	}
-	else                //节点开辟成功
+	else
 	{
-		head = NULL;        //开始head指向NULL
-		//strcpy(p1->name, "n1");
-		//strcpy(p1->tel, "111");
+		head = NULL;
 		fillstudent(p1);
 	}
-#if 1
-	while (n < max)      //只要学号不为0，就继续录入下一个节点
+	while (count < maxcount)
 	{
-		n += 1;         //节点总数增加1个
-		if (n == 1)      //如果节点总数是1，则head指向刚创建的节点p1
+		count += 1;
+		if (count == 1)
 		{
 			head = p1;
-			p2->next = NULL;  //此时的p2就是p1,也就是p1->next指向NULL。
+			p2->next = NULL;
 		}
 		else
 		{
-			p2->next = p1;   //指向上次下面刚刚开辟的新节点
+			p2->next = p1;
 		}
 
-		p2 = p1;            //把p1的地址给p2保留，然后p1产生新的节点
+		p2 = p1;
 
 		p1 = (student *)malloc(sizeof(student));
-
-		if (n < max)
+		if (count < maxcount)
 			fillstudent(p1);
-		//n++;
-		/*++nn;
-		sprintf(name, "n%d", nn * 2);
-		sprintf(tel, "t%d", nn * 22);
-		strcpy(p1->name, name);
-		strcpy(p1->tel, tel);*/
 	}
-#endif
-	p2->next = NULL;     //此句就是根据单向链表的最后一个节点要指向NULL
+	p2->next = NULL;
 
-	free(p1);           //p1->num为0的时候跳出了while循环，并且释放p1
-	p1 = NULL;          //特别不要忘记把释放的变量清空置为NULL,否则就变成"野指针"，即地址不确定的指针
-	return head;        //返回创建链表的头指针
+	free(p1);
+	p1 = NULL;
+	return head;
 }
 
 
 void print(student *head)
 {
 	student *p;
-	//printf("\nNow , These %d records are:\n", n);
 	p = head;
-	//p = head->next;
-	if (head != NULL)        //只要不是空链表，就输出链表中所有节点
+	if (head != NULL)
 	{
-		//printf("head is %o\n", head);    //输出头指针指向的地址
 		do
 		{
-			/*
-			输出相应的值：当前节点地址、各字段值、当前节点的下一节点地址。
-			这样输出便于读者形象看到一个单向链表在计算机中的存储结构，和我们
-			设计的图示是一模一样的。
-			*/
-			//printf("%s %s\n", p->name, p->tel);
-			student stu = *p;
-
-			printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2]);
-
-			p = p->next;     //移到下一个节点
+			printf("%s\t%s\t%d\t%d\t%d\n",
+				p->no, p->name, p->score[0], p->score[1], p->score[2]);
+			p = p->next;
 		} while (p != NULL);
 	}
 }
 
-//显示一个通讯信息
-void displaystudent(student stu)
+float calccourseave(student *head, int courseid)
 {
-	printf("%s\t%s\t%d\t%d\t%d\n", stu.no, stu.name, stu.score[0], stu.score[1], stu.score[2]);
+	int sum = 0;
+	student *p;
+	p = head;
+	if (head != NULL)
+	{
+		do
+		{
+			sum += p->score[courseid];
+			p = p->next;
+		} while (p != NULL);
+	}
+	return sum / (float)count;
 }
 
+void calcbeststu(student *head)
+{
+	int sum = 0, bestsum = 0;
 
+	student beststu;
 
-//新增通讯信息
+	student *p;
+	p = head;
+	if (head != NULL)
+	{
+		do
+		{
+			sum = p->score[0] + p->score[1] + p->score[2];
+			if (bestsum < sum)
+			{
+				bestsum = sum;
+				beststu = *p;
+			}
+			p = p->next;
+		} while (p != NULL);
+	}
+	printf("总分最高的学生学号:%s，姓名:%s，3门课程成绩:%d %d %d，平均分数:%.1f\n",
+		beststu.no, beststu.name,
+		beststu.score[0], beststu.score[1], beststu.score[2],
+		bestsum / 3.0f);
 
-
-
-
-
+}
 
 int main()
 {
-	student *head = create();
-
-
-#if 1
-
-	print(head);
-#endif
-
-
-	fseek(stdin, 0, SEEK_END);
+	int courseid;
+	printf("请输位10个学生的成绩信息：\n");
+	student *head = create(10);
+	//print(head);//输出所有学生信息
+	for (courseid = 0; courseid < 3; courseid++)
+	{
+		printf("第%d科的平均成绩是%.1f\n", courseid, calccourseave(head, courseid));
+	}
+	calcbeststu(head);
 	system("pause");
 	return 0;
 }
