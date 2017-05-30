@@ -26,12 +26,12 @@ typedef struct /*定义数据结构*/
 int  enter(address t[]) {
 	int i, n;
 	system("cls"); /*清屏*/
-	printf("\nplease input num \n"); /*提示信息*/
+	printf("\n请输入记录数\n"); /*提示信息*/
 	scanf("%d", &n); /*输入记录数*/
-	printf("please input record \n"); /*提示输入记录*/
-	printf("name             unit                     telephone\n");
+	printf("请输入记录\n"); /*提示输入记录*/
+	printf("姓名             单位                     电话\n");
 	printf("------------------------------------------------\n");
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 	{
 		scanf("%s%s%s", t[i].name, t[i].units, t[i].tele);  /*输入记录*/
 		printf("----------------------------------------------\n");
@@ -44,14 +44,14 @@ void list(address t[], int n)
 {
 	int i;
 	system("cls");
-	printf("\n\n*******************ADDRESS******************\n");
-	printf("name               unit                     telephone\n");
+	printf("\n\n******************联系人******************\n");
+	printf("姓名             单位                     电话\n");
 	printf("------------------------------------------------\n");
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 		printf("%-20s%-30s%-10s\n", t[i].name, t[i].units, t[i].tele);
 	if ((i + 1) % 10 == 0)   /*判断输出是否达到10条记录*/
 	{
-		printf("Press any key continue...\n"); /*提示信息*/
+		printf("按任意键继续...\n"); /*提示信息*/
 		getchar();  /*压任意键继续*/
 	}
 	printf("************************end*******************\n");
@@ -72,7 +72,7 @@ void print(address temp)
 int find(address t[], int n, char *s)
 {
 	int i;
-	for (i = 0; i<n; i++)/*从第一条记录开始，直到最后一条*/
+	for (i = 0; i < n; i++)/*从第一条记录开始，直到最后一条*/
 	{
 		if (strcmp(s, t[i].name) == 0)  /*记录中的姓名和待比较的姓名是否相等*/
 			return i;   /*相等，则返回该记录的下标号，程序提前结结束*/
@@ -89,7 +89,7 @@ void search(address t[], int n)
 	printf("please search name\n");
 	scanf("%s", s); /*输入待查找姓名*/
 	i = find(t, n, s); /*调用find函数，得到一个整数*/
-	if (i>n - 1)  /*如果整数i值大于n-1，说明没找到*/
+	if (i > n - 1)  /*如果整数i值大于n-1，说明没找到*/
 		printf("not found\n");
 	else
 		print(t[i]);  /*找到，调用显示函数显示记录*/
@@ -104,7 +104,7 @@ int dele(address t[], int n)
 	printf("please deleted name\n"); /*提示信息*/
 	scanf("%s", s);/*输入姓名*/
 	i = find(t, n, s); /*调用find函数*/
-	if (i>n - 1)  /*如果i>n-1超过了数组的长度*/
+	if (i > n - 1)  /*如果i>n-1超过了数组的长度*/
 		printf("no found not deleted\n"); /*显示没找到要删除的记录*/
 	else
 	{
@@ -113,7 +113,7 @@ int dele(address t[], int n)
 		scanf("%d", &ch);  /*输入一个整数0或1*/
 		if (ch == 1)  /*如果确认删除整数为1*/
 		{
-			for (j = i + 1; j<n; j++)  /*删除该记录，实际后续记录前移*/
+			for (j = i + 1; j < n; j++)  /*删除该记录，实际后续记录前移*/
 			{
 				strcpy(t[j - 1].name, t[j].name); /*将后一条记录的姓名拷贝到前一条*/
 				strcpy(t[j - 1].units, t[j].units); /*将后一条记录的单位拷贝到前一条*/
@@ -158,19 +158,19 @@ void save(address t[], int n)
 	FILE *fp;  /*指向文件的指针*/
 	if ((fp = fopen("record.txt", "wb")) == NULL)  /*打开文件，并判断打开是否正常*/
 	{
-		printf("can not open file\n");/*没打开*/
+		printf("打不开文件\n");/*没打开*/
 		exit(1);  /*退出*/
 	}
-	printf("\nSaving file\n"); /*输出提示信息*/
+	printf("\n保存文件。。\n"); /*输出提示信息*/
 	fprintf(fp, "%d", n);  /*将记录数写入文件*/
 	fprintf(fp, "\r\n");  /*将换行符号写入文件*/
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 	{
 		fprintf(fp, "%-20s%-30s%-10s", t[i].name, t[i].units, t[i].tele);/*格式写入记录*/
 		fprintf(fp, "\r\n"); /*将换行符号写入文件*/
 	}
 	fclose(fp);/*关闭文件*/
-	printf("****save success***\n"); /*显示保存成功*/
+	printf("保存成功\n"); /*显示保存成功*/
 }
 /*读入函数，参数为结构体数组*/
 int load(address t[])
@@ -179,14 +179,14 @@ int load(address t[])
 	FILE *fp; /*指向文件的指针*/
 	if ((fp = fopen("record.txt", "rb")) == NULL)/*打开文件*/
 	{
-		printf("can not open file\n");  /*不能打开*/
+		printf("打不开文件\n");  /*不能打开*/
 		exit(1);  /*退出*/
 	}
 	fscanf(fp, "%d", &n); /*读入记录数*/
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 		fscanf(fp, "%20s%30s%10s", t[i].name, t[i].units, t[i].tele); /*按格式读入记录*/
 	fclose(fp);  /*关闭文件*/
-	printf("You have success read data from file!!!\n"); /*显示保存成功*/
+	printf("成功读取文件!!!\n"); /*显示保存成功*/
 	return n; /*返回记录数*/
 }
 /*按序号显示记录函数*/
@@ -199,17 +199,17 @@ void display(address t[])
 		printf("can not open file\n"); /*不能打开文件*/
 		exit(1);  /*退出*/
 	}
-	printf("Enter order number...\n"); /*显示信息*/
+	printf("请输入序号...\n"); /*显示信息*/
 	scanf("%d", &id);  /*输入序号*/
 	fscanf(fp, "%d", &n); /*从文件读入记录数*/
-	if (id >= 0 && id<n) /*判断序号是否在记录范围内*/
+	if (id >= 0 && id < n) /*判断序号是否在记录范围内*/
 	{
 		fseek(fp, (id - 1) * sizeof(address), 1); /*移动文件指针到该记录位置*/
 		print(t[id]); /*调用输出函数显示该记录*/
 		printf("\r\n");
 	}
 	else
-		printf("no %d number record!!!\n ", id); /*如果序号不合理显示信息*/
+		printf("没有序号为 %d 的记录!!!\n ", id); /*如果序号不合理显示信息*/
 	fclose(fp);  /*关闭文件*/
 }
 /*排序函数，参数为结构体数组和记录数*/
@@ -217,11 +217,11 @@ void sort(address t[], int n)
 {
 	int i, j, flag;
 	address temp; /*临时变量做交换数据用*/
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 	{
 		flag = 0;  /*设标志判断是否发生过交换*/
-		for (j = 0; j<n - 1; j++)
-			if ((strcmp(t[j].name, t[j + 1].name))>0) /*比较大小*/
+		for (j = 0; j < n - 1; j++)
+			if ((strcmp(t[j].name, t[j + 1].name)) > 0) /*比较大小*/
 			{
 				flag = 1;
 				strcpy(temp.name, t[j].name);  /*交换记录*/
@@ -236,15 +236,15 @@ void sort(address t[], int n)
 			}
 		if (flag == 0)break;  /*如果标志为0，说明没有发生过交换循环结束*/
 	}
-	printf("sort sucess!!!\n"); /*显示排序成功*/
+	printf("排序成功!!!\n"); /*显示排序成功*/
 }
 /*快速查找，参数为结构体数组和记录数*/
 void qseek(address t[], int n)
 {
 	char s[20];
 	int l, r, m;
-	printf("\nPlease  sort before qseek!\n"); /*提示确认在查找之前，记录是否已排序*/
-	printf("please enter  name for qseek\n"); /*提示输入*/
+	printf("\n确认在查找之前，记录是否已排序!\n"); /*提示确认在查找之前，记录是否已排序*/
+	printf("输入用来排序的名称\n"); /*提示输入*/
 	scanf("%s", s); /*输入待查找的姓名*/
 	l = 0; r = n - 1;  /*设置左边界与右边界的初值*/
 	while (l <= r) /*当左边界<=右边界时*/
@@ -255,13 +255,13 @@ void qseek(address t[], int n)
 			print(t[m]); /*如果相等，则调用print函数显示记录信息*/
 			return; /*返回*/
 		}
-		if (strcmp(t[m].name, s)<0)  /*如果中间结点小*/
+		if (strcmp(t[m].name, s) < 0)  /*如果中间结点小*/
 			l = m + 1;  /*修改左边界*/
 		else
 			r = m - 1; /*否则，中间结点大，修改右边界*/
 	}
-	if (l>r)   /*如果左边界大于右边界时*/
-		printf("not found\n"); /*显示没找到*/
+	if (l > r)   /*如果左边界大于右边界时*/
+		printf("没找到\n"); /*显示没找到*/
 }
 /*复制文件*/
 void copy()
@@ -273,20 +273,20 @@ void copy()
 	system("cls");/*清屏*/
 	if ((sfp = fopen("record.txt", "rb")) == NULL) /*打开记录文件*/
 	{
-		printf("can not open file\n"); /*显示不能打开文件信息*/
+		printf("不能打开文件信息\n"); /*显示不能打开文件信息*/
 		exit(1); /*退出*/
 	}
-	printf("Enter outfile name,for example c:\\f1\\te.txt:\n"); /*提示信息*/
+	printf("输入文件名，比如 c:\\f1\\te.txt:\n"); /*提示信息*/
 	scanf("%s", outfile); /*输入目标文件名*/
 	if ((tfp = fopen(outfile, "wb")) == NULL) /*打开目标文件*/
 	{
-		printf("can not open file\n"); /*显示不能打开文件信息*/
+		printf("不能打开文件信息\n"); /*显示不能打开文件信息*/
 		exit(1); /*退出*/
 	}
 	fscanf(sfp, "%d", &n); /*读出文件记录数*/
 	fprintf(tfp, "%d", n);/*写入目标文件数*/
 	fprintf(tfp, "\r\n"); /*写入换行符*/
-	for (i = 0; i<n; i++)
+	for (i = 0; i < n; i++)
 	{
 		fscanf(sfp, "%20s%30s%10s\n", temp[i].name, temp[i].units,
 			temp[i].tele); /*读入记录*/
@@ -296,7 +296,7 @@ void copy()
 	}
 	fclose(sfp); /*关闭源文件*/
 	fclose(tfp); /*关闭目标文件*/
-	printf("you have success copy  file!!!\n"); /*显示复制成功*/
+	printf("复制成功!!!\n"); /*显示复制成功*/
 }
 void gotoxy(int x, int y) //cursor an gewuenschte position auf dem bildschirm setzen 
 {
@@ -316,29 +316,29 @@ int menu_select()
 	char s[80];
 	int c;
 	gotoxy(1, 25);/*将光标定为在第25行，第1列*/
-	printf("press any key enter menu......\n");/*提示压任意键继续*/
+	printf("压任意键继续......\n");/*提示压任意键继续*/
 	getchar(); /*读入任意字符*/
 	system("cls"); /*清屏*/
 	gotoxy(1, 1);
 	printf("********************MENU*********************\n\n");
-	printf("		0. Enter record\n");
-	printf("		1. List the file\n");
-	printf("		2. Search record on name\n");
-	printf("		3. Delete a record\n");
-	printf("		4. add record \n");
-	printf("		5. Save the file\n");
-	printf("		6. Load the file\n");
-	printf("		7. display record on order\n");
-	printf("	        8. sort to make new file\n");
-	printf("	        9. Quick seek record\n");
-	printf("		10. copy the file to new file\n");
-	printf("	        11. Quit\n");
+	printf("		0. 输入记录\n");
+	printf("		1. 显示文件内容\n");
+	printf("		2. 通过姓名查找记录\n");
+	printf("		3. 删除记录\n");
+	printf("		4. 添加记录\n");
+	printf("		5. 保存文件\n");
+	printf("		6. 打开文件\n");
+	printf("		7. 排序并输出\n");
+	printf("	        8. 排序并保存新文件\n");
+	printf("	        9. 快速查找\n");
+	printf("		10. 复制到新文件\n");
+	printf("	        11. 退出\n");
 	printf("***********************************************\n");
 	do {
-		printf("\n	 Enter you choice(0~11):"); /*提示输入选项*/
+		printf("\n	 请选择功能(0~11):"); /*提示输入选项*/
 		scanf("%s", s); /*输入选择项*/
 		c = atoi(s); /*将输入的字符串转化为整型数*/
-	} while (c<0 || c>11); /*选择项不在0~11之间重输*/
+	} while (c < 0 || c>11); /*选择项不在0~11之间重输*/
 	return c; /*返回选择项，主程序根据该数调用相应的函数*/
 }
 
