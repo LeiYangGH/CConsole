@@ -21,9 +21,10 @@ typedef struct /*定义数据结构*/
 	char units[30];  /*单位*/
 	char tele[10];  /*电话*/
 }address;
+address t[M];  /*定义结构体数组*/
 
 /*输入记录，形参为结构体数组，函数值返回类型为整型表示记录长度*/
-int  enter(address t[]) {
+int  enter() {
 	int i, n;
 	system("cls"); /*清屏*/
 	printf("\n请输入记录数\n"); /*提示信息*/
@@ -40,7 +41,7 @@ int  enter(address t[]) {
 }
 
 /*显示记录，参数为记录数组和记录条数*/
-void list(address t[], int n)
+void list(int n)
 {
 	int i;
 	system("cls");
@@ -69,7 +70,7 @@ void print(address temp)
 	printf("**********************end***********************\n");
 }
 /*查找函数，参数为记录数组和记录条数以及姓名s */
-int find(address t[], int n, char *s)
+int find(int n, char *s)
 {
 	int i;
 	for (i = 0; i < n; i++)/*从第一条记录开始，直到最后一条*/
@@ -81,14 +82,14 @@ int find(address t[], int n, char *s)
 }
 
 /*查找记录*/
-void search(address t[], int n)
+void search(int n)
 {
 	char s[20];   /*保存待查找姓名字符串*/
 	int i;   /*保存查找到结点的序号*/
 	system("cls");   /*清屏*/
 	printf("please search name\n");
 	scanf("%s", s); /*输入待查找姓名*/
-	i = find(t, n, s); /*调用find函数，得到一个整数*/
+	i = find(n, s); /*调用find函数，得到一个整数*/
 	if (i > n - 1)  /*如果整数i值大于n-1，说明没找到*/
 		printf("not found\n");
 	else
@@ -96,14 +97,14 @@ void search(address t[], int n)
 }
 
 /*删除函数，参数为记录数组和记录条数*/
-int dele(address t[], int n)
+int dele(int n)
 {
 	char s[20];  /*要删除记录的姓名*/
 	int ch = 0;
 	int i, j;
 	printf("please deleted name\n"); /*提示信息*/
 	scanf("%s", s);/*输入姓名*/
-	i = find(t, n, s); /*调用find函数*/
+	i = find(n, s); /*调用find函数*/
 	if (i > n - 1)  /*如果i>n-1超过了数组的长度*/
 		printf("no found not deleted\n"); /*显示没找到要删除的记录*/
 	else
@@ -125,7 +126,7 @@ int dele(address t[], int n)
 	return n;  /*返回记录数*/
 }
 /*插入记录函数，参数为结构体数组和记录数*/
-int add(address t[], int n)/*插入函数，参数为结构体数组和记录数*/
+int add(int n)/*插入函数，参数为结构体数组和记录数*/
 {
 	address temp;  /*新插入记录信息*/
 	int i, j;
@@ -138,7 +139,7 @@ int add(address t[], int n)/*插入函数，参数为结构体数组和记录数*/
 	printf("------------------------------------------------\n");
 	printf("please input locate name \n");
 	scanf("%s", s); /*输入插入位置的姓名*/
-	i = find(t, n, s);  /*调用find，确定插入位置*/
+	i = find(n, s);  /*调用find，确定插入位置*/
 	for (j = n - 1; j >= i; j--)   /*从最后一个结点开始向后移动一条*/
 	{
 		strcpy(t[j + 1].name, t[j].name); /*当前记录的姓名拷贝到后一条*/
@@ -152,7 +153,7 @@ int add(address t[], int n)/*插入函数，参数为结构体数组和记录数*/
 	return n; /*返回记录数*/
 }
 /*保存函数，参数为结构体数组和记录数*/
-void save(address t[], int n)
+void save(int n)
 {
 	int i;
 	FILE *fp;  /*指向文件的指针*/
@@ -173,7 +174,7 @@ void save(address t[], int n)
 	printf("保存成功\n"); /*显示保存成功*/
 }
 /*读入函数，参数为结构体数组*/
-int load(address t[])
+int load()
 {
 	int i, n;
 	FILE *fp; /*指向文件的指针*/
@@ -190,7 +191,7 @@ int load(address t[])
 	return n; /*返回记录数*/
 }
 /*按序号显示记录函数*/
-void display(address t[])
+void display()
 {
 	int id, n;
 	FILE *fp; /*指向文件的指针*/
@@ -213,7 +214,7 @@ void display(address t[])
 	fclose(fp);  /*关闭文件*/
 }
 /*排序函数，参数为结构体数组和记录数*/
-void sort(address t[], int n)
+void sort(int n)
 {
 	int i, j, flag;
 	address temp; /*临时变量做交换数据用*/
@@ -239,7 +240,7 @@ void sort(address t[], int n)
 	printf("排序成功!!!\n"); /*显示排序成功*/
 }
 /*快速查找，参数为结构体数组和记录数*/
-void qseek(address t[], int n)
+void qseek(int n)
 {
 	char s[20];
 	int l, r, m;
@@ -345,23 +346,22 @@ int menu_select()
 /******主函数开始*******/
 void main()
 {
-	address adr[M];  /*定义结构体数组*/
 	int length;  /*保存记录长度*/
 	system("cls");  /*清屏*/
 	for (;;)/*无限循环*/
 	{
 		switch (menu_select())   /*调用主菜单函数，返回值整数作开关语句的条件*/
 		{
-		case 0:length = enter(adr); break;/*输入记录*/
-		case 1:list(adr, length); break; /*显示全部记录*/
-		case 2:search(adr, length); break; /*查找记录*/
-		case 3:length = dele(adr, length); break; /*删除记录*/
-		case 4:length = add(adr, length);  break;   /*插入记录*/
-		case 5:save(adr, length); break; /*保存文件*/
-		case 6:length = load(adr); break; /*读文件*/
-		case 7:display(adr); break;  /*按序号显示记录*/
-		case 8:sort(adr, length); break; /*按姓名排序*/
-		case 9:qseek(adr, length); break; /*快速查找记录*/
+		case 0:length = enter(); break;/*输入记录*/
+		case 1:list(length); break; /*显示全部记录*/
+		case 2:search(length); break; /*查找记录*/
+		case 3:length = dele(length); break; /*删除记录*/
+		case 4:length = add(length);  break;   /*插入记录*/
+		case 5:save(length); break; /*保存文件*/
+		case 6:length = load(); break; /*读文件*/
+		case 7:display(); break;  /*按序号显示记录*/
+		case 8:sort(length); break; /*按姓名排序*/
+		case 9:qseek(length); break; /*快速查找记录*/
 		case 10:copy(); break; /*复制文件*/
 		case 11:exit(0); /*如返回值为11则程序结束*/
 		}
