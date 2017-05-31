@@ -1,10 +1,118 @@
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<Windows.h>
 #include<conio.h>
 #include<string.h>
-#define EDGE 20//棋盘规格。
+#define EDGE 20 
+#define HISTORY_FILE "history.txt" 
+
+typedef struct history
+{
+	char p1[11];
+	char p2[11];
+	char win[2];
+}history;
+
+history allhistorys[50];
+int allhistoryscount = 0;
+
+void displayhistory(history stu)
+{
+	printf("%s%s\t%s%s\n", stu.p1, strcmp(stu.win, "0") == 0 ? "(win)" : "",
+		stu.p2, strcmp(stu.win, "1") == 0 ? "(win)" : "");
+}
+
+void displayallhistorys()
+{
+	int i;
+	printf("最近10次对战\r\n", allhistoryscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allhistoryscount; i++)
+	{
+		displayhistory(allhistorys[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
+history gethistoryfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	history stu;
+	part = strtok(line, " \n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(stu.p1, part);
+			break;
+		case 2:
+			strcpy(stu.p2, part);
+			break;
+		case 3:
+			strcpy(stu.win, part);
+			break;
+
+		default:
+			break;
+		}
+		part = strtok(NULL, " \n");
+	}
+	return stu;
+}
+
+void readallhistorys()
+{
+	char line[200];
+	FILE *fp = fopen(HISTORY_FILE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", HISTORY_FILE);
+	}
+	else
+	{
+		allhistoryscount = 0;
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 5)
+				continue;
+			allhistorys[allhistoryscount++] = gethistoryfromline(line);
+		}
+		printf("\n已读入文件!", HISTORY_FILE);
+	}
+}
+
+void writeallhistorys()
+{
+	int i;
+	history stu;
+	FILE *fp = fopen(HISTORY_FILE, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", HISTORY_FILE);
+		getchar();
+		exit(1);
+	}
+	for (i = allhistoryscount <= 10 ? 0 : allhistoryscount - 10; i < allhistoryscount; i++)
+	{
+		stu = allhistorys[i];
+		fprintf(fp, "%s %s %s\n", stu.p1, stu.p2, stu.win);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
+void addhistory(char p1[11], char p2[11], char win[2])
+{
+	history stu;
+	strcpy(stu.p1, p1);
+	strcpy(stu.p2, p2);
+	strcpy(stu.win, win);
+	allhistorys[allhistoryscount++] = stu;
+}
+
 char name1[10], name2[10];//玩家姓名。
 int block[EDGE][EDGE];//0代表棋盘位置为空,1代表1玩家的棋子,2代表2玩家的棋子。
 int coord[2] = { EDGE / 2, EDGE / 2 };//选择的位置，初始默认在中间。
@@ -109,6 +217,8 @@ void board()//此函数中有清屏。
 	}
 	printf(" ════════════════════\n");
 }
+
+
 void init()//在这个函数中有清屏。
 {
 	int a, b;
@@ -125,9 +235,14 @@ void init()//在这个函数中有清屏。
 	printf("                             Use  │     W     │     to move and 'Q' to press.\n");
 	printf("                                  │  A  S  D  │ \n");
 	printf("                                  └-----------┘ \n\n");
+	readallhistorys();
+	displayallhistorys();
 	printf("                             Input the two players' name below before the chess.\n\n\n");
 	printf("                                                     ");
 	scanf("%s%s", &name1, &name2);
+	addhistory(name1, name2, "1");
+	//addhistory("name1", "name2", "1");
+	writeallhistorys();
 
 }
 void right()
