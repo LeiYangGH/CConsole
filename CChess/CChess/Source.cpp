@@ -18,8 +18,8 @@ int allhistoryscount = 0;
 
 void displayhistory(history stu)
 {
-	printf("%s%s\t%s%s\n", stu.p1, strcmp(stu.win, "0") == 0 ? "(win)" : "",
-		stu.p2, strcmp(stu.win, "1") == 0 ? "(win)" : "");
+	printf("%s%s\t%s%s\n", stu.p1, strcmp(stu.win, "1") == 0 ? "(win)" : "",
+		stu.p2, strcmp(stu.win, "2") == 0 ? "(win)" : "");
 }
 
 void displayallhistorys()
@@ -240,9 +240,8 @@ void init()//ÔÚÕâ¸öº¯ÊıÖĞÓĞÇåÆÁ¡£
 	printf("                             Input the two players' name below before the chess.\n\n\n");
 	printf("                                                     ");
 	scanf("%s%s", &name1, &name2);
-	addhistory(name1, name2, "1");
-	//addhistory("name1", "name2", "1");
-	writeallhistorys();
+	//addhistory(name1, name2, "1");
+	//writeallhistorys();
 
 }
 void right()
@@ -492,7 +491,10 @@ int win()//Ê×ÏÈËµÃ÷Ò»ÏÂ ÕâÀïµÄx´ú±íblockµÄµÚÒ»¸ö²ÎÊı,y´ú±íblockµÄµÚ¶ş¸ö²ÎÊı,¶øx´
 	}
 	if (heng >= 5 || shu >= 5 || zuoxie >= 5 || youxie >= 5)//ËÄ¸ö·½ÏòÉÏ,ÓĞÃ»ÓĞ´óÓÚµÈÓÚ5µÄ
 	{
+		addhistory(name1, name2, player == 1 ? "1" : "2");
+		writeallhistorys();
 		return 1;
+
 	}
 	else
 	{
