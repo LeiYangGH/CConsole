@@ -1,56 +1,28 @@
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+#include <stdlib.h>
 int login()
 {
-	int i = 3, ret = 0;
-	char input[20], pw[] = "12345";
-
+	int tryleft = 3;//返回值0为登录失败，1为成功
+	char input[20], pwd[] = "12345";//分别为用户输入密码和要求的密码
 	printf("---------------------------------------\n");
 	printf("             -欢迎进入系统-            \n");
 	printf("---------------------------------------\n");
-	while (i)
+	while (tryleft)
 	{
-		printf("请输入密码，你还有%d次机会：\n", i--);
+		printf("请输入密码，你还有%d次机会：\n", tryleft--);
 		//gets(upw);有点编译器不支持gets
 		scanf("%s", input);
-		if (strcmp(input, pw) == 0)
+		if (strcmp(input, pwd) == 0)
 		{
-			ret = 1; break;
+			return 1;
+			break;
 		}
 	}
-	return ret;
+	return 0;
 }
 
-int menu()
-{
-	printf("---------------------------------------\n");
-	printf("-            -趣味程序主菜单-         -\n");
-	printf("-            1.生活中的趣味题         -\n");
-	printf("-            2.数字趣味题             -\n");
-	printf("-            3.乒乓球队比赛分组       -\n");
-	printf("-            4.退出                   -\n");
-	printf("---------------------------------------\n");
-	int sub = 0; int s_ret;
-	while (1)
-	{
-		printf("请输入1-4.\n");
-		while (1)
-		{
-			s_ret = scanf("%d", &sub);
-			if (s_ret != 1)
-			{
-				fflush(stdin);
-				printf("输入格式错误，请重新输入\n");
-			}
-			else break;
-		}
-		if (1 <= sub && sub <= 4) break;
-	}
-	return sub;
-}
-
-void submenu_1()
+void calcdate()
 {
 	printf("---------------------------------------\n");
 	printf("           -生活中的趣味题 -           \n");
@@ -59,27 +31,28 @@ void submenu_1()
 	int daysofmonth[13] = { 0,31,28,31,30,31,30,31,31,30,31,30,31 };
 	int totaldays = 0, i;
 	int year, month, day;
-	int s_ret;
 	printf("请输入年月日\n");
 	while (1)
 	{
 		printf("年: ");
 		while (1)
 		{
-			s_ret = scanf("%d", &year);
-			if (s_ret != 1)
+			if (scanf("%d", &year) == 1)
+				break;
+			else
 			{
 				fflush(stdin);
 				printf("输入格式错误，请重新输入\n");
 			}
-			else break;
 		}
 
 		if (year < 0 || year>9999)
 			printf("输入格式错误，请重新输入.\n");
 		else
 		{
-			if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))  daysofmonth[2]++;
+			if ((year % 4 == 0 && year % 100 != 0)
+				|| (year % 400 == 0))  //闰年2月天数+1
+				daysofmonth[2]++;
 			break;
 		}
 	}
@@ -91,7 +64,8 @@ void submenu_1()
 			printf("输入格式错误，请重新输入.\n");
 		else
 		{
-			for (i = 0; i < month; i++) totaldays += daysofmonth[i];
+			for (i = 0; i < month; i++)
+				totaldays += daysofmonth[i];
 			break;
 		}
 
@@ -111,22 +85,22 @@ void submenu_1()
 	printf("%d年%d月%d日是第%d天。\n", year, month, day, totaldays);
 }
 
-void submenu_2()
+void prime()
 {
 	printf("---------------------------------------\n");
 	printf("             -数字趣味题 -             \n");
 	printf("---------------------------------------\n");
-	int x, i, ss = 1; int s_ret;
+	int x, i, ss = 1;
 	printf("请输入一个整数：");
 	while (1)
 	{
-		s_ret = scanf("%d", &x);
-		if (s_ret != 1)
+		if (scanf("%d", &x) == 1)
+			break;
+		else
 		{
 			fflush(stdin);
 			printf("输入格式错误，请重新输入\n");
 		}
-		else break;
 	}
 	for (i = 2; i < x; i++)
 		if (x%i == 0)
@@ -140,22 +114,20 @@ void submenu_2()
 		printf("%d不是素数。\n", x);
 }
 
-void submenu_3()
+void pingpang()
 {
 	printf("---------------------------------------\n");
 	printf("          -乒乓球队比赛分组-           \n");
 	printf("---------------------------------------\n");
-	int i, j, k, found = 0;
+	int i, j, k;
 	char a = ' ', b = ' ', c = ' ', ch[3] = { 'x','y','z' };
 	for (i = 0; i < 3; i++)
 	{
-		if (found)break;
 		a = ch[i];
 		if (a != 'x')
 		{
 			for (j = 0; j < 3; j++)
 			{
-				if (found) break;
 				c = ch[j];
 				if (c != 'x'&& c != 'z')
 				{
@@ -163,33 +135,62 @@ void submenu_3()
 						if (b != c && b != a && c != a)
 						{
 							b = ch[k];
-							found = 1;
+							printf("a和%c比.\n", a);
+							printf("b和%c比.\n", b);
+							printf("c和%c比.\n", c);
 							break;
 						}
 				}
 			}
 		}
 	}
-
-	printf("a和%c比.\n", a);
-	printf("b和%c比.\n", b);
-	printf("c和%c比.\n", c);
 }
 
-void main()
+int main()
 {
-	int choice = 0;
-	if (login())
-		while (1)
+	int choice = -1;
+	if (!login())
+	{
+		printf("\n密码错误，将退出程序！\n");
+		system("pause");
+		return 0;
+	}
+	while (choice != 0)
+	{
+		printf("\n\t 趣味程序");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 生活中的趣味题");
+		printf("\n\t 2. 数字趣味题");
+		printf("\n\t 3. 乒乓球队比赛分组");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);//清楚输入缓冲区，以免意外非法输入造成死循环
+		choice = getchar();//获得输入字符
+		switch (choice)
 		{
-			choice = menu();
-			if (choice == 1)
-				submenu_1();
-			else if (choice == 2)
-				submenu_2();
-			else if (choice == 3)
-				submenu_3();
-			else if (choice == 4) break;
-			printf("\n\n");
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
+			system("pause");
+			exit(0);
+			break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			calcdate();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			prime();
+			break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			pingpang();
+			break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
 		}
+	}
+	printf("\n\n按任意键退出\n");
+	system("pause");
+	return 0;
 }
