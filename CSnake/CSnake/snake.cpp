@@ -1,19 +1,28 @@
 #include "game.h"
-
+#include <ctime>
 //Ö÷º¯Êý
 int main()
 {
 	GameInit();
+	time_t td = time(0);
+	struct tm   nowd = *localtime(&td);
 
 	while (1)
 	{
 		while (!kbhit())
 		{
 			cleardevice();
-			if (food.isEat == 0)
+			time_t t = time(0);
+			struct tm * now = localtime(&t);
+
+			if (food.isEat == 0 || difftime(t, mktime(&nowd)) >= 10)
 			{
 				FoodCoor();
+				td = time(0);
+				nowd = *localtime(&t);
 			}
+
+
 			FoodDraw();
 			SnakeMove();
 			FoodEat();
