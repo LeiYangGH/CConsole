@@ -1,12 +1,7 @@
-// CProj.cpp : Defines the entry point for the console application.
-//
-
-//#include "stdafx.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_INPUT "input.txt"
+#define FILE_INPUT "stu.txt"
 #define MAX_STRLEN 20
 #define COURSES_COUNT 5
 
@@ -22,14 +17,18 @@ student allstudents[100];//所有学生
 int allstudentscount = 0;//学生数量
 
 
-typedef struct course//课程
+//typedef struct course//课程
+//{
+//	int oldindex;//课程在input.txt里的序号
+//	float average;//平均分
+//}course;
+//course allcourses[COURSES_COUNT];//5门课程
+
+								 //字符串相等
+int streq(char *s1, char *s2)
 {
-	int oldindex;//课程在input.txt里的序号
-	float average;//平均分
-}course;
-course allcourses[COURSES_COUNT];//5门课程
-
-
+	return strcmp(s1, s2) == 0;
+}
 //int cmpcourseindex;//排序的课程下标（0～4）
 				   //字符串转整数
 int toint(char *s)
@@ -67,14 +66,15 @@ void displaystudent(student stu)
 void displayallstudents()
 {
 	int i;
-	printf("所有%d位同学分数如下\r\n", allstudentscount);
-	printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "学号", "姓名", "语文", "数学", "英文", "体育", "艺术");
-	printf("--------------------------------------------\r\n");
+	printf("所有%d位同学分数如下:\r\n", allstudentscount);
+	printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		"学号", "姓名", "语文", "数学", "英文", "体育", "艺术");
+	printf("--------------------------------------------------\r\n");
 	for (i = 0; i < allstudentscount; i++)
 	{
 		displaystudent(allstudents[i]);
 	}
-	printf("\r\n--------------------------------------------\r\n");
+	printf("--------------------------------------------------\r\n");
 }
 
 //从一行拆分构造出一个学生
@@ -152,14 +152,14 @@ void readallstudents()
 
 
 //下面两个函数是快速排序qsort要求的格式，按总分排学生
-int cmptotalfunc(const void * a, const void * b)
-{
-	return ((student*)a)->total - ((student*)b)->total;
-}
-void sorttotal()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
-}
+//int cmptotalfunc(const void * a, const void * b)
+//{
+//	return ((student*)a)->total - ((student*)b)->total;
+//}
+//void sorttotal()
+//{
+//	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
+//}
 
 ////按某科目排所有成绩
 //int cmponecoursefunc(const void * a, const void * b)
@@ -322,13 +322,59 @@ void calcdisplaybeststudetns()
 	}
 	printf("\n");
 }
+
+//根据编号查数组里的序号
+int getstudentidexbyno(char no[50])
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (streq(allstudents[i].no, no))
+			return i;
+	}
+	return -1;//没找到
+}
+
+void editstudent(char no[50])
+{
+	int i;
+	int s1, s2, s3, s4, s5;
+	i = getstudentidexbyno(no);
+	if (i >= 0)
+	{
+		printf("\n请输入5科成绩（整数），空格隔开\n");
+		scanf("%d%d%d%d%d",
+			&allstudents[i].score[0],
+			&allstudents[i].score[1],
+			&allstudents[i].score[2],
+			&allstudents[i].score[3],
+			&allstudents[i].score[4]);
+		writeallstudents();
+		printf("修改完毕。\r\n");
+	}
+	else
+	{
+		printf("没找到对应学号的学生。\r\n");
+	}
+
+}
+
+void prompteditstudent()
+{
+	char no[50];
+	printf("请输入要修改的学号:");
+	scanf("%s", &no);
+	editstudent(no);
+}
+
 //2
 int main()
 {
 #if 1
 	readallstudents();
 	displayallstudents();
-	promptaddstudent();
+	//promptaddstudent();
+	prompteditstudent();
 	displayallstudents();
 	//calcdisplayhighlowave(promptaskcmpcourseindex());
 	//calcdisplaybeststudetns();
@@ -361,8 +407,8 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			sorttotal();
-			displayallstudents();
+			/*sorttotal();
+			displayallstudents();*/
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
