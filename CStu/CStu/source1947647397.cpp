@@ -286,20 +286,18 @@ void prompteditstudent()
 	editstudent(no);
 }
 
+void welcome()
+{
+	////////////////你自己加/////////////
+	printf("-----------这里输入欢迎界面---------");
+	getchar();
+	system("cls");
+}
+
 int main()
 {
-#if 0
-	readallstudents();
-	displayallstudents();
-	//promptaddstudent();
-	prompteditstudent();
-	displayallstudents();
-	//calcdisplayhighlowave(promptaskcmpcourseindex());
-	//calcdisplaybeststudetns();
-	system("pause");
-
-#endif
 	int choice = -1;
+	welcome();
 	readallstudents();
 	while (choice != 0)
 	{
