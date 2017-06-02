@@ -20,6 +20,7 @@ typedef struct student
 student allstudents[100];//所有学生
 int allstudentscount = 0;//学生数量
 
+
 typedef struct course//课程
 {
 	int oldindex;//课程在input.txt里的序号
@@ -236,16 +237,25 @@ void calcdisplayhighlowave(int courseid)
 {
 	int i, t, h = 0, l = 100, sum = 0;
 	float ave;
+	int  below60stuindexes[20], belowcount = 0;
 	for (i = 0; i < allstudentscount; i++)
 	{
 		t = allstudents[i].score[courseid];
 		h = h < t ? t : h;
 		l = l > t ? t : l;
 		sum += t;
+		if (t < 60)
+			below60stuindexes[belowcount++] = i;
 	}
 	ave = sum / (float)allstudentscount;
 	printf("第%d门课程统计信息：\r\n", courseid + 1);
 	printf("平均分:%.1f、最高分%d、最低分%d\n", ave, h, l);
+	printf("补考名单:", ave, h, l);
+	for (i = 0; i < belowcount; i++)
+	{
+		printf("%s\t", allstudents[below60stuindexes[i]].name);
+	}
+	printf("\n");
 }
 
 int main()
