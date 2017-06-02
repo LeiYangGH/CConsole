@@ -16,46 +16,18 @@ typedef struct student
 student allstudents[100];//所有学生
 int allstudentscount = 0;//学生数量
 
-
-//typedef struct course//课程
-//{
-//	int oldindex;//课程在input.txt里的序号
-//	float average;//平均分
-//}course;
-//course allcourses[COURSES_COUNT];//5门课程
-
-								 //字符串相等
+//字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-//int cmpcourseindex;//排序的课程下标（0～4）
-				   //字符串转整数
+//字符串转整数
 int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
-//显示一个学生成绩
-//void displaystudent(student stu)
-//{
-//	printf("%s\t%d\t%d\t%d\t%d\t%d\n", stu.name,
-//		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4]);
-//}
-//
-////显示所有学生成绩
-//void displayallstudents()
-//{
-//	int i;
-//	printf("所有%d位同学分数如下\r\n", allstudentscount);
-//	printf("--------------------------------------------\r\n");
-//	for (i = 0; i < allstudentscount; i++)
-//	{
-//		displaystudent(allstudents[i]);
-//	}
-//	printf("--------------------------------------------\r\n");
-//}
-//显示一个学生成绩
+
 void displaystudent(student stu)
 {
 	printf("%s\t%s\t%d\t%d\t%d\t%d\t%d\n", stu.no, stu.name,
@@ -145,59 +117,9 @@ void readallstudents()
 			++allstudentscount;
 			allstudents[allstudentscount - 1] = getstudentfromline(line);
 		}
-		//calctotalandave();
 	}
 
 }
-
-
-//下面两个函数是快速排序qsort要求的格式，按总分排学生
-//int cmptotalfunc(const void * a, const void * b)
-//{
-//	return ((student*)a)->total - ((student*)b)->total;
-//}
-//void sorttotal()
-//{
-//	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
-//}
-
-////按某科目排所有成绩
-//int cmponecoursefunc(const void * a, const void * b)
-//{
-//	return ((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex];
-//}
-//void sortonecourse()
-//{
-//	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
-//}
-
-//计算每个科目的平均分
-//void calceachcourseave()
-//{
-//	int i, j;
-//	float sum;
-//	for (j = 0; j < COURSES_COUNT; j++)
-//	{
-//		sum = 0;
-//		for (i = 0; i < allstudentscount; i++)
-//		{
-//			sum += allstudents[i].score[j];
-//		}
-//		allcourses[j].oldindex = j;
-//		allcourses[j].average = sum / (float)COURSES_COUNT;
-//	}
-//}
-
-//科目平均分排序
-//int cmpcoursesavefunc(const void * a, const void * b)
-//{
-//	return  ((course*)a)->average > ((course*)b)->average;
-//}
-//void sortcoursesave()
-//{
-//	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
-//}
-
 
 //提示输入要排序的科目
 int promptaskcmpcourseindex()
@@ -240,7 +162,6 @@ void addstudent(char no[], char name[], int s0, int s1, int s2, int s3, int s4)
 	stu.score[3] = s3;
 	stu.score[4] = s4;
 	allstudents[allstudentscount++] = stu;
-	//calctotalandave();
 	writeallstudents();
 }
 
@@ -282,8 +203,6 @@ void calcdisplayhighlowave(int courseid)
 	printf("\n");
 }
 
-
-//1
 void calcdisplaybeststudetns()
 {
 	int i, j, below60courseexist;
@@ -367,10 +286,9 @@ void prompteditstudent()
 	editstudent(no);
 }
 
-//2
 int main()
 {
-#if 1
+#if 0
 	readallstudents();
 	displayallstudents();
 	//promptaddstudent();
@@ -382,18 +300,16 @@ int main()
 
 #endif
 	int choice = -1;
-	printf("\n开始读文件...\n");
 	readallstudents();
-	printf("\n读文件结束！\n");
-
 	while (choice != 0)
 	{
 		printf("\n\t 学生成绩读入统计");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 按学生总分升降序输出");
-		printf("\n\t 2. 按某门课程分数升降序输出");
-		printf("\n\t 3. 按所有课程平均分升降序输出");
-		printf("\n\t 4. 添加学生成绩");
+		printf("\n\t 1. 录入新记录");
+		printf("\n\t 2. 显示所有记录");
+		printf("\n\t 3. 修改分数");
+		printf("\n\t 4. 按照单门课程统计、查询平均分、最高分、最低分、补考（不及格）学生名单");
+		printf("\n\t 5. 获奖学金学生名单");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -407,21 +323,23 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			/*sorttotal();
-			displayallstudents();*/
+			promptaddstudent();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptaskcmpcourseindex();
-
+			displayallstudents();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-
+			prompteditstudent();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptaddstudent();
+			calcdisplayhighlowave(promptaskcmpcourseindex());
+			break;
+		case '5':
+			printf("\n\n你选择了 5\n");
+			calcdisplaybeststudetns();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
