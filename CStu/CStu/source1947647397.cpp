@@ -258,12 +258,54 @@ void calcdisplayhighlowave(int courseid)
 	printf("\n");
 }
 
+
+//1
+void calcdisplaybeststudetns()
+{
+	int i, j, below60courseexist;
+	float ave;
+	int  beststuindexes[20], bestcount = 0;
+
+	calctotalandave();
+	for (i = 0; i < allstudentscount; i++)
+	{
+		if (allstudents[i].average > 85)
+		{
+			below60courseexist = 0;
+			for (j = 0; j < COURSES_COUNT; j++)
+			{
+				if (allstudents[i].score[j] < 60)
+				{
+					below60courseexist = 1;
+					break;
+				}
+			}
+			if (below60courseexist == 0)
+			{
+				beststuindexes[bestcount++] = i;
+			}
+		}
+	}
+	if (bestcount == 0)
+		printf("奖学金获得者（平均分大于85而且没有不及格课程）:（没人）");
+	else
+	{
+		printf("奖学金获得者（平均分大于85而且没有不及格课程）:");
+		for (i = 0; i < bestcount; i++)
+		{
+			printf("%s\t", allstudents[beststuindexes[i]].name);
+		}
+	}
+	printf("\n");
+}
+//2
 int main()
 {
 #if 1
 	readallstudents();
 	displayallstudents();
-	calcdisplayhighlowave(promptaskcmpcourseindex());
+	//calcdisplayhighlowave(promptaskcmpcourseindex());
+	calcdisplaybeststudetns();
 	system("pause");
 
 #endif
