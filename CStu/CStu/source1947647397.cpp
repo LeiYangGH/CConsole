@@ -28,7 +28,6 @@ typedef struct course//课程
 course allcourses[COURSES_COUNT];//5门课程
 
 
-int ascending = 1;//升序还是降序
 int cmpcourseindex;//排序的课程下标（0～4）
 				   //字符串转整数
 int toint(char *s)
@@ -161,7 +160,7 @@ void readallstudents()
 //下面两个函数是快速排序qsort要求的格式，按总分排学生
 int cmptotalfunc(const void * a, const void * b)
 {
-	return (((student*)a)->total - ((student*)b)->total)*ascending;
+	return ((student*)a)->total - ((student*)b)->total;
 }
 void sorttotal()
 {
@@ -171,7 +170,7 @@ void sorttotal()
 //按某科目排所有成绩
 int cmponecoursefunc(const void * a, const void * b)
 {
-	return (((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex])*ascending;
+	return ((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex];
 }
 void sortonecourse()
 {
@@ -198,21 +197,13 @@ void calceachcourseave()
 //科目平均分排序
 int cmpcoursesavefunc(const void * a, const void * b)
 {
-	return (int)(((course*)a)->average - ((course*)b)->average)*ascending;
+	return  ((course*)a)->average > ((course*)b)->average;
 }
 void sortcoursesave()
 {
 	qsort(allcourses, COURSES_COUNT, sizeof(course), cmpcoursesavefunc);
 }
 
-//提示选择升序还是降序
-void promptaskascending()
-{
-	int asc;
-	printf("\n请输入升序(1)还是降序(-1)，以回车结束：");
-	scanf("%d", &asc);
-	ascending = asc;
-}
 
 //提示输入要排序的科目
 void promptaskcmpcourseindex()
@@ -275,6 +266,12 @@ void promptaddstudent()
 
 int main()
 {
+#if 1
+	readallstudents();
+	displayallstudents();
+	system("pause");
+
+#endif
 	int choice = -1;
 	printf("\n开始读文件...\n");
 	readallstudents();
@@ -301,21 +298,18 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaskascending();
 			sorttotal();
 			displayallstudents();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
 			promptaskcmpcourseindex();
-			promptaskascending();
 			sortonecourse();
 			displayonecourseorder();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
 			calceachcourseave();
-			promptaskascending();
 			sortcoursesave();
 			displayallcoursesaveorder();
 			break;
