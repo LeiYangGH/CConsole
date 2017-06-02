@@ -28,7 +28,7 @@ typedef struct course//课程
 course allcourses[COURSES_COUNT];//5门课程
 
 
-int cmpcourseindex;//排序的课程下标（0～4）
+//int cmpcourseindex;//排序的课程下标（0～4）
 				   //字符串转整数
 int toint(char *s)
 {
@@ -38,7 +38,6 @@ int toint(char *s)
 //显示一个学生成绩
 void displaystudent(student stu)
 {
-	printf("\r\n");
 	printf("%s\t%d\t%d\t%d\t%d\t%d\t%.1f\n", stu.name,
 		stu.score[0], stu.score[1], stu.score[2], stu.score[3], stu.score[4],
 		stu.average);
@@ -54,40 +53,9 @@ void displayallstudents()
 	{
 		displaystudent(allstudents[i]);
 	}
-	printf("\r\n--------------------------------------------\r\n");
-}
-//显示一门课程排序
-void displayonecourseorder()
-{
-	int i;
-	printf("第%d科目分数如下\r\n", cmpcourseindex + 1);
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
-	{
-		printf("\r\n");
-		student stu = allstudents[i];
-		printf("%s\t%d\n", stu.name,
-			stu.score[cmpcourseindex]);
-	}
-	printf("\r\n--------------------------------------------\r\n");
 }
 
-
-//显示所有科目平均分排序
-void displayallcoursesaveorder()
-{
-	int i;
-	printf("所有科目平均分排序如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < COURSES_COUNT; i++)
-	{
-		printf("\r\n");
-		course cou = allcourses[i];
-		printf("第%d科\t%.1f\n", cou.oldindex + 1,
-			cou.average);
-	}
-	printf("\r\n--------------------------------------------\r\n");
-}
 //从一行拆分构造出一个学生
 student getstudentfromline(char *line)
 {
@@ -167,15 +135,15 @@ void sorttotal()
 	qsort(allstudents, allstudentscount, sizeof(student), cmptotalfunc);
 }
 
-//按某科目排所有成绩
-int cmponecoursefunc(const void * a, const void * b)
-{
-	return ((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex];
-}
-void sortonecourse()
-{
-	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
-}
+////按某科目排所有成绩
+//int cmponecoursefunc(const void * a, const void * b)
+//{
+//	return ((student*)a)->score[cmpcourseindex] - ((student*)b)->score[cmpcourseindex];
+//}
+//void sortonecourse()
+//{
+//	qsort(allstudents, allstudentscount, sizeof(student), cmponecoursefunc);
+//}
 
 //计算每个科目的平均分
 void calceachcourseave()
@@ -206,12 +174,12 @@ void sortcoursesave()
 
 
 //提示输入要排序的科目
-void promptaskcmpcourseindex()
+int promptaskcmpcourseindex()
 {
 	int courseid;
 	printf("\n请输入要排序的课程序号(1~5)，以回车结束：");
 	scanf("%d", &courseid);
-	cmpcourseindex = courseid - 1;
+	return courseid - 1;
 }
 
 void writeallstudents()
@@ -264,11 +232,28 @@ void promptaddstudent()
 	printf("完成第%d个学生成绩录入!\r\n", allstudentscount);
 }
 
+void calcdisplayhighlowave(int courseid)
+{
+	int i, t, h = 0, l = 100, sum = 0;
+	float ave;
+	for (i = 0; i < allstudentscount; i++)
+	{
+		t = allstudents[i].score[courseid];
+		h = h < t ? t : h;
+		l = l > t ? t : l;
+		sum += t;
+	}
+	ave = sum / (float)allstudentscount;
+	printf("第%d门课程统计信息：\r\n", courseid + 1);
+	printf("平均分:%.1f、最高分%d、最低分%d\n", ave, h, l);
+}
+
 int main()
 {
 #if 1
 	readallstudents();
 	displayallstudents();
+	calcdisplayhighlowave(promptaskcmpcourseindex());
 	system("pause");
 
 #endif
@@ -304,14 +289,12 @@ int main()
 		case '2':
 			printf("\n\n你选择了 2\n");
 			promptaskcmpcourseindex();
-			sortonecourse();
-			displayonecourseorder();
+
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
 			calceachcourseave();
 			sortcoursesave();
-			displayallcoursesaveorder();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
