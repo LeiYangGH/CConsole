@@ -36,6 +36,12 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+int cmpfunc(const void * b, const void * a)
+{
+	return ((group*)a)->total - ((group*)b)->total;
+}
+
+
 void displaygroup(group g)
 {
 	printf("%s\t%s\t%s\t%s\t%d\n", g.gname,
@@ -409,13 +415,26 @@ void grouptest()
 	}
 }
 
-void modulegroup()
+void modulegrouptest()
 {
 	welcomegroup();
 	grouptest();
 	printf("所有%d组参赛小组得分如下:\r\n", allgroupscount);
 	displayallgroups();
 	writeallgroups();
+}
+
+void modulereadsortgroup()
+{
+	readallgroups();
+	system("cls");
+	printf("----所有%d组参赛小组按总分倒序排序信息如下:----\r\n", allgroupscount);
+	qsort(allgroups, allgroupscount, sizeof(group), cmpfunc);
+	displayallgroups();
+	printf("-----------按任意键回主菜单---------\n");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
+	system("cls");
 }
 
 int main()
@@ -425,7 +444,7 @@ int main()
 	srand(time(NULL));
 	init();
 #if TEST
-	modulegroup();
+	modulereadsortgroup();
 	//readallgroups();
 	//displayallgroups();
 	//writeallgroups();
@@ -455,7 +474,8 @@ int main()
 		printf("\n\t 1. 退出");
 		printf("\n\t 2. 模块2 单运算符四则运算");
 		printf("\n\t 3. 模块3 多运算符四则运算");
-		printf("\n\t 4. 模块3 多运算符四则运算");
+		printf("\n\t 4. 模块4 多运算符四则运算");
+		printf("\n\t 5. 模块5 从分组数据文件获得参赛小组成绩，输出排序结果");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -477,11 +497,12 @@ int main()
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			modulegroup();
+			modulegrouptest();
 			break;
-			//case '5':
-			//	printf("\n\n你选择了 5\n");
-			//	break;
+		case '5':
+			printf("\n\n你选择了 5\n");
+			modulereadsortgroup();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;

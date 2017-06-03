@@ -30,7 +30,10 @@ for my $f (@files)
 		   open(FILE, $f);  
 		    while (<FILE>) 
 		    {
-			 if ($_ =~ /\w+\s\w+\(.*?\)/)
+			 if (
+			 $_ =~ /sort/
+			&&  $_ =~ /\w+\s\w+\(.*?\)/
+			 )
 			 {
 			    say "$&";
 			    # print "$fullname\n\n";
