@@ -9,14 +9,15 @@
 #define FILE_SCORE "num_name.txt"
 #define MIN 2
 #define MAX 9
-#define TEST 1
+#define TEST 0
+#define NOANSWER 0
 //1
 typedef struct group
 {
 	char gname[MAX_STRLEN];//学号
-	char p1[MAX_STRLEN];//姓名1
-	char p2[MAX_STRLEN];//姓名2
-	char p3[MAX_STRLEN];//姓名3
+	char players[MAX_STRLEN][3];//姓名1
+	//char p2[MAX_STRLEN];//姓名2
+	//char p3[MAX_STRLEN];//姓名3
 	int score[3];//分数
 	int total;//总分
 }group;
@@ -37,14 +38,16 @@ int toint(char *s)
 
 void displaygroup(group g)
 {
-	printf("%s\t%s\t%s\t%s\t%d\n", g.gname, g.p1, g.p2, g.p3, g.total);
+	printf("%s\t%s\t%s\t%s\t%d\n", g.gname,
+		//g.p1, g.p2, g.p3,
+		g.players[0], g.players[1], g.players[2],
+		g.total);
 }
 
 //显示所有学生成绩
 void displayallgroups()
 {
 	int i;
-	printf("所有%d组参赛小组信息如下:\r\n", allgroupscount);
 	printf("%s\t%s\t%s\t%s\t%s\n",
 		"分组", "选手1", "选手2", "选手3", "总分");
 	printf("--------------------------------------------------\r\n");
@@ -69,14 +72,23 @@ group getgroupfromline(char *line)
 		case 1:
 			strcpy(g.gname, part);
 			break;
+			//case 2:
+			//	strcpy(g.p1, part);
+			//	break;
+			//case 3:
+			//	strcpy(g.p2, part);
+			//	break;
+			//case 4:
+			//	strcpy(g.p3, part);
+			//	break;
 		case 2:
-			strcpy(g.p1, part);
+			strcpy(g.players[0], part);
 			break;
 		case 3:
-			strcpy(g.p2, part);
+			strcpy(g.players[1], part);
 			break;
 		case 4:
-			strcpy(g.p3, part);
+			strcpy(g.players[2], part);
 			break;
 		case 5:
 			g.total = toint(part);
@@ -127,19 +139,16 @@ void writeallgroups()
 	for (i = 0; i < allgroupscount; i++)
 	{
 		g = allgroups[i];
-		fprintf(fp, "%s %s %s %s %d\n", g.gname, g.p1, g.p2, g.p3, g.total);
+		fprintf(fp, "%s %s %s %s %d\n", g.gname,
+			//g.p1, g.p2, g.p3,
+			g.players[0], g.players[1], g.players[2],
+			g.total);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
-void welcome()
-{
-	////////////////你自己加/////////////
-	printf("-----------这里输入欢迎界面---------");
-	getchar();
-	system("cls");
-}
+
 //2
 int add(int a, int b)
 {
@@ -237,7 +246,7 @@ int testone(int nums[], int opindex[], int oplen)
 		concatstringandint(exp, nums[i + 1]);
 	}
 	printf("%s =? ", exp);
-#if TEST
+#if NOANSWER
 	printf("\n");
 
 	return 0;
@@ -360,6 +369,55 @@ int module2or3(int issingleop)
 	return total;
 }
 
+void welcomegroup()
+{
+	readallgroups();
+	system("cls");
+	printf("-----------欢迎进入小组赛---------\n");
+	printf("所有%d组参赛小组信息如下:\r\n", allgroupscount);
+	displayallgroups();
+	printf("-----------按任意键开始，注意，一旦开始就必须依次完成所有选手比赛---------\n");
+	printf("-----------如果显示的信息里已经有分数，那么新比赛的分数会覆盖原来的分数---------\n");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
+	system("cls");
+}
+
+void grouptest()
+{
+	int i, j, k, total = 0;
+	int opidrange[4] = { 0,1,2,3 };
+	for (i = 0; i < allgroupscount; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			printf("-----------下面请 %s 小组的选手 %s 答题---------\n",
+				allgroups[i].gname, allgroups[i].players[j]);
+#if TEST
+			for (k = 0; k < 2; k++)
+#else
+			for (k = 0; k < 10; k++)
+#endif
+			{
+				if (questionvaroplenandrange(random(1, 3), opidrange))
+				{
+					total += 10;
+				}
+			}
+		}
+		allgroups[i].total = total;
+	}
+}
+
+void modulegroup()
+{
+	welcomegroup();
+	grouptest();
+	printf("所有%d组参赛小组得分如下:\r\n", allgroupscount);
+	displayallgroups();
+	writeallgroups();
+}
+
 int main()
 {
 	int i, total = 0;
@@ -367,10 +425,10 @@ int main()
 	srand(time(NULL));
 	init();
 #if TEST
-
-	readallgroups();
-	displayallgroups();
-	writeallgroups();
+	modulegroup();
+	//readallgroups();
+	//displayallgroups();
+	//writeallgroups();
 	//int opsids[] = { 0,1,2,3 };
 	//int opsids[] = { 1,1,1,1 };
 	//int useopids[4];
@@ -394,34 +452,33 @@ int main()
 	while (choice != 0)
 	{
 		printf("\n\t 心算练习/竞赛系统");
-		printf("\n\t 0. 退出");
-		printf("\n\t 1. 模块2 单运算符四则运算");
-		printf("\n\t 2. 模块3 多运算符四则运算");
+		printf("\n\t 1. 退出");
+		printf("\n\t 2. 模块2 单运算符四则运算");
+		printf("\n\t 3. 模块3 多运算符四则运算");
+		printf("\n\t 4. 模块3 多运算符四则运算");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
-		case '0':
+		case '1':
 			printf("\n\n 你选择了退出。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
 			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			module2or3(1);
-			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
+			module2or3(1);
+			break;
+		case '3':
+			printf("\n\n你选择了 3\n");
 			module2or3(0);
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			//	break;
+		case '4':
+			printf("\n\n你选择了 4\n");
+			modulegroup();
+			break;
 			//case '5':
 			//	printf("\n\n你选择了 5\n");
 			//	break;
