@@ -1,16 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-//#include <conio.h>
 #include <time.h>
 #define MAX_STRLEN 20
 #define FILE_GROUP "group.txt"
-
-#define FILE_SCORE "num_name.txt"
+//计算的数的范围
 #define MIN 2
 #define MAX 9
 #define TEST 0
-#define NOANSWER 0
+#define NOANSWER 0 //不用用户回答，只显示题 1或者0
+#define LESSLOOP 0 //减少循环次数 1或者0
 //1
 typedef struct group
 {
@@ -47,16 +46,13 @@ int cmpgroupfunc(const void * b, const void * a)
 	return ((group*)a)->total - ((group*)b)->total;
 }
 
-
 void displaygroup(group g)
 {
 	printf("%s\t%s\t%s\t%s\t%d\n", g.gname,
-		//g.p1, g.p2, g.p3,
 		g.players[0], g.players[1], g.players[2],
 		g.total);
 }
 
-//显示所有学生成绩
 void displayallgroups()
 {
 	int i;
@@ -84,15 +80,6 @@ group getgroupfromline(char *line)
 		case 1:
 			strcpy(g.gname, part);
 			break;
-			//case 2:
-			//	strcpy(g.p1, part);
-			//	break;
-			//case 3:
-			//	strcpy(g.p2, part);
-			//	break;
-			//case 4:
-			//	strcpy(g.p3, part);
-			//	break;
 		case 2:
 			strcpy(g.players[0], part);
 			break;
@@ -113,8 +100,6 @@ group getgroupfromline(char *line)
 	return g;
 }
 
-
-//读文件到学生数组
 void readallgroups()
 {
 	char line[200];
@@ -152,7 +137,6 @@ void writeallgroups()
 	{
 		g = allgroups[i];
 		fprintf(fp, "%s %s %s %s %d\n", g.gname,
-			//g.p1, g.p2, g.p3,
 			g.players[0], g.players[1], g.players[2],
 			g.total);
 	}
@@ -160,8 +144,6 @@ void writeallgroups()
 	printf("已保存记录到文件。");
 }
 
-
-//2
 int add(int a, int b)
 {
 	return a + b;
@@ -191,33 +173,12 @@ int random(int min, int max)
 	return rand() % (max - min + 1) + min;
 }
 
-int randomminmax()
+int randomminmax()//固定1-9
 {
 	return rand() % (MAX - MIN + 1) + MIN;
 }
 
-void generateuseids(int allcnt, int usecnt, int useids[])
-{
-	int i;
-	int r, ri, ucnt = 0, tmp, top;
-	int allids[100];
-	for (i = 0; i < allcnt; i++)
-	{
-		allids[i] = i;
-	}
-	while (ucnt < usecnt)
-	{
-		ri = random(0, allcnt - ucnt);
-		useids[ucnt++] = r = allids[ri];
-		top = allcnt - ucnt - 1;
-		if (r < top)
-		{
-			allids[r] = allids[top];
-		}
-	}
-}
-
-//1+2*3/4 n={1,2,3,4} op ={+,*,/} oplen =3
+//示例：1+2*3/4 n={1,2,3,4} op ={+,*,/} oplen =3
 int calc(int n[], int opindex[], int oplen)
 {
 	int i, re = n[0];
@@ -279,6 +240,8 @@ int testone(int nums[], int opindex[], int oplen)
 	}
 #endif
 }
+
+//只用来测试
 void testop()
 {
 	int nums[] = { 1,2,3,4 };
@@ -330,7 +293,11 @@ int module2or3(int issingleop)
 
 
 		printf("\n-----2题运算对象均是2位整数-------\n");
+#if LESSLOOP
 		for (i = 0; i < 2; i++)
+#else
+		for (i = 0; i < 2; i++)
+#endif
 		{
 			if (questionvaroplenandrange(1, opidrange))
 			{
@@ -339,7 +306,11 @@ int module2or3(int issingleop)
 		}
 
 		printf("\n-----4题运算对象均是3位整数-------\n");
+#if LESSLOOP
+		for (i = 0; i < 2; i++)
+#else
 		for (i = 0; i < 4; i++)
+#endif
 		{
 			if (questionvaroplenandrange(2, opidrange))
 			{
@@ -348,7 +319,11 @@ int module2or3(int issingleop)
 		}
 
 		printf("\n-----6题运算对象均是4位整数-------\n");
+#if LESSLOOP
+		for (i = 0; i < 2; i++)
+#else
 		for (i = 0; i < 6; i++)
+#endif
 		{
 			if (questionvaroplenandrange(3, opidrange))
 			{
@@ -357,7 +332,11 @@ int module2or3(int issingleop)
 		}
 
 		printf("\n-----8题运算对象均是2-4位整数-------\n");
+#if LESSLOOP
+		for (i = 0; i < 2; i++)
+#else
 		for (i = 0; i < 8; i++)
+#endif		
 		{
 			if (questionvaroplenandrange(random(1, 3), opidrange))
 			{
@@ -403,9 +382,10 @@ void grouptest()
 	{
 		for (j = 0; j < 3; j++)
 		{
+			total = 0;
 			printf("-----------下面请 %s 小组的选手 %s 答题---------\n",
 				allgroups[i].gname, allgroups[i].players[j]);
-#if TEST
+#if LESSLOOP
 			for (k = 0; k < 2; k++)
 #else
 			for (k = 0; k < 10; k++)
@@ -416,8 +396,8 @@ void grouptest()
 					total += 10;
 				}
 			}
+			allgroups[i].total = total;
 		}
-		allgroups[i].total = total;
 	}
 }
 
@@ -486,7 +466,7 @@ void singletest()
 	{
 		printf("-----------下面请选手 %s 答题---------\n",
 			allsingles[i].name);
-#if TEST
+#if LESSLOOP
 		for (k = 0; k < 2; k++)
 #else
 		for (k = 0; k < 20; k++)
