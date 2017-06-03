@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdio.h>
-#include <conio.h>
+//#include <conio.h>
 #include <time.h>
 #define USE_QUESTIONS_COUNT 3
 #define FILE_SEL "file1.txt"
@@ -10,6 +9,7 @@
 #define FILE_SCORE "num_name.txt"
 #define MIN 2
 #define MAX 9
+#define TEST 0
 
 int add(int a, int b)
 {
@@ -354,6 +354,12 @@ int testone(int nums[], int opindex[], int oplen)
 		concatstringandint(exp, nums[i + 1]);
 	}
 	printf("%s =? ", exp);
+#if TEST
+	printf("\n");
+
+	return 0;
+#else
+
 	re = calc(nums, opindex, oplen);
 	scanf("%d", &input);
 	if (re == input)
@@ -367,6 +373,7 @@ int testone(int nums[], int opindex[], int oplen)
 		printf("错误！正确答案应该是 %d\n\n", re);
 		return 0;
 	}
+#endif
 }
 void testop()
 {
@@ -378,99 +385,82 @@ void testop()
 	testone(nums, opindex, len);
 }
 
-int module2_2(int op)
+int questionvaroplenandrange(int oplen, int opidrange[])
 {
-	int i, total = 0;
+	int i;
 	int nums[4];
-	int opindex[3];
-	int len;
-	nums[0] = randomminmax();
-	nums[1] = randomminmax();
-	opindex[0] = op - 1;
-	return testone(nums, opindex, 1);
-}
-
-int module2_4(int op)
-{
-	int i, total = 0;
-	int nums[4];
-	int opindex[3];
-	int len;
-	nums[0] = randomminmax();
-	nums[1] = randomminmax();
-	nums[2] = randomminmax();
-	opindex[0] = op - 1;
-	opindex[1] = op - 1;
-	return testone(nums, opindex, 2);
-}
-
-int module2_6(int op)
-{
-	int i, total = 0;
-	int nums[4];
-	int opindex[3];
-	int len;
+	int opindex[4];
 	nums[0] = randomminmax();
 	nums[1] = randomminmax();
 	nums[2] = randomminmax();
 	nums[3] = randomminmax();
-	opindex[0] = op - 1;
-	opindex[1] = op - 1;
-	opindex[2] = op - 1;
-	return testone(nums, opindex, 3);
+	opindex[0] = opidrange[random(0, 3)];
+	opindex[1] = opidrange[random(0, 3)];
+	opindex[2] = opidrange[random(0, 3)];
+	opindex[3] = opidrange[random(0, 3)];
+	return testone(nums, opindex, oplen);
 }
 
-int module2()
+int module2or3(int issingleop)
 {
 	int i, op = 1, total = 0;
-	int nums[4];
-	int opindex[3];
-	int len;
-	int(*f[3])(int) = { module2_2 ,module2_4 ,module2_6 };
-	printf("\n请输入运算符（整数）\n1 +\n2 -\n3 *\n4 /:");
-	scanf("%d", &op);
-	for (i = 0; i < 2; i++)
-	{
-		if (module2_2(op))
-		{
-			total += 5;
-		}
-	}
-
-	for (i = 0; i < 4; i++)
-	{
-		if (module2_4(op))
-		{
-			total += 5;
-		}
-	}
-
-	for (i = 0; i < 6; i++)
-	{
-		if (module2_6(op))
-		{
-			total += 5;
-		}
-	}
-
-	for (i = 0; i < 8; i++)
-	{
-		if (f[random(0, 2)](op))
-		{
-			total += 5;
-		}
-	}
-	return total;
-}
-
-int main()
-{
-	int total = 0;
-	char choice = 0;
-	init();
+	int opidrange[4];
 	while (1)
 	{
-		total = module2();
+		if (issingleop)
+		{
+			printf("\n请输入运算符（整数）\n1 +\n2 -\n3 *\n4 /:");
+			scanf("%d", &op);
+			opidrange[0] = op - 1;
+			opidrange[1] = op - 1;
+			opidrange[2] = op - 1;
+			opidrange[3] = op - 1;
+		}
+		else
+		{
+			opidrange[0] = 0;
+			opidrange[1] = 1;
+			opidrange[2] = 2;
+			opidrange[3] = 3;
+		}
+
+
+		printf("\n-----2题运算对象均是2位整数-------\n");
+		for (i = 0; i < 2; i++)
+		{
+			if (questionvaroplenandrange(1, opidrange))
+			{
+				total += 5;
+			}
+		}
+
+		printf("\n-----4题运算对象均是3位整数-------\n");
+		for (i = 0; i < 4; i++)
+		{
+			if (questionvaroplenandrange(2, opidrange))
+			{
+				total += 5;
+			}
+		}
+
+		printf("\n-----6题运算对象均是4位整数-------\n");
+		for (i = 0; i < 6; i++)
+		{
+			if (questionvaroplenandrange(3, opidrange))
+			{
+				total += 5;
+			}
+		}
+
+		printf("\n-----8题运算对象均是2-4位整数-------\n");
+		for (i = 0; i < 8; i++)
+		{
+			if (questionvaroplenandrange(random(1, 3), opidrange))
+			{
+				total += 5;
+			}
+		}
+
 		printf("总分=%d\n", total);
 		if (total >= 60)
 			break;
@@ -482,6 +472,75 @@ int main()
 			{
 				break;
 			}
+		}
+	}
+	return total;
+}
+
+int main()
+{
+	int i, total = 0;
+	char choice = -1;
+	srand(time(NULL));
+	init();
+#if TEST
+	int opsids[] = { 0,1,2,3 };
+	//int opsids[] = { 1,1,1,1 };
+	//int useopids[4];
+	//generateuseids(4, 4, useopids);
+	//printf("useopids=%d %d %d %d\n",
+	//	useopids[0], useopids[1], useopids[2], useopids[3]);
+	//for (i = 0; i < 20; i++)
+	//{
+	//	total = module2or3_x(3, opsids);
+	//	printf("\n");
+
+	//}
+	total = module2or3(0);
+	printf("总分=%d\n", total);
+
+ 
+	system("pause");
+#endif
+
+
+	while (choice != 0)
+	{
+		printf("\n\t 心算练习/竞赛系统");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 模块2 单运算符四则运算");
+		printf("\n\t 2. 模块3 多运算符四则运算");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
+		choice = getchar();
+		switch (choice)
+		{
+		case '0':
+			printf("\n\n 你选择了退出。");
+			fseek(stdin, 0, SEEK_END);
+			system("pause");
+			exit(0);
+			break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			module2or3(1);
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			module2or3(0);
+			break;
+			//case '3':
+			//	printf("\n\n你选择了 3\n");
+			//	break;
+			//case '4':
+			//	printf("\n\n你选择了 4\n");
+			//	break;
+			//case '5':
+			//	printf("\n\n你选择了 5\n");
+			//	break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
 		}
 	}
 
