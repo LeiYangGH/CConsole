@@ -4,8 +4,8 @@
 //#include <conio.h>
 #include <time.h>
 #define USE_QUESTIONS_COUNT 3
-#define FILE_SEL "file1.txt"
-#define FILE_TF "file2.txt"
+#define FILE_GROUP "group.txt"
+ 
 #define FILE_SCORE "num_name.txt"
 #define MIN 2
 #define MAX 9
@@ -34,34 +34,6 @@ typedef struct opr
 	int(*op)(int a, int b);
 }opr;
 opr alloprators[4];
-//int(*op[4])(int a, int b) = { add ,minus ,multiply ,devide };
-
-
-
-typedef struct truefalseqestion
-{
-	char title[50];
-	int best;//0~1
-	int userchoice;
-}tfq;
-
-
-typedef struct examscore
-{
-	int no;
-	char name[50];
-	int score;
-}escore;
-
-
-
-
-escore allescores[100];
-int allescorecnt = 0;
-
-tfq alltfqs[100];
-tfq usetfqs[USE_QUESTIONS_COUNT];
-int alltfqcnt = 0;
 
 int streq(char *s1, char *s2)
 {
@@ -74,127 +46,6 @@ int toint(char *s)
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
-
-tfq gettfqfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	tfq q;
-	part = strtok(line, "\t");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			strcpy(q.title, part);
-			break;
-		case 2:
-			q.best = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-	return q;
-}
-
-escore getescorefromline(char *line)
-{
-	char *part;
-	int index = 0;
-	escore q;
-	part = strtok(line, "\t");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			q.no = toint(part);
-			break;
-		case 2:
-			strcpy(q.name, part);
-			break;
-		case 3:
-			q.score = toint(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, "\t");
-	}
-	return q;
-}
-
-
-
-void readalltfqs()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_SEL, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_SEL);
-		getchar();
-		exit(1);
-	}
-	alltfqcnt = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		alltfqs[alltfqcnt++] = gettfqfromline(line);
-	}
-	printf("\n已读入文件!\n");
-
-}
-
-void readallescores()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_SCORE, "r");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_SCORE);
-		getchar();
-		exit(1);
-	}
-	allescorecnt = 0;
-
-	while (fgets(line, 1024, fp) != NULL)
-	{
-		if (strlen(line) < 5)
-			continue;
-		allescores[allescorecnt++] = getescorefromline(line);
-	}
-	printf("\n已读入文件!", FILE_SEL);
-
-}
-
-int cmpbyno(const void * a, const void * b)
-{
-	return  ((escore*)a)->no - ((escore*)b)->no;
-}
-
-int cmpbyscore(const void * a, const void * b)
-{
-	return  ((escore*)a)->score - ((escore*)b)->score;
-}
-
-void sortanddisplayallescores()
-{
-	int i;
-	qsort(allescores, allescorecnt, sizeof(escore), cmpbyno);
-	printf("所有成绩按学好排序后如下\r\n");
-	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allescorecnt; i++)
-	{
-		printf("%d  %s %d\n", allescores[i].no, allescores[i].name, allescores[i].score);
-	}
-	printf("--------------------------------------------\r\n");
-}
-
 
 int random(int min, int max)
 {
@@ -227,90 +78,6 @@ void generateuseids(int allcnt, int usecnt, int useids[])
 	}
 }
 
-
-void testonetfq(tfq *q)
-{
-	int i, b, r, answer = 0, repeat = -2;
-	char o;
-	printf("--%s--\n\n", q->title);
-	printf("请输入你的判断（0表是错误，1表示正确），并以回车结束:");
-	scanf("%d", &answer);
-	q->userchoice = answer;
-}
-
-
-void testalltfqs()
-{
-	int i;
-	int useids[USE_QUESTIONS_COUNT] = { 0 };
-	generateuseids(alltfqcnt, USE_QUESTIONS_COUNT, useids);
-	printf("----------判断题-----------\n\n");
-	for (i = 0; i < USE_QUESTIONS_COUNT; i++)
-	{
-		usetfqs[i] = alltfqs[useids[i]];
-		testonetfq(&usetfqs[i]);
-	}
-}
-
-int displaytfqstestresult()
-{
-	int i, score = 0;
-	//int useids[USE_QUESTIONS_COUNT] = { 0 };
-	//generateuseids(allselqcnt, USE_QUESTIONS_COUNT, useids);
-	//for (i = 0; i < USE_QUESTIONS_COUNT; i++)
-	//{
-	//	printf("\n第%d题：%s\n", i + 1, useselqs[i].title);
-	//	printf("你的答案：%s\n", useselqs[i].choices[useselqs[i].userchoice - 1]);
-
-	//	if (useselqs[i].userchoice == useselqs[i].best)
-	//	{
-	//		printf("\t\t\t\t正确！\n");
-	//		score += 5;
-	//	}
-	//	else
-	//		printf("--错误，正确答案是：%s\n", useselqs[i].choices[useselqs[i].best - 1]);
-	//}
-	//printf("\n你的总分：%d\n", score);
-	return score;
-}
-
-
-void inputstudentandexam()
-{
-	//int i, no, score, save;
-	//char name[50] = "";
-	//srand(time(NULL));
-	//printf("\n请输入要考生学号(1~100)，并以回车结束:");
-	//scanf("%d", &no);
-	//printf("\n请输入考生姓名，不能带空格、Tab或回车符，并以回车结束:");
-	//scanf("%s", name);
-	//readallselqs();
-	//readalltfqs();
-	//testallselqs();
-	//testalltfqs();
-	//score = displayselqstestresult() + displaytfqstestresult();
-	//printf("\n题目全部做完，请选择是否保存成绩？选1保存，否则考试记录清除。以回车结束:");
-	//scanf("%d", &save);
-	//if (save == 1)
-	//{
-	//	appendscores(no, name, score);
-	//}
-	//printf("\n\n要选其他菜单，请按任意键\n");
-	//system("pause");
-}
-
-void avehighlowescores()
-{
-	int i;
-	float sum = 0;
-	qsort(allescores, allescorecnt, sizeof(escore), cmpbyscore);
-	for (i = 0; i < allescorecnt; i++)
-		sum += allescores[i].score;
-	printf("%s\t%d\r\n", "最高", allescores[allescorecnt - 1].score);
-	printf("%s\t%d\r\n", "最低", allescores[0].score);
-	printf("%s\t%.1f\r\n", "平均", sum / (float)allescorecnt);
-}
-
 //1+2*3/4 n={1,2,3,4} op ={+,*,/} oplen =3
 int calc(int n[], int opindex[], int oplen)
 {
@@ -321,8 +88,6 @@ int calc(int n[], int opindex[], int oplen)
 	}
 	return re;
 }
-
-
 
 void init()
 {
