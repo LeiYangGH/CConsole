@@ -14,17 +14,23 @@
 //1
 typedef struct group
 {
-	char gname[MAX_STRLEN];//学号
-	char players[MAX_STRLEN][3];//姓名1
-	//char p2[MAX_STRLEN];//姓名2
-	//char p3[MAX_STRLEN];//姓名3
-	int score[3];//分数
-	int total;//总分
+	char gname[MAX_STRLEN];
+	char players[MAX_STRLEN][3];
+	int score[3];
+	int total;
 }group;
-group allgroups[100];//所有学生
-int allgroupscount = 0;//学生数量
+group allgroups[100];
+int allgroupscount = 0;
 
-						 //字符串相等
+typedef struct single
+{
+	char name[MAX_STRLEN];
+	int total;
+}single;
+single allsingles[100];
+int allsinglescount = 0;
+
+//字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
@@ -36,7 +42,7 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
-int cmpfunc(const void * b, const void * a)
+int cmpgroupfunc(const void * b, const void * a)
 {
 	return ((group*)a)->total - ((group*)b)->total;
 }
@@ -429,12 +435,100 @@ void modulereadsortgroup()
 	readallgroups();
 	system("cls");
 	printf("----所有%d组参赛小组按总分倒序排序信息如下:----\r\n", allgroupscount);
-	qsort(allgroups, allgroupscount, sizeof(group), cmpfunc);
+	qsort(allgroups, allgroupscount, sizeof(group), cmpgroupfunc);
 	displayallgroups();
 	printf("-----------按任意键回主菜单---------\n");
 	fseek(stdin, 0, SEEK_END);
 	getchar();
 	system("cls");
+}
+
+void readallsingles()
+{
+	readallgroups();
+	int i, j, k, total = 0;
+	int opidrange[4] = { 0,1,2,3 };
+	for (i = 0; i < allgroupscount; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			single s;
+			strcpy(s.name, allgroups[i].players[j]);
+			s.total = 0;
+			allsingles[allsinglescount++] = s;
+		}
+	}
+}
+
+void welcomesingle()
+{
+	int i;
+	system("cls");
+	printf("-----------欢迎进入个人赛---------\n");
+	printf("所有%d名个人赛选手如下:\r\n", allsinglescount);
+	printf("--------------------------------------------------\r\n");
+	for (i = 0; i < allsinglescount; i++)
+	{
+		printf("%s\t", allsingles[i].name);
+	}
+	printf("\n--------------------------------------------------\r\n");
+	printf("-----------按任意键开始，注意，一旦开始就必须依次完成所有选手比赛---------\n");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
+	system("cls");
+}
+
+void singletest()
+{
+	int i, j, k, total = 0;
+	int opidrange[4] = { 0,1,2,3 };
+	for (i = 0; i < allsinglescount; i++)
+	{
+		printf("-----------下面请选手 %s 答题---------\n",
+			allsingles[i].name);
+#if TEST
+		for (k = 0; k < 2; k++)
+#else
+		for (k = 0; k < 20; k++)
+#endif
+		{
+			if (questionvaroplenandrange(random(1, 3), opidrange))
+			{
+				total += 5;
+			}
+		}
+		allsingles[i].total = total;
+	}
+}
+
+
+void displaysingleresult()
+{
+	int i;
+	printf("-----------个人赛淘汰名单---------\n");
+	for (i = 0; i < allsinglescount; i++)
+	{
+		if (allsingles[i].total < 60)
+			printf("%s\n", allsingles[i].name);
+	}
+	printf("-----------个人赛入围名单---------\n");
+	for (i = 0; i < allsinglescount; i++)
+	{
+		if (allsingles[i].total > 90)
+			printf("%s\n", allsingles[i].name);
+	}
+	printf("-----------按任意键回到主界面---------\n");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
+	system("cls");
+}
+
+void modulesingletest()
+{
+	readallsingles();
+	welcomesingle();
+	singletest();
+	displaysingleresult();
 }
 
 int main()
@@ -444,7 +538,8 @@ int main()
 	srand(time(NULL));
 	init();
 #if TEST
-	modulereadsortgroup();
+	modulesingletest();
+	//modulereadsortgroup();
 	//readallgroups();
 	//displayallgroups();
 	//writeallgroups();
@@ -476,6 +571,7 @@ int main()
 		printf("\n\t 3. 模块3 多运算符四则运算");
 		printf("\n\t 4. 模块4 多运算符四则运算");
 		printf("\n\t 5. 模块5 从分组数据文件获得参赛小组成绩，输出排序结果");
+		printf("\n\t 6. 模块6 个人赛");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -502,6 +598,10 @@ int main()
 		case '5':
 			printf("\n\n你选择了 5\n");
 			modulereadsortgroup();
+			break;
+		case '6':
+			printf("\n\n你选择了 5\n");
+			modulesingletest();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
