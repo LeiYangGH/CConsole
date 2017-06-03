@@ -3,14 +3,144 @@
 #include <stdio.h>
 //#include <conio.h>
 #include <time.h>
-#define USE_QUESTIONS_COUNT 3
+#define MAX_STRLEN 20
 #define FILE_GROUP "group.txt"
- 
+
 #define FILE_SCORE "num_name.txt"
 #define MIN 2
 #define MAX 9
-#define TEST 0
+#define TEST 1
+//1
+typedef struct group
+{
+	char gname[MAX_STRLEN];//学号
+	char p1[MAX_STRLEN];//姓名1
+	char p2[MAX_STRLEN];//姓名2
+	char p3[MAX_STRLEN];//姓名3
+	int score[3];//分数
+	int total;//总分
+}group;
+group allgroups[100];//所有学生
+int allgroupscount = 0;//学生数量
 
+						 //字符串相等
+int streq(char *s1, char *s2)
+{
+	return strcmp(s1, s2) == 0;
+}
+//字符串转整数
+int toint(char *s)
+{
+	char *end;
+	return (int)strtol(s, &end, 10);
+}
+
+void displaygroup(group g)
+{
+	printf("%s\t%s\t%s\t%s\t%d\n", g.gname, g.p1, g.p2, g.p3, g.total);
+}
+
+//显示所有学生成绩
+void displayallgroups()
+{
+	int i;
+	printf("所有%d组参赛小组信息如下:\r\n", allgroupscount);
+	printf("%s\t%s\t%s\t%s\t%s\n",
+		"分组", "选手1", "选手2", "选手3", "总分");
+	printf("--------------------------------------------------\r\n");
+	for (i = 0; i < allgroupscount; i++)
+	{
+		displaygroup(allgroups[i]);
+	}
+	printf("--------------------------------------------------\r\n");
+}
+
+group getgroupfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	group g;
+	g.total = 0;
+	part = strtok(line, " \n");//通过\t符号拆分不同分数
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(g.gname, part);
+			break;
+		case 2:
+			strcpy(g.p1, part);
+			break;
+		case 3:
+			strcpy(g.p2, part);
+			break;
+		case 4:
+			strcpy(g.p3, part);
+			break;
+		case 5:
+			g.total = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, " \n");
+	}
+	return g;
+}
+
+
+//读文件到学生数组
+void readallgroups()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_GROUP, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_GROUP);
+	}
+	else
+	{
+		allgroupscount = 0;
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 5)
+				continue;
+			++allgroupscount;
+			allgroups[allgroupscount - 1] = getgroupfromline(line);
+		}
+	}
+
+}
+void writeallgroups()
+{
+	int i;
+	group g;
+	FILE *fp = fopen(FILE_GROUP, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_GROUP);
+		getchar();
+		exit(1);
+	}
+	for (i = 0; i < allgroupscount; i++)
+	{
+		g = allgroups[i];
+		fprintf(fp, "%s %s %s %s %d\n", g.gname, g.p1, g.p2, g.p3, g.total);
+	}
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
+
+void welcome()
+{
+	////////////////你自己加/////////////
+	printf("-----------这里输入欢迎界面---------");
+	getchar();
+	system("cls");
+}
+//2
 int add(int a, int b)
 {
 	return a + b;
@@ -34,18 +164,6 @@ typedef struct opr
 	int(*op)(int a, int b);
 }opr;
 opr alloprators[4];
-
-int streq(char *s1, char *s2)
-{
-	return strcmp(s1, s2) == 0;
-}
-
-//字符串转整数
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
 
 int random(int min, int max)
 {
@@ -249,7 +367,11 @@ int main()
 	srand(time(NULL));
 	init();
 #if TEST
-	int opsids[] = { 0,1,2,3 };
+
+	readallgroups();
+	displayallgroups();
+	writeallgroups();
+	//int opsids[] = { 0,1,2,3 };
 	//int opsids[] = { 1,1,1,1 };
 	//int useopids[4];
 	//generateuseids(4, 4, useopids);
@@ -261,10 +383,10 @@ int main()
 	//	printf("\n");
 
 	//}
-	total = module2or3(0);
-	printf("总分=%d\n", total);
+	//total = module2or3(0);
+	//printf("总分=%d\n", total);
 
- 
+
 	system("pause");
 #endif
 
