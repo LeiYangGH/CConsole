@@ -31,8 +31,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			# $_ =~ /sort/
-			#&& 
+			 $_ =~ /remove/ && 
 			 $_ =~ /\w+\s\w+\(.*?\)/
 			 )
 			 {

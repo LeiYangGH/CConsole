@@ -145,32 +145,6 @@ int getstudentidexbyno(char no[50])
 	return -1;//没找到
 }
 
-void editstudent(char no[50])
-{
-	int i;
-	char pwd[20] = "";
-	i = getstudentidexbyno(no);
-	if (i >= 0)
-	{
-		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
-		printf("修改完毕。\r\n");
-	}
-	else
-	{
-		printf("没找到对应学号的学生。\r\n");
-	}
-
-}
-
-void prompteditstudent()
-{
-	char no[50];
-	printf("请输入要修改的学号:");
-	scanf("%s", &no);
-	editstudent(no);
-}
-
 void writeallstudents()
 {
 	int i;
@@ -189,6 +163,32 @@ void writeallstudents()
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
+}
+
+void editstudent(char no[50])
+{
+	int i;
+	char pwd[20] = "";
+	i = getstudentidexbyno(no);
+	if (i >= 0)
+	{
+		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
+		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
+		writeallstudents();
+		printf("修改完毕。\r\n");
+	}
+	else
+	{
+		printf("没找到对应学号的学生。\r\n");
+	}
+}
+
+void prompteditstudent()
+{
+	char no[50];
+	printf("请输入要修改的学号:");
+	scanf("%s", &no);
+	editstudent(no);
 }
 
 void addstudent(char no[50], char name[], char birthday[], int chinese, int math, int english)
@@ -218,7 +218,33 @@ void promptaddstudent()
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
+void removestudent(char no[20])
+{
+	int i;
+	int index;
+	index = getstudentidexbyno(no);
+	if (index >= 0)
+	{
+		for (i = index; i < allstudentscount - 1; i++)
+			allstudents[i] = allstudents[i + 1];
+		allstudentscount--;
+		writeallstudents();
+		printf("删除完毕，剩下%d个。\r\n", allstudentscount);
+	}
+	else
+	{
+		printf("没找到对应学号的学生。\r\n");
+	}
 
+}
+
+void promptremovestudent()
+{
+	char no[20];
+	printf("请输入要删除的学号:");
+	scanf("%s", no);
+	removestudent(no);
+}
 
 int main()
 {
@@ -239,7 +265,8 @@ int main()
 
 	displayallstudents();
 	//sortstudentsbytotal();
-	prompteditstudent();
+	//prompteditstudent();
+	promptremovestudent();
 	displayallstudents();
 
 
