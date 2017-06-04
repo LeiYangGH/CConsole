@@ -152,19 +152,9 @@ void editstudent(char no[50])
 	i = getstudentidexbyno(no);
 	if (i >= 0)
 	{
-		printf("\n请输入密码:");
-		scanf("%s", pwd);
-		if (streq(pwd, "admin"))
-		{
-
-			printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-			scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
-			printf("修改完毕。\r\n");
-		}
-		else
-		{
-			printf("密码错误，取消修改。\r\n");
-		}
+		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
+		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
+		printf("修改完毕。\r\n");
 	}
 	else
 	{
@@ -248,7 +238,8 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-	sortstudentsbytotal();
+	//sortstudentsbytotal();
+	prompteditstudent();
 	displayallstudents();
 
 
