@@ -218,6 +218,40 @@ void promptaddstudent()
 	printf("完成第%d个入库录入!\r\n", allstudentscount);
 }
 
+void promptaddallstudent()
+{
+	int i, count;
+	char no[50];
+	char name[MAX_STRLEN] = "";
+	char birthday[MAX_STRLEN] = "";
+	int math; int english; int chinese;
+	printf("\n请输入要输入多少位学生信息(1-10):");
+	scanf("%d", &count);
+	allstudentscount = 0;
+	for (i = 0; i < count; i++)
+	{
+		promptaddstudent();
+	}
+}
+
+void promptaddallorreadstudent()
+{
+	char choice = -1;
+	fseek(stdin, 0, SEEK_END);
+	printf("请选择手动输入(h)、读文件(r)、还是放弃(q)：");
+	choice = getchar();
+	if (choice == 'q')
+		return;
+	if (allstudentscount > 0)
+	{
+		printf("\n注意：目前已经有%d位学生信息，重新读入或创建会覆盖原来的记录！");
+	}
+	if (choice == 'h')
+		promptaddallstudent();
+	else if (choice == 'r')
+		readallstudents();
+}
+
 void removestudent(char no[20])
 {
 	int i;
@@ -270,7 +304,7 @@ void promptsearchbyname()
 int main()
 {
 	char choice = -1;
-#if 1//测试用，if块可删除
+#if 0//测试用，if块可删除
 	readallstudents();
 	//addstudent("05", "n5", "20170605", 41, 92, 93);
 	//addstudent("06", "n6", "20170606", 46, 96, 96);
@@ -283,9 +317,9 @@ int main()
 	//writeallstudents();*/
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-
+	promptaddallstudent();
 	displayallstudents();
-	promptsearchbyname();
+	//promptsearchbyname();
 	//sortstudentsbytotal();
 	//prompteditstudent();
 	//promptremovestudent();
@@ -298,50 +332,52 @@ int main()
 	readallstudents();
 	while (choice != 'g')
 	{
-		printf("\n\t 请选择系统功能项");
-		printf("\n\t a、成绩录入");
-		printf("\n\t b、成绩显示");
-		printf("\n\t c、成绩保存");
-		printf("\n\t d、成绩排序");
-		printf("\n\t e、成绩修改");
-		printf("\n\t f、成绩统计");
-		printf("\n\t    1）显示每门课程成绩最高的学生基本信息");
-		printf("\n\t    2）显示每门课程的平均成绩");
-		printf("\n\t    3）显示超过某门课程平均成绩的学生人数");
-		printf("\n\t g、退出系统\n\n");
+		printf("\n\t 学生信息管理系统");
+		printf("\n\t 0---学生信息的创建");
+		printf("\n\t 1---学生信息的排序");
+		printf("\n\t 2---学生信息的增加");
+		printf("\n\t 3---学生信息的删除");
+		printf("\n\t 4---学生信息的修改");
+		printf("\n\t 5---学生信息的查找");
+		printf("\n\t 6---学生信息的浏览");
+		printf("\n\t 7---退出\n\n");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
-		case 'a':
-			printf("\n\n你选择了 a\n");
-			promptaddstudent();
+		case '0':
+			printf("\n\n你选择了 0\n");
+			promptaddallorreadstudent();
 			break;
-		case 'b':
-			printf("\n\n你选择了 b\n");
-			displayallstudents();
-			break;
-		case 'c':
-			printf("\n\n你选择了 c\n");
-			writeallstudents();
-			break;
-		case 'd':
-			printf("\n\n你选择了 d\n");
+		case '1':
+			printf("\n\n你选择了 1\n");
 			sortstudentsbytotalanddisplay();
 			break;
-		case 'e':
-			printf("\n\n你选择了 e\n");
+		case '2':
+			printf("\n\n你选择了 2\n");
+			promptaddstudent();
+			break;
+		case '3':
+			printf("\n\n你选择了 c\n");
+			promptremovestudent();
+			break;
+		case '4':
+			printf("\n\n你选择了 d\n");
 			prompteditstudent();
 			break;
-		case 'f':
-			printf("\n\n你选择了 f\n");
+		case '5':
+			printf("\n\n你选择了 e\n");
+			promptsearchbyname();
 			break;
-		case 'g':
+		case '6':
+			printf("\n\n你选择了 f\n");
+			displayallstudents();
+			break;
+		case '7':
 			printf("\n\n 你选择了退出。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0);
-			break;
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
