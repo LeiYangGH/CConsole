@@ -235,7 +235,6 @@ int main()
 	char choice = -1;
 #if 1//²âÊÔÓÃ£¬if¿é¿ÉÉ¾³ı
 	readallstudents();
-
 	//addstudent("05", "n5", "20170605", 41, 92, 93);
 	//addstudent("06", "n6", "20170606", 46, 96, 96);
 
@@ -249,7 +248,9 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
-	//calcanddisplaycoursehighest();
+	sortstudentsbytotal();
+	displayallstudents();
+
 
 	system("pause");
 
