@@ -31,7 +31,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /remove/ && 
+			 $_ =~ /search/ && 
 			 $_ =~ /\w+\s\w+\(.*?\)/
 			 )
 			 {

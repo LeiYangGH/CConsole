@@ -246,6 +246,27 @@ void promptremovestudent()
 	removestudent(no);
 }
 
+//查找姓名
+void searcbyname(char *name)
+{
+	int i;
+	for (i = 0; i < allstudentscount; i++)
+		if (strcmp(name, allstudents[i].name) == 0)
+		{
+			displaystudent(allstudents[i]);
+			return;
+		}
+	printf("没找到对应学生的信息。\r\n");
+}
+//用户输入并查找姓名
+void promptsearchbyname()
+{
+	char name[20];
+	printf("请输入姓名:");
+	scanf("%s", name);
+	searcbyname(name);
+}
+
 int main()
 {
 	char choice = -1;
@@ -264,10 +285,11 @@ int main()
 	////promptsearchtotalbyno();
 
 	displayallstudents();
+	promptsearchbyname();
 	//sortstudentsbytotal();
 	//prompteditstudent();
-	promptremovestudent();
-	displayallstudents();
+	//promptremovestudent();
+	//displayallstudents();
 
 
 	system("pause");
