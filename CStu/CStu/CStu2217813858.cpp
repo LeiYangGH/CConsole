@@ -36,7 +36,7 @@ int toint(char *s)
 
 void displaystudent(student stu)
 {
-	printf("%s\t%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.birthday, stu.name, stu.chinese, stu.math, stu.english);
+	printf("%s\t%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.name, stu.birthday, stu.chinese, stu.math, stu.english);
 }
 
 void displayallstudents()
@@ -195,7 +195,7 @@ void writeallstudents()
 	for (i = 0; i < allstudentscount; i++)
 	{
 		stu = allstudents[i];
-		fprintf(fp, "%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.name, stu.math, stu.english, stu.chinese);
+		fprintf(fp, "%s\t%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.name, stu.birthday, stu.math, stu.english, stu.chinese);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -206,11 +206,12 @@ void addstudent(char no[50], char name[], char birthday[], int chinese, int math
 	student stu;
 	strcpy(stu.snum, no);
 	strcpy(stu.name, name);
-	strcpy(stu.birthday, name);
+	strcpy(stu.birthday, birthday);
 	stu.chinese = chinese;
 	stu.math = math;
 	stu.english = english;
 	allstudents[allstudentscount++] = stu;
+	writeallstudents();
 }
 
 void promptaddstudent()
@@ -235,12 +236,9 @@ int main()
 #if 1//测试用，if块可删除
 	readallstudents();
 
-	//addstudent("04", "n4", 41, 92, 93);
-	//addstudent("01", "n1", 11, 12, 3);
-	//addstudent("02", "n2", 21, 22, 99);
-	//addstudent("05", "n5", 51, 52, 93);
-	//addstudent("06", "n6", 61, 62, 93);
-	//addstudent("03", "n3", 31, 32, 93);
+	//addstudent("05", "n5", "20170605", 41, 92, 93);
+	//addstudent("06", "n6", "20170606", 46, 96, 96);
+
 	//editstudent("01");
 	////printf("\n%d\n", allstudentscount);
 	///*promptaddstudent();
