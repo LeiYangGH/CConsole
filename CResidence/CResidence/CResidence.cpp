@@ -28,8 +28,6 @@ typedef struct person
 person allpersons[100];
 int allpersonscount = 0;
 
-float averagechinese, averageage, averagescholar;
-
 //字符串相等
 int streq(char *s1, char *s2)
 {
@@ -124,31 +122,27 @@ void readallpersons()
 	}
 }
 
-//qsort是快速排序，要求如下写法，根据total排序
+//qsort是快速排序，要求如下写法，根据age排序
 int cmpfunc(const void * a, const void * b)
 {
 	return ((person*)a)->age - ((person*)b)->age;
 }
-void sortpersonsbyage()
-{
-	qsort(allpersons, allpersonscount, sizeof(person), cmpfunc);
-}
 
-void sortpersonsbytotalanddisplay()
+void sortpersonsbyageanddisplay()
 {
 	int i;
-	sortpersonsbyage();
+	qsort(allpersons, allpersonscount, sizeof(person), cmpfunc);
 	printf("按每个居民年龄排序后如下\r\n");
 	displayallpersons();
 }
 
 //根据编号查数组里的序号
-int getpersonidexbyno(char no[50])
+int getpersonidexbyno(char id[50])
 {
 	int i;
 	for (i = 0; i < allpersonscount; i++)
 	{
-		if (streq(allpersons[i].id, no))
+		if (streq(allpersons[i].id, id))
 			return i;
 	}
 	return -1;//没找到
@@ -174,11 +168,10 @@ void writeallpersons()
 	printf("已保存记录到文件。");
 }
 
-void editperson(char no[50])
+void editperson(char id[50])
 {
 	int i;
-	char pwd[20] = "";
-	i = getpersonidexbyno(no);
+	i = getpersonidexbyno(id);
 	if (i >= 0)
 	{
 		printf("\n请输入新的学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
@@ -194,10 +187,10 @@ void editperson(char no[50])
 
 void prompteditperson()
 {
-	char no[50];
+	char id[50];
 	printf("请输入要修改的身份证号:");
-	scanf("%s", &no);
-	editperson(no);
+	scanf("%s", &id);
+	editperson(id);
 }
 
 void addperson(char id[], char name[], char sex[], int age, char scholar[], char address[], char telephone[])
@@ -262,10 +255,10 @@ void removeperson(char no[20])
 
 void promptremoveperson()
 {
-	char no[20];
+	char id[20];
 	printf("请输入要删除的身份证号:");
-	scanf("%s", no);
-	removeperson(no);
+	scanf("%s", id);
+	removeperson(id);
 }
 
 
@@ -350,7 +343,7 @@ int main()
 			break;
 		case '3':
 			printf("\n\n你选择了 c\n");
-			sortpersonsbytotalanddisplay();
+			sortpersonsbyageanddisplay();
 			break;
 		case '4':
 			printf("\n\n你选择了 d\n");
