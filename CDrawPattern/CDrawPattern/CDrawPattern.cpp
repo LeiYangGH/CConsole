@@ -86,6 +86,7 @@ int main()
 	int i, x, y;
 	int linediffy = 200;//上下两条线的间距
 	int linedotdiffy = 5;//直线与虚线的间距
+	int flowerhalfx = 75;//7朵画一半宽度
 	initgraph(600, 600);
 	setbkcolor(RGB(0, 0, 0));
 	cleardevice();
@@ -106,13 +107,13 @@ int main()
 
 	for (i = 0; i < 5; i++)
 	{
-		draw7flowers(20 + i * 150, 400);
+		draw7flowers(20 + i * flowerhalfx * 2, 400);
 	}
 
 	for (i = 0; i < 5; i++)
 	{
-		jiaochayuan(20 - 75 + i * 150, 300 + 50);
-		jiaochayuan(20 - 75 + i * 150, 300 + 150);
+		jiaochayuan(20 - flowerhalfx + i * flowerhalfx * 2, 300 + 50);
+		jiaochayuan(20 - flowerhalfx + i * flowerhalfx * 2, 300 + 150);
 	}
 
 	system("pause");
