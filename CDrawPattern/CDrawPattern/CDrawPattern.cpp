@@ -71,6 +71,13 @@ void draw2(int x, int y)
 	draw1(RED, x - 20, y + 40); draw1(RED, x + 20, y + 40);
 }
 
+void lingxing(int x, int y)
+{
+	setlinestyle(PS_SOLID, 4);
+	setcolor(BLACK);
+	line(x - 20, y, x, y - 20); line(x, y - 20, x + 20, y);
+	line(x - 20, y, x, y + 20); line(x, y + 20, x + 20, y);
+}
 
 int main()
 {
@@ -79,7 +86,8 @@ int main()
 	cleardevice();
 	//jiaochayuan(300, 300);
 	//tuan(400, 400);
-	draw2(400, 400);
+	//draw2(400, 400);
+	lingxing(300, 300);
 	system("pause");
 	closegraph();
 	return 0;
