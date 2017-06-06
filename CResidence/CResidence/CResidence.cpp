@@ -11,23 +11,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_STU "stu.txt"
+#define FILE_per "per.txt"
 #define MAX_STRLEN 20
-typedef struct student
+typedef struct person
 {
-	char snum[20];
+	char id[20];
 	char name[20];
-	char birthday[20];
-	int chinese;
-	int math;
-	int english;
-	int total;
-}student;
+	char sex[10];
+	int age;
+	char scholar[30];
+	char address[50];
+	char telephone[20];
 
-student allstudents[100];
-int allstudentscount = 0;
+}person;
 
-float averagechinese, averagemath, averageenglish;
+person allpersons[100];
+int allpersonscount = 0;
+
+float averagechinese, averageage, averagescholar;
 
 //字符串相等
 int streq(char *s1, char *s2)
@@ -44,263 +45,235 @@ int toint(char *s)
 }
 
 
-void displaystudent(student stu)
+void displayperson(person per)
 {
-	printf("%s\t%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.name, stu.birthday, stu.chinese, stu.math, stu.english);
+	printf("%s\t%s\t%s\t%d\t%s\t%s\t%s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
 }
 
-void displayallstudents()
+void displayallpersons()
 {
 	int i;
-	printf("所有%d位同学信息如下\r\n", allstudentscount);
+	printf("所有%d位居民信息如下\r\n", allpersonscount);
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allpersonscount; i++)
 	{
-		displaystudent(allstudents[i]);
+		displayperson(allpersons[i]);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
-//从一行文本读入并根据\t符号拆分，组合成一个student
-student getstudentfromline(char *line)
+//从一行文本读入并根据\t符号拆分，组合成一个person
+person getpersonfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	student stu;
+	person per;
 	part = strtok(line, " \t\n");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
-			strcpy(stu.snum, part);
+			strcpy(per.id, part);
 			break;
 		case 2:
-			strcpy(stu.name, part);
+			strcpy(per.name, part);
 			break;
 		case 3:
-			strcpy(stu.birthday, part);
+			strcpy(per.sex, part);
 			break;
 		case 4:
-			stu.math = toint(part);
+			per.age = toint(part);
 			break;
 		case 5:
-			stu.english = toint(part);
+			strcpy(per.scholar, part);
 			break;
 		case 6:
-			stu.chinese = toint(part);
+			strcpy(per.address, part);
+			break;
+		case 7:
+			strcpy(per.telephone, part);
 			break;
 		default:
 			break;
 		}
 		part = strtok(NULL, " \t\n");
 	}
-	return stu;
+	return per;
 }
 
-void readallstudents()
+void readallpersons()
 {
 	char line[200];
-	FILE *fp = fopen(FILE_STU, "r");
+	FILE *fp = fopen(FILE_per, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_STU);
+		printf("\n打开文件%s失败!", FILE_per);
 	}
 	else
 	{
-		allstudentscount = 0;
+		allpersonscount = 0;
 
 		while (fgets(line, 1024, fp) != NULL)
 		{
 			if (strlen(line) < 5)
 				continue;
-			allstudents[allstudentscount++] = getstudentfromline(line);
+			allpersons[allpersonscount++] = getpersonfromline(line);
 		}
-		printf("\n已读入文件!", FILE_STU);
+		printf("\n已读入文件!", FILE_per);
 	}
 }
 
 //qsort是快速排序，要求如下写法，根据total排序
-int cmpfunc(const void * b, const void * a)
+int cmpfunc(const void * a, const void * b)
 {
-	return ((student*)a)->total - ((student*)b)->total;
+	return ((person*)a)->age - ((person*)b)->age;
 }
-void sortstudentsbytotal()
+void sortpersonsbyage()
 {
-	int i;
-	for (i = 0; i < allstudentscount; i++)
-	{
-		allstudents[i].total = allstudents[i].chinese + allstudents[i].math + allstudents[i].english;
-	}
-	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
+	qsort(allpersons, allpersonscount, sizeof(person), cmpfunc);
 }
 
-void sortstudentsbytotalanddisplay()
+void sortpersonsbytotalanddisplay()
 {
 	int i;
-	sortstudentsbytotal();
-	printf("按每个学生各科平均成绩排序后如下\r\n");
-	displayallstudents();
+	sortpersonsbyage();
+	printf("按每个居民年龄排序后如下\r\n");
+	displayallpersons();
 }
 
 //根据编号查数组里的序号
-int getstudentidexbyno(char no[50])
+int getpersonidexbyno(char no[50])
 {
 	int i;
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allpersonscount; i++)
 	{
-		if (streq(allstudents[i].snum, no))
+		if (streq(allpersons[i].id, no))
 			return i;
 	}
 	return -1;//没找到
 }
 
-void writeallstudents()
+void writeallpersons()
 {
 	int i;
-	student stu;
-	FILE *fp = fopen(FILE_STU, "w+");
+	person per;
+	FILE *fp = fopen(FILE_per, "w+");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_STU);
+		printf("\n打开文件%s失败!", FILE_per);
 		getchar();
 		exit(1);
 	}
-	for (i = 0; i < allstudentscount; i++)
+	for (i = 0; i < allpersonscount; i++)
 	{
-		stu = allstudents[i];
-		fprintf(fp, "%s\t%s\t%s\t%d\t%d\t%d\n", stu.snum, stu.name, stu.birthday, stu.math, stu.english, stu.chinese);
+		per = allpersons[i];
+		fprintf(fp, "%s\t%s\t%s\t%d\t%d\t%d\n", per.id, per.name, per.sex, per.age, per.scholar, per.age);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
-void editstudent(char no[50])
+void editperson(char no[50])
 {
 	int i;
 	char pwd[20] = "";
-	i = getstudentidexbyno(no);
+	i = getpersonidexbyno(no);
 	if (i >= 0)
 	{
 		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-		scanf("%d%d%d", &allstudents[i].chinese, &allstudents[i].math, &allstudents[i].english);
-		writeallstudents();
+		scanf("%d%d%d", &allpersons[i].age, &allpersons[i].age, &allpersons[i].scholar);
+		writeallpersons();
 		printf("修改完毕。\r\n");
 	}
 	else
 	{
-		printf("没找到对应学号的学生。\r\n");
+		printf("没找到对应学号的居民。\r\n");
 	}
 }
 
-void prompteditstudent()
+void prompteditperson()
 {
 	char no[50];
 	printf("请输入要修改的学号:");
 	scanf("%s", &no);
-	editstudent(no);
+	editperson(no);
 }
 
-void addstudent(char no[50], char name[], char birthday[], int chinese, int math, int english)
+void addperson(char id[], char name[], char sex[], int age, char scholar[], char address[], char telephone[])
 {
-	student stu;
-	strcpy(stu.snum, no);
-	strcpy(stu.name, name);
-	strcpy(stu.birthday, birthday);
-	stu.chinese = chinese;
-	stu.math = math;
-	stu.english = english;
-	allstudents[allstudentscount++] = stu;
-	writeallstudents();
+	person per;
+	strcpy(per.id, id);
+	strcpy(per.name, name);
+	strcpy(per.sex, sex);
+	per.age = age;
+	strcpy(per.scholar, scholar);
+	strcpy(per.address, address);
+	strcpy(per.telephone, telephone);
+	allpersons[allpersonscount++] = per;
+	writeallpersons();
 }
 
-void promptaddstudent()
+void promptaddperson()
 {
-	char no[50];
-	char name[MAX_STRLEN] = "";
-	char birthday[MAX_STRLEN] = "";
-	int math; int english; int chinese;
-	printf("\n请输入学号、姓名、和生日（都是不带空格的字符串），空格隔开\n");
-	scanf("%s%s%s", no, name, birthday);
-	printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-	scanf("%d%d%d", &chinese, &math, &english);
-	addstudent(no, name, birthday, chinese, math, english);
-	printf("完成第%d个入库录入!\r\n", allstudentscount);
+	char id[20];
+	char name[20];
+	char sex[10];
+	int age;
+	char scholar[30];
+	char address[50];
+	char telephone[20];
+	printf("\n请身份证（不重复）:\n");
+	scanf("%s", id);
+	//dup
+	printf("\n请输入姓名、性别（都是不带空格的字符串）、年龄(正整数)，空格隔开\n");
+	scanf("%s%s%d", name, sex, &age);
+	printf("\n请输入学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
+	scanf("%s%s%s", scholar, address, telephone);
+	addperson(id, name, sex, age, scholar, address, telephone);
+	printf("完成第%d位居民录入!\r\n", allpersonscount);
 }
 
-void promptaddallstudent()
-{
-	int i, count;
-	char no[50];
-	char name[MAX_STRLEN] = "";
-	char birthday[MAX_STRLEN] = "";
-	int math; int english; int chinese;
-	printf("\n请输入要输入多少位学生信息(1-10):");
-	scanf("%d", &count);
-	allstudentscount = 0;
-	for (i = 0; i < count; i++)
-	{
-		promptaddstudent();
-	}
-}
 
-void promptaddallorreadstudent()
-{
-	char choice = -1;
-	fseek(stdin, 0, SEEK_END);
-	printf("请选择手动输入(h)、读文件(r)、还是放弃(q)：");
-	choice = getchar();
-	if (choice == 'q')
-		return;
-	if (allstudentscount > 0)
-	{
-		printf("\n注意：目前已经有%d位学生信息，重新读入或创建会覆盖原来的记录！");
-	}
-	if (choice == 'h')
-		promptaddallstudent();
-	else if (choice == 'r')
-		readallstudents();
-}
-
-void removestudent(char no[20])
+void removeperson(char no[20])
 {
 	int i;
 	int index;
-	index = getstudentidexbyno(no);
+	index = getpersonidexbyno(no);
 	if (index >= 0)
 	{
-		for (i = index; i < allstudentscount - 1; i++)
-			allstudents[i] = allstudents[i + 1];
-		allstudentscount--;
-		writeallstudents();
-		printf("删除完毕，剩下%d个。\r\n", allstudentscount);
+		for (i = index; i < allpersonscount - 1; i++)
+			allpersons[i] = allpersons[i + 1];
+		allpersonscount--;
+		writeallpersons();
+		printf("删除完毕，剩下%d个。\r\n", allpersonscount);
 	}
 	else
 	{
-		printf("没找到对应学号的学生。\r\n");
+		printf("没找到对应学号的居民。\r\n");
 	}
 
 }
 
-void promptremovestudent()
+void promptremoveperson()
 {
 	char no[20];
 	printf("请输入要删除的学号:");
 	scanf("%s", no);
-	removestudent(no);
+	removeperson(no);
 }
 
 //查找姓名
 void searcbyname(char *name)
 {
 	int i;
-	for (i = 0; i < allstudentscount; i++)
-		if (strcmp(name, allstudents[i].name) == 0)
+	for (i = 0; i < allpersonscount; i++)
+		if (strcmp(name, allpersons[i].name) == 0)
 		{
-			displaystudent(allstudents[i]);
+			displayperson(allpersons[i]);
 			return;
 		}
-	printf("没找到对应学生的信息。\r\n");
+	printf("没找到对应居民的信息。\r\n");
 }
 //用户输入并查找姓名
 void promptsearchbyname()
@@ -315,41 +288,41 @@ int main()
 {
 	char choice = -1;
 #if 0//测试用，if块可删除
-	readallstudents();
-	//addstudent("05", "n5", "20170605", 41, 92, 93);
-	//addstudent("06", "n6", "20170606", 46, 96, 96);
+	readallpersons();
+	//addperson("05", "n5", "20170605", 41, 92, 93);
+	//addperson("06", "n6", "20170606", 46, 96, 96);
 
-	//editstudent("01");
-	////printf("\n%d\n", allstudentscount);
-	///*promptaddstudent();
-	//writeallstudents();*/
-	///*prompteditstudent();
-	//writeallstudents();*/
+	//editperson("01");
+	////printf("\n%d\n", allpersonscount);
+	///*promptaddperson();
+	//writeallpersons();*/
+	///*prompteditperson();
+	//writeallpersons();*/
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-	promptaddallstudent();
-	displayallstudents();
+	promptaddallperson();
+	displayallpersons();
 	//promptsearchbyname();
-	//sortstudentsbytotal();
-	//prompteditstudent();
-	//promptremovestudent();
-	//displayallstudents();
+	//sortpersonsbytotal();
+	//prompteditperson();
+	//promptremoveperson();
+	//displayallpersons();
 
 
 	system("pause");
 
 #endif
-	readallstudents();
+	readallpersons();
 	while (choice != 'g')
 	{
-		printf("\n\t 学生信息管理系统");
-		printf("\n\t 0---学生信息的创建");
-		printf("\n\t 1---学生信息的排序");
-		printf("\n\t 2---学生信息的增加");
-		printf("\n\t 3---学生信息的删除");
-		printf("\n\t 4---学生信息的修改");
-		printf("\n\t 5---学生信息的查找");
-		printf("\n\t 6---学生信息的浏览");
+		printf("\n\t 居民信息管理系统");
+		printf("\n\t 0---居民信息的创建");
+		printf("\n\t 1---居民信息的排序");
+		printf("\n\t 2---居民信息的增加");
+		printf("\n\t 3---居民信息的删除");
+		printf("\n\t 4---居民信息的修改");
+		printf("\n\t 5---居民信息的查找");
+		printf("\n\t 6---居民信息的浏览");
 		printf("\n\t 7---退出\n\n");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -357,23 +330,22 @@ int main()
 		{
 		case '0':
 			printf("\n\n你选择了 0\n");
-			promptaddallorreadstudent();
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			sortstudentsbytotalanddisplay();
+			sortpersonsbytotalanddisplay();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptaddstudent();
+			promptaddperson();
 			break;
 		case '3':
 			printf("\n\n你选择了 c\n");
-			promptremovestudent();
+			promptremoveperson();
 			break;
 		case '4':
 			printf("\n\n你选择了 d\n");
-			prompteditstudent();
+			prompteditperson();
 			break;
 		case '5':
 			printf("\n\n你选择了 e\n");
@@ -381,7 +353,7 @@ int main()
 			break;
 		case '6':
 			printf("\n\n你选择了 f\n");
-			displayallstudents();
+			displayallpersons();
 			break;
 		case '7':
 			printf("\n\n 你选择了退出。");
