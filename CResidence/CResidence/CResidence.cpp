@@ -214,6 +214,7 @@ void addperson(char id[], char name[], char sex[], int age, char scholar[], char
 	writeallpersons();
 }
 
+
 void promptaddperson()
 {
 	char id[20];
@@ -225,7 +226,11 @@ void promptaddperson()
 	char telephone[20];
 	printf("\n请身份证（不重复）:\n");
 	scanf("%s", id);
-	//dup
+	if (getpersonidexbyno(id) >= 0)
+	{
+		printf("身份证与已有居民重复！\n");
+		return;
+	}
 	printf("\n请输入姓名、性别（都是不带空格的字符串）、年龄(正整数)，空格隔开\n");
 	scanf("%s%s%d", name, sex, &age);
 	printf("\n请输入学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
@@ -263,25 +268,26 @@ void promptremoveperson()
 	removeperson(no);
 }
 
-//查找姓名
-void searcbyname(char *name)
+
+void searcbetweenage(int from, int to)
 {
-	int i;
+	int i, found = 0;
 	for (i = 0; i < allpersonscount; i++)
-		if (strcmp(name, allpersons[i].name) == 0)
+		if (allpersons[i].age >= from && allpersons[i].age <= to)
 		{
 			displayperson(allpersons[i]);
-			return;
+			found = 1;
 		}
-	printf("没找到对应居民的信息。\r\n");
+	if (!found)
+		printf("没找到对应居民的信息。\r\n");
 }
-//用户输入并查找姓名
-void promptsearchbyname()
+
+void promptsearchbetweenage()
 {
-	char name[20];
-	printf("请输入姓名:");
-	scanf("%s", name);
-	searcbyname(name);
+	int from, to;
+	printf("请输入要查找的最低和最高年龄(正整数，空格分隔):");
+	scanf("%d%d", &from, &to);
+	searcbetweenage(from, to);
 }
 
 int main()
@@ -295,16 +301,16 @@ int main()
 	//editperson("01");
 	////printf("\n%d\n", allpersonscount);
 	displayallpersons();
-	//promptaddperson();
-
+	promptaddperson();
+	displayallpersons();
+	//promptsearchbetweenage();
 	//prompteditperson();
 	//writeallpersons();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-	promptremoveperson();
-
-	displayallpersons();
-	//promptsearchbyname();
+	//promptremoveperson();
+	//sortpersonsbytotalanddisplay();
+	//displayallpersons();
 	//sortpersonsbytotal();
 	//prompteditperson();
 	//displayallpersons();
@@ -350,7 +356,7 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 e\n");
-			promptsearchbyname();
+			promptsearchbetweenage();
 			break;
 		case '6':
 			printf("\n\n你选择了 f\n");
