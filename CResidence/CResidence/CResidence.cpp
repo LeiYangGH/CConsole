@@ -287,7 +287,7 @@ void promptsearchbyname()
 int main()
 {
 	char choice = -1;
-#if 0//²âÊÔÓÃ£¬if¿é¿ÉÉ¾³ı
+#if 1//²âÊÔÓÃ£¬if¿é¿ÉÉ¾³ı
 	readallpersons();
 	//addperson("05", "n5", "20170605", 41, 92, 93);
 	//addperson("06", "n6", "20170606", 46, 96, 96);
@@ -300,7 +300,7 @@ int main()
 	//writeallpersons();*/
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-	promptaddallperson();
+
 	displayallpersons();
 	//promptsearchbyname();
 	//sortpersonsbytotal();
