@@ -84,6 +84,8 @@ void lingxing(int x, int y)
 int main()
 {
 	int i, x, y;
+	int linediffy = 200;//上下两条线的间距
+	int linedotdiffy = 5;//直线与虚线的间距
 	initgraph(600, 600);
 	setbkcolor(RGB(0, 0, 0));
 	cleardevice();
@@ -93,13 +95,14 @@ int main()
 	//lingxing(300, 300);
 	setlinestyle(PS_SOLID, 4);
 	setcolor(RED);
+
 	line(0, 300, 600, 300);
-	line(0, 300 + 200, 600, 300 + 200);
+	line(0, 300 + linediffy, 600, 300 + linediffy);
 
 	setlinestyle(PS_DASHDOT, 4);
 	setcolor(RED);
-	line(0, 300 + 5, 600, 300 + 5);
-	line(0, 300 + 200 - 5, 600, 300 + 200 - 5);
+	line(0, 300 + linedotdiffy, 600, 300 + linedotdiffy);
+	line(0, 300 + linediffy - linedotdiffy, 600, 300 + linediffy - linedotdiffy);
 
 	for (i = 0; i < 5; i++)
 	{
