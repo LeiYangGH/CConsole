@@ -168,7 +168,7 @@ void writeallpersons()
 	for (i = 0; i < allpersonscount; i++)
 	{
 		per = allpersons[i];
-		fprintf(fp, "%s\t%s\t%s\t%d\t%d\t%d\n", per.id, per.name, per.sex, per.age, per.scholar, per.age);
+		fprintf(fp, "%s %s %s %d %s %s %s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
@@ -294,8 +294,9 @@ int main()
 
 	//editperson("01");
 	////printf("\n%d\n", allpersonscount);
-	///*promptaddperson();
-	//writeallpersons();*/
+	displayallpersons();
+	promptaddperson();
+
 	///*prompteditperson();
 	//writeallpersons();*/
 	////promptsearchtotalbyname();
