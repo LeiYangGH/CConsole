@@ -297,16 +297,16 @@ int main()
 	displayallpersons();
 	//promptaddperson();
 
-	prompteditperson();
+	//prompteditperson();
 	//writeallpersons();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
+	promptremoveperson();
 
 	displayallpersons();
 	//promptsearchbyname();
 	//sortpersonsbytotal();
 	//prompteditperson();
-	//promptremoveperson();
 	//displayallpersons();
 
 
