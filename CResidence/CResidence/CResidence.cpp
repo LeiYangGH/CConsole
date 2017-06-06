@@ -181,21 +181,21 @@ void editperson(char no[50])
 	i = getpersonidexbyno(no);
 	if (i >= 0)
 	{
-		printf("\n请输入语文、数学、英语成绩（整数），空格隔开\n");
-		scanf("%d%d%d", &allpersons[i].age, &allpersons[i].age, &allpersons[i].scholar);
+		printf("\n请输入新的学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
+		scanf("%s%s%s", allpersons[i].scholar, allpersons[i].address, allpersons[i].telephone);
 		writeallpersons();
 		printf("修改完毕。\r\n");
 	}
 	else
 	{
-		printf("没找到对应学号的居民。\r\n");
+		printf("没找到对应身份证号的居民。\r\n");
 	}
 }
 
 void prompteditperson()
 {
 	char no[50];
-	printf("请输入要修改的学号:");
+	printf("请输入要修改的身份证号:");
 	scanf("%s", &no);
 	editperson(no);
 }
@@ -250,7 +250,7 @@ void removeperson(char no[20])
 	}
 	else
 	{
-		printf("没找到对应学号的居民。\r\n");
+		printf("没找到对应身份证号的居民。\r\n");
 	}
 
 }
@@ -258,7 +258,7 @@ void removeperson(char no[20])
 void promptremoveperson()
 {
 	char no[20];
-	printf("请输入要删除的学号:");
+	printf("请输入要删除的身份证号:");
 	scanf("%s", no);
 	removeperson(no);
 }
@@ -295,10 +295,10 @@ int main()
 	//editperson("01");
 	////printf("\n%d\n", allpersonscount);
 	displayallpersons();
-	promptaddperson();
+	//promptaddperson();
 
-	///*prompteditperson();
-	//writeallpersons();*/
+	prompteditperson();
+	//writeallpersons();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
 
