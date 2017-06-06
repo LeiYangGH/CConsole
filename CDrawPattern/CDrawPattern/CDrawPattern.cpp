@@ -13,8 +13,8 @@ void jiaochayuan(int x, int y)
 {
 
 	setlinestyle(PS_SOLID, 4);
-	setcolor(BLACK);
-	circle(x, y, 50);
+	setcolor(GREEN);
+	circle(x, y, 20);
 	setorigin(x, y);
 	line(-(int)(50 * cos(PI / 4)), -(int)(50 * sin(PI / 4)), (int)(50 * cos(PI / 4)), (int)(50 * sin(PI / 4)));
 	line(-(int)(50 * cos(PI / 4)), (int)(50 * sin(PI / 4)), (int)(50 * cos(PI / 4)), -(int)(50 * sin(PI / 4)));
@@ -63,7 +63,7 @@ void draw1(int color, int x, int y)
 	}
 }
 
-void draw2(int x, int y)
+void draw7flowers(int x, int y)
 {
 	draw1(RED, x, y);
 	draw1(RED, x - 40, 400); draw1(RED, x + 40, 400);
@@ -79,15 +79,39 @@ void lingxing(int x, int y)
 	line(x - 20, y, x, y + 20); line(x, y + 20, x + 20, y);
 }
 
+
+
 int main()
 {
+	int i, x, y;
 	initgraph(600, 600);
-	setbkcolor(RGB(255, 153, 51));
+	setbkcolor(RGB(0, 0, 0));
 	cleardevice();
 	//jiaochayuan(300, 300);
 	//tuan(400, 400);
-	//draw2(400, 400);
-	lingxing(300, 300);
+	//draw7flowers(400, 400);
+	//lingxing(300, 300);
+	setlinestyle(PS_SOLID, 4);
+	setcolor(RED);
+	line(0, 300, 600, 300);
+	line(0, 300 + 200, 600, 300 + 200);
+
+	setlinestyle(PS_DASHDOT, 4);
+	setcolor(RED);
+	line(0, 300 + 5, 600, 300 + 5);
+	line(0, 300 + 200 - 5, 600, 300 + 200 - 5);
+
+	for (i = 0; i < 5; i++)
+	{
+		draw7flowers(20 + i * 150, 400);
+	}
+
+	for (i = 0; i < 5; i++)
+	{
+		jiaochayuan(20 - 75 + i * 150, 300 + 50);
+		jiaochayuan(20 - 75 + i * 150, 300 + 150);
+	}
+
 	system("pause");
 	closegraph();
 	return 0;
