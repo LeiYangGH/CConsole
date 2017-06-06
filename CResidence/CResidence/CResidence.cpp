@@ -224,7 +224,7 @@ void promptaddperson()
 	char scholar[30];
 	char address[50];
 	char telephone[20];
-	printf("\n请身份证（不重复）:\n");
+	printf("\n请输入身份证（不重复）:\n");
 	scanf("%s", id);
 	if (getpersonidexbyno(id) >= 0)
 	{
@@ -293,7 +293,7 @@ void promptsearchbetweenage()
 int main()
 {
 	char choice = -1;
-#if 1//测试用，if块可删除
+#if 0//测试用，if块可删除
 	readallpersons();
 	//addperson("05", "n5", "20170605", 41, 92, 93);
 	//addperson("06", "n6", "20170606", 46, 96, 96);
@@ -320,53 +320,49 @@ int main()
 
 #endif
 	readallpersons();
-	while (choice != 'g')
+	while (choice != 0)
 	{
 		printf("\n\t 居民信息管理系统");
-		printf("\n\t 0---居民信息的创建");
-		printf("\n\t 1---居民信息的排序");
-		printf("\n\t 2---居民信息的增加");
-		printf("\n\t 3---居民信息的删除");
-		printf("\n\t 4---居民信息的修改");
-		printf("\n\t 5---居民信息的查找");
-		printf("\n\t 6---居民信息的浏览");
-		printf("\n\t 7---退出\n\n");
+		printf("\n\t 0---退出");
+		printf("\n\t 1---户籍信息录入");
+		printf("\n\t 2---户籍信息浏览");
+		printf("\n\t 3---按年龄排序");
+		printf("\n\t 4---按年龄区间查询");
+		printf("\n\t 5---户籍信息删除");
+		printf("\n\t 6---户籍信息修改");
+		printf("\n请选择:");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
 		case '0':
-			printf("\n\n你选择了 0\n");
-			break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			sortpersonsbytotalanddisplay();
-			break;
-		case '2':
-			printf("\n\n你选择了 2\n");
-			promptaddperson();
-			break;
-		case '3':
-			printf("\n\n你选择了 c\n");
-			promptremoveperson();
-			break;
-		case '4':
-			printf("\n\n你选择了 d\n");
-			prompteditperson();
-			break;
-		case '5':
-			printf("\n\n你选择了 e\n");
-			promptsearchbetweenage();
-			break;
-		case '6':
-			printf("\n\n你选择了 f\n");
-			displayallpersons();
-			break;
-		case '7':
 			printf("\n\n 你选择了退出。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
-			exit(0);
+			exit(0); break;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			promptaddperson();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			displayallpersons();
+			break;
+		case '3':
+			printf("\n\n你选择了 c\n");
+			sortpersonsbytotalanddisplay();
+			break;
+		case '4':
+			printf("\n\n你选择了 d\n");
+			promptsearchbetweenage();
+			break;
+		case '5':
+			printf("\n\n你选择了 e\n");
+			promptremoveperson();
+			break;
+		case '6':
+			printf("\n\n你选择了 f\n");
+			prompteditperson();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
