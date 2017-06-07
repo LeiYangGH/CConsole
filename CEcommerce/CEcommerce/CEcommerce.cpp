@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_USER "user.txt"
-#define FILE_ADMIN "admin.txt"
+#define FILE_USER "user.txt"//消费者文件
+#define FILE_ADMIN "admin.txt"//管理员文件
+#define FILE_WARE "ware.txt"//商品文件，可增删改查，下次运行exe时读入
+#define FILE_LOG "log.txt"//购物记录文件，只提供一次性追加，下次运行exe时不读入
 typedef struct ware//商品
 {
 	char wid[20];//产品标识码
@@ -45,6 +47,7 @@ int streq(char *s1, char *s2)
 }
 
 #pragma region users
+//登录
 void login()
 {
 	int i;
@@ -67,6 +70,7 @@ void login()
 	printf("用户名或密码错误，登录失败！\n");
 }
 
+//是否已经存在相同用户
 int isusernameexists(char uname[20])
 {
 	int i;
@@ -84,7 +88,8 @@ int ispassowrdcomplicated(char password[20])
 	return strlen(password) >= 6;
 }
 
-void writeallusers()
+//写所有用户和管理员到文件
+void writeallusersandadmins()
 {
 	int i;
 	user u;
@@ -129,9 +134,10 @@ void registeruser(char uname[20], char password[20], int isadmin)
 	u.isadmin = isadmin;
 	u.money = 0;//余额开始都为0
 	allusers[alluserscount++] = u;
-	writeallusers();
+	writeallusersandadmins();
 }
 
+//当前用户是否管理员
 int iscurrentuseradmin()
 {
 	int i;
@@ -144,6 +150,7 @@ int iscurrentuseradmin()
 	return 0;
 }
 
+//当前用户是否消费者
 int iscurrentuserconsumer()
 {
 	int i;
@@ -185,13 +192,14 @@ void promptregisteruser(int willbeadmin)
 	printf("新%注册成功!", role);
 }
 
-
+//登出
 void logout()
 {
 	strcpy(currentusername, "");
 	printf("登出成功!");
 }
 
+//从一行文本拆分为用户
 user getuserfromline(char *line, int isadmin)
 {
 	char *part;
@@ -218,7 +226,8 @@ user getuserfromline(char *line, int isadmin)
 	return u;
 }
 
-void readallusers()
+//读入所有消费者和管理员
+void readallusersandadmins()
 {
 	char line[200];
 	FILE *fp = fopen(FILE_USER, "r");
@@ -259,66 +268,78 @@ void readallusers()
 
 
 
-
+//显示所有商品
 void displayallwares()
 {
 }
 
+//读入所有商品
 void readallwares()
 {
 }
 
+//根据商品识别码得出数组下标
 int getwareidexbyno(char wid[20])
 {
 	return 1;
 
 }
 
+//写所有商品信息到文件
 void writeallwares()
 {
 }
 
+//修改商品只允许修改价格和库存
 void editware(char wid[20])
 {
 }
 
+//添加商品
 void addware(char wid[20], char uname[], float price, char address, int quantity, int warnquantity)
 {
 }
 
+//删除商品
 void removeware(char wid[20])
 {
 }
 
-void searcbyname(char *uname)
+//通过名称查找商品
+void searchwarebyname(char *uname)
 {
 }
 
+//写所有购物记录
 void writealllogs()
 {
 
 }
 
+//每次加入购物车就检查库存如果不足则警告
 void warnlack(char wid[20])
 {
 
 }
-
+//加购物车，log里加
 void addwant(char uname[], char wid[], int quantity)
 {
 
 }
 
+//充值
 void recharge(char uname[], float money)
 {
 
 }
 
+//支付，把log里所有当前用户的未支付的全部置为支付
 void pay(char uname[])
 {
 
 }
 
+//退货，倒着遍历log，退货数量上限是上一次购买的数量
 void returnware(char uname[], char wid[], int quantity)
 {
 
@@ -330,7 +351,7 @@ void returnware(char uname[], char wid[], int quantity)
 int main()
 {
 	char choice = -1;
-	readallusers();
+	readallusersandadmins();
 #if 0
 	readallusers();
 	login();
