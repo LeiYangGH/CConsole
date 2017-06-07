@@ -5,6 +5,7 @@
 #define FILE_ADMIN "admin.txt"//管理员文件
 #define FILE_WARE "ware.txt"//商品文件，可增删改查，下次运行exe时读入
 #define FILE_LOG "log.txt"//购物记录文件，只提供一次性追加，下次运行exe时不读入
+#pragma region typedef
 typedef struct ware//商品
 {
 	char wid[20];//产品标识码
@@ -38,6 +39,7 @@ typedef struct log//购买记录
 
 user alllogs[10];
 int alllogscount = 0;
+#pragma endregion
 
 char currentusername[20] = "";
 
@@ -45,7 +47,16 @@ int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-
+int toint(char *s)
+{
+	char *end;
+	return (int)strtol(s, &end, 10);
+}
+float tofloat(char *s)
+{
+	char *end;
+	return (float)strtol(s, &end, 10);
+}
 #pragma region users
 //登录
 void login()
@@ -266,56 +277,253 @@ void readallusersandadmins()
 
 #pragma endregion
 
+#pragma region ware
 
 
+void displayware(ware w)
+{
+	printf("%s\t%s\t%.1f\t%s\t%d\n", w.wid, w.name, w.price, w.address, w.quantity);
+}
 //显示所有商品
 void displayallwares()
 {
+	int i;
+	printf("所有%d种商品信息如下\r\n", allwarescount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allwarescount; i++)
+	{
+		displayware(allwares[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+//从一行文本读入并根据\t符号拆分，组合成一个ware
+ware getwarefromline(char *line)
+{
+	char *part;
+	int index = 0;
+	ware w;
+	part = strtok(line, " \t\n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(w.wid, part);
+			break;
+		case 2:
+			strcpy(w.name, part);
+			break;
+		case 3:
+			w.price = tofloat(part);
+			break;
+		case 4:
+			strcpy(w.address, part);
+			break;
+		case 5:
+			w.quantity = toint(part);
+			break;
+		case 6:
+			w.warnquantity = toint(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, " \t\n");
+	}
+	return w;
 }
 
 //读入所有商品
 void readallwares()
 {
+	char line[200];
+	FILE *fp = fopen(FILE_WARE, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_WARE);
+	}
+	else
+	{
+		allwarescount = 0;
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 5)
+				continue;
+			allwares[allwarescount++] = getwarefromline(line);
+		}
+		printf("\n已读入商品文件!");
+	}
 }
 
-//根据商品识别码得出数组下标
-int getwareidexbyno(char wid[20])
-{
-	return 1;
 
+//根据商品识别码得出数组下标
+int getwareidexbywid(char wid[20])
+{
+	int i;
+	for (i = 0; i < allwarescount; i++)
+	{
+		ware w = allwares[i];
+		if (streq(w.wid, wid))
+			return i;
+	}
+	return -1;
 }
 
 //写所有商品信息到文件
 void writeallwares()
 {
+	int i;
+	ware w;
+	FILE *fp = fopen(FILE_WARE, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_WARE);
+		getchar();
+		exit(1);
+	}
+	for (i = 0; i < allwarescount; i++)
+	{
+		w = allwares[i];
+		fprintf(fp, "%s %s %.1f %s %d %d\n",
+			w.wid, w.name, w.price, w.address, w.quantity, w.warnquantity);
+	}
+	fclose(fp);
+	printf("已保存记录到商品文件。");
 }
+
 
 //修改商品只允许修改价格和库存
-void editware(char wid[20])
+void editware(char wid[50])
 {
+	int i;
+	char pwd[20] = "";
+	i = getwareidexbywid(wid);
+	if (i >= 0)
+	{
+		printf("\n请输入新的价格（整数或浮点数）和库存（整数），空格隔开\n");
+		scanf("%f%d", &allwares[i].price, &allwares[i].quantity);
+		writeallwares();
+		printf("修改完毕。\r\n");
+	}
+	else
+	{
+		printf("没找到对应识别码的商品。\r\n");
+	}
 }
 
-//添加商品
-void addware(char wid[20], char uname[], float price, char address, int quantity, int warnquantity)
+void prompteditware()
 {
+	char wid[50];
+	printf("请输入要修改的识别码:");
+	scanf("%s", &wid);
+	editware(wid);
+}
+
+////添加商品
+void addware(char wid[20], char wname[], float price, char address[], int quantity, int warnquantity)
+{
+	ware w;
+	strcpy(w.wid, wid);
+	strcpy(w.name, wname);
+	w.price = price;
+	strcpy(w.address, address);
+	w.quantity = quantity;
+	w.warnquantity = warnquantity;
+	allwares[allwarescount++] = w;
+	writeallwares();
+}
+
+//是否已经存在相同用户
+int iswarewidexists(char wid[20])
+{
+	int i;
+	for (i = 0; i < allwarescount; i++)
+	{
+		if (streq(wid, allwares[i].wid))
+			return 1;
+	}
+	return 0;
+}
+
+void promptaddware()
+{
+	char wid[20];//产品标识码
+	char wname[20];//名称
+	float price;//单价
+	char address[20];//产地
+	int quantity;//库存
+	int warnquantity;//警告最低库存阈值
+	printf("\n请输入商品识别码:\n");
+	scanf("%s", wid);
+	if (iswarewidexists(wid))
+	{
+		printf("识别码%s已经存在，不能重复添加商品!", wid);
+		return;
+	}
+	printf("\n请输入商品名称、产地（都是不带空格的字符串）、单价（整数或浮点数）、库存、警告库存下限（都是整数），空格隔开\n");
+	scanf("%s%s%f%d%d", wname, address, &price, &quantity, &warnquantity);
+
+	addware(wid, wname, price, address, quantity, warnquantity);
+	printf("完成第%d个入库录入!\r\n", allwarescount);
 }
 
 //删除商品
-void removeware(char wid[20])
+void removeware(char no[20])
 {
+	int i;
+	int index;
+	index = getwareidexbywid(no);
+	if (index >= 0)
+	{
+		for (i = index; i < allwarescount - 1; i++)
+			allwares[i] = allwares[i + 1];
+		allwarescount--;
+		writeallwares();
+		printf("删除完毕，剩下%d种商品。\r\n", allwarescount);
+	}
+	else
+	{
+		printf("没找到对应识别码的商品。\r\n");
+	}
+
+}
+
+void promptremoveware()
+{
+	char no[20];
+	printf("请输入要删除的商品的识别码:");
+	scanf("%s", no);
+	removeware(no);
 }
 
 //通过名称查找商品
-void searchwarebyname(char *uname)
+void searchwarebyname(char *name)
 {
+	int i;
+	for (i = 0; i < allwarescount; i++)
+		if (strcmp(name, allwares[i].name) == 0)
+		{
+			displayware(allwares[i]);
+			return;
+		}
+	printf("没找到对应商品的信息。\r\n");
+}
+//用户输入名称并查找商品信息
+void promptsearchbyname()
+{
+	char name[20];
+	printf("请输入要查找的商品名称:");
+	scanf("%s", name);
+	searchwarebyname(name);
 }
 
+#pragma endregion
 //写所有购物记录
 void writealllogs()
 {
 
 }
-
 //每次加入购物车就检查库存如果不足则警告
 void warnlack(char wid[20])
 {
@@ -352,6 +560,7 @@ int main()
 {
 	char choice = -1;
 	readallusersandadmins();
+	readallwares();
 #if 0
 	readallusers();
 	login();
@@ -361,10 +570,16 @@ int main()
 	{
 		printf("\n\t 超市管理系统");
 		printf("\n\t 1---用户登录");
-		printf("\n\t 2---注册消费者");
-		printf("\n\t 3---注册管理员");
-		printf("\n\t 4---用户登出");
+		printf("\n\t 2---用户登出");
+		printf("\n\t 3---注册消费者");
+		printf("\n\t 4---注册管理员");
+		printf("\n\t 5---查看所有商品信息");
+		printf("\n\t 6---根据名称查找商品");
+		printf("\n\t 7---添加商品");
+		printf("\n\t 8---输入识别码修改商品价格和库存");
+		printf("\n\t 9---输入识别码删除商品");
 		printf("\n\t 0---退出程序\n\n");
+		printf("\n---请选择：");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
@@ -381,15 +596,35 @@ int main()
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptregisteruser(0);
+			logout();
 			break;
 		case '3':
-			printf("\n\n你选择了 2\n");
-			promptregisteruser(1);
+			printf("\n\n你选择了 3\n");
+			promptregisteruser(0);
 			break;
 		case '4':
-			printf("\n\n你选择了 2\n");
-			logout();
+			printf("\n\n你选择了 4\n");
+			promptregisteruser(1);
+			break;
+		case '5':
+			printf("\n\n你选择了 5\n");
+			displayallwares();
+			break;
+		case '6':
+			printf("\n\n你选择了 6\n");
+			promptsearchbyname();
+			break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			promptaddware();
+			break;
+		case '8':
+			printf("\n\n你选择了 8\n");
+			prompteditware();
+			break;
+		case '9':
+			printf("\n\n你选择了 9\n");
+			promptremoveware();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");

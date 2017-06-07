@@ -11,8 +11,8 @@ use File::Spec::Functions 'catfile';
  use File::Find qw(finddepth);
 
 my $testdir = 'C:/test';
-# my $cdir = 'C:/G/CConsole/CStu';
-my $cdir = 'C:/G/CConsole';
+ my $cdir = 'C:/G/CConsole/CStu';
+# my $cdir = 'C:/G/CConsole';
 my @files;
 
 finddepth(sub 
@@ -30,7 +30,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /log/ && 
+			 $_ =~ /get/ && 
 			 $_ =~ /\w+\s\w+\(.*?\)/
 			 )
 			 {
