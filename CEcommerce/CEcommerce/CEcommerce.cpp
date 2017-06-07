@@ -10,10 +10,11 @@ typedef struct ware//商品
 {
 	char wid[20];//产品标识码
 	char name[20];//名称
-	float price;//单价
 	char address[20];//产地
+	float price;//单价
 	int quantity;//库存
-	int warnquantity;//警告最低库存阈值
+	int leastleft;//警告最低库存阈值
+	int leastout;//警告最低库存阈值
 }ware;
 
 ware allwares[20];//所有商品，下同
@@ -282,7 +283,8 @@ void readallusersandadmins()
 
 void displayware(ware w)
 {
-	printf("%s\t%s\t%.1f\t%s\t%d\n", w.wid, w.name, w.price, w.address, w.quantity);
+	printf("%s\t%s\t%s\t%.1f\t%d\t%d\t%d\n",
+		w.wid, w.name, w.address, w.price, w.quantity, w.leastleft, w.leastout);
 }
 //显示所有商品
 void displayallwares()
@@ -314,16 +316,19 @@ ware getwarefromline(char *line)
 			strcpy(w.name, part);
 			break;
 		case 3:
-			w.price = tofloat(part);
+			strcpy(w.address, part);
 			break;
 		case 4:
-			strcpy(w.address, part);
+			w.price = tofloat(part);
 			break;
 		case 5:
 			w.quantity = toint(part);
 			break;
 		case 6:
-			w.warnquantity = toint(part);
+			w.leastleft = toint(part);
+			break;
+		case 7:
+			w.leastout = toint(part);
 			break;
 		default:
 			break;
@@ -385,8 +390,8 @@ void writeallwares()
 	for (i = 0; i < allwarescount; i++)
 	{
 		w = allwares[i];
-		fprintf(fp, "%s %s %.1f %s %d %d\n",
-			w.wid, w.name, w.price, w.address, w.quantity, w.warnquantity);
+		fprintf(fp, "%s %s %s %.1f %d %d %d\n",
+			w.wid, w.name, w.address, w.price, w.quantity, w.leastleft, w.leastout);
 	}
 	fclose(fp);
 	printf("已保存记录到商品文件。");
@@ -421,15 +426,17 @@ void prompteditware()
 }
 
 ////添加商品
-void addware(char wid[20], char wname[], float price, char address[], int quantity, int warnquantity)
+void addware(char wid[20], char wname[], char address[],
+	float price, int quantity, int leastleft, int leastout)
 {
 	ware w;
 	strcpy(w.wid, wid);
 	strcpy(w.name, wname);
-	w.price = price;
 	strcpy(w.address, address);
+	w.price = price;
 	w.quantity = quantity;
-	w.warnquantity = warnquantity;
+	w.leastleft = leastleft;
+	w.leastout = leastout;
 	allwares[allwarescount++] = w;
 	writeallwares();
 }
@@ -450,10 +457,11 @@ void promptaddware()
 {
 	char wid[20];//产品标识码
 	char wname[20];//名称
-	float price;//单价
 	char address[20];//产地
+	float price;//单价
 	int quantity;//库存
-	int warnquantity;//警告最低库存阈值
+	int leastleft;//警告最低库存阈值
+	int leastout;//警告最低库存阈值
 	printf("\n请输入商品识别码:\n");
 	scanf("%s", wid);
 	if (iswarewidexists(wid))
@@ -461,11 +469,12 @@ void promptaddware()
 		printf("识别码%s已经存在，不能重复添加商品!", wid);
 		return;
 	}
-	printf("\n请输入商品名称、产地（都是不带空格的字符串）、单价（整数或浮点数）、库存、警告库存下限（都是整数），空格隔开\n");
-	scanf("%s%s%f%d%d", wname, address, &price, &quantity, &warnquantity);
-
-	addware(wid, wname, price, address, quantity, warnquantity);
-	printf("完成第%d个入库录入!\r\n", allwarescount);
+	printf("\n请输入商品名称、产地（都是不带空格的字符串），空格隔开\n");
+	scanf("%s%s", wname, address);
+	printf("\n单价（整数或浮点数）、库存、警告库存下限和销量下限（都是整数），空格隔开\n");
+	scanf("%f%d%d%d", &price, &quantity, &leastleft, &leastout);
+	addware(wid, wname, address, price, quantity, leastleft, leastout);
+	printf("完成第%d种商品录入!\r\n", allwarescount);
 }
 
 //删除商品
