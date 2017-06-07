@@ -38,7 +38,7 @@ typedef struct log//购买记录
 	int paid;//是否付费，1为购买，0为没购买，相当于购物车
 }log;
 
-user alllogs[10];
+log alllogs[10];
 int alllogscount = 0;
 #pragma endregion
 
@@ -298,6 +298,46 @@ void displayallwares()
 	}
 	printf("--------------------------------------------\r\n");
 }
+
+//显示所有库存不足商品
+void displaylowleftwares()
+{
+	int i;
+	printf("库存不足商品信息如下\r\n", allwarescount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allwarescount; i++)
+	{
+		if (allwares[i].quantity < allwares[i].leastleft)
+			displayware(allwares[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
+int getsoldquantity(char wid[])
+{
+	int i, sum = 0;
+	for (i = 0; i < alllogscount; i++)
+	{
+		if (alllogs[i].paid)
+			sum += alllogs[i].quantity;
+	}
+	return sum;
+}
+
+//显示所有销量不足商品
+void displaylowoutwares()
+{
+	int i;
+	printf("销量不足商品信息如下\r\n", allwarescount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allwarescount; i++)
+	{
+		if (getsoldquantity(allwares[i].wid) < allwares[i].leastout)
+			displayware(allwares[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
 //从一行文本读入并根据\t符号拆分，组合成一个ware
 ware getwarefromline(char *line)
 {
@@ -527,6 +567,7 @@ void promptsearchbyname()
 	searchwarebyname(name);
 }
 
+
 #pragma endregion
 //写所有购物记录
 void writealllogs()
@@ -587,6 +628,7 @@ int main()
 		printf("\n\t 7---添加商品");
 		printf("\n\t 8---输入识别码修改商品价格和库存");
 		printf("\n\t 9---输入识别码删除商品");
+		printf("\n\t a--显示库存不足和滞销商品");
 		printf("\n\t 0---退出程序\n\n");
 		printf("\n---请选择：");
 		fseek(stdin, 0, SEEK_END);
@@ -634,6 +676,11 @@ int main()
 		case '9':
 			printf("\n\n你选择了 9\n");
 			promptremoveware();
+			break;
+		case 'a':
+			printf("\n\n你选择了 a\n");
+			displaylowleftwares();
+			displaylowoutwares();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
