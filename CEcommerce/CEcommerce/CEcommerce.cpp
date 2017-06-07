@@ -667,18 +667,38 @@ int main()
 			break;
 		case '7':
 			printf("\n\n你选择了 7\n");
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
 			promptaddware();
 			break;
 		case '8':
 			printf("\n\n你选择了 8\n");
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
 			prompteditware();
 			break;
 		case '9':
 			printf("\n\n你选择了 9\n");
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
 			promptremoveware();
 			break;
 		case 'a':
 			printf("\n\n你选择了 a\n");
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
 			displaylowleftwares();
 			displaylowoutwares();
 			break;
