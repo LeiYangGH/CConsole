@@ -34,7 +34,7 @@ typedef struct log//购买记录
 {
 	char uname[20];//消费者姓名
 	char wid[20];//商品识别码
-	float quantity;//数量
+	int quantity;//数量
 	int paid;//是否付费，1为购买，0为没购买，相当于购物车
 }log;
 
@@ -606,10 +606,10 @@ void writealllogs()
 		getchar();
 		exit(1);
 	}
-	for (i = 0; i < allwarescount; i++)
+	for (i = 0; i < alllogscount; i++)
 	{
 		l = alllogs[i];
-		fprintf(fp, "%s %s %s %.1f %d %d %d\n",
+		fprintf(fp, "%s %s %d %d\n",
 			l.uname, l.wid, l.quantity, l.paid);
 	}
 	fclose(fp);
@@ -682,6 +682,7 @@ void promptaddtocart(char uname[])
 	scanf("%d", &quantity);
 	if (deductwareleft(wid, quantity))
 	{
+		addtocart(uname, wid, quantity);
 		printf("尊敬的客户%s，您要购买的产品%s数量%d成功添加到购物车!", uname, allwares[windex].name, quantity);
 	}
 }
@@ -705,11 +706,12 @@ int recharge(char uname[], int money)
 //充值，假定uname一定是消费者
 void promptrecharge()
 {
-	int i, money;
+	int uindex, money;
+	uindex = getuseridexbyuname(currentusername);
 	printf("尊敬的客户%s，您好！请输入要充值的金额（正整数）:", currentusername);
 	scanf("%d", &money);
 	if (recharge(currentusername, money))
-		printf("尊敬的客户%s，已为您充值成功，当余额为%d元！\n", currentusername, allusers[i].money);
+		printf("尊敬的客户%s，已为您充值成功，当余额为%.1f元！\n", currentusername, allusers[uindex].money);
 }
 
 
@@ -764,7 +766,7 @@ float showcarttouser(char uname[])
 			ware w = allwares[windex];
 			multiple = w.price* alllogs[i].quantity;
 			total += multiple;
-			printf("%s\t%.1f\t%d\t%.1f\n，\n",
+			printf("%s\t%.1f\t%d\t%.1f\n",
 				w.name, w.price, alllogs[i].quantity, multiple);
 		}
 	printf("--------------------------------------------\n");
@@ -777,6 +779,9 @@ void pay(char uname[])
 {
 	int i, found = 0;//found:此消费者的购物车里有（未支付）商品
 	float total = showcarttouser(uname);
+	printf("----按任意键支付----（主要是为了暂停屏幕让消费者看清购物车清单）！");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
 	if (deductusermoney(uname, total))
 	{
 		//所有相关查找都可以算法优化，
@@ -847,10 +852,11 @@ int main()
 	char choice = -1;
 	readallusersandadmins();
 	readallwares();
-#if 0
-	readallusers();
-	login();
-	promptregisteruser(0);
+#if 0 //测试用
+	//login();
+	//promptregisteruser(0);
+	strcpy(currentusername, "u1");
+	addtocart("u1", "006", 2);
 #endif
 	while (choice != 'g')
 	{
