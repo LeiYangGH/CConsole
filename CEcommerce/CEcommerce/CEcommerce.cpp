@@ -645,6 +645,27 @@ void addtocart(char uname[], char wid[], int quantity)
 	}
 }
 
+//扣除库存，库存不足则返回0
+int deductwareleft(char wid[], int quantity)
+{
+	int index = getwareidexbywid(wid);
+	if (index < 0)//不可能运行到这行
+	{
+		printf("没找到识别码为%d的商品！\n", wid);
+		return 0;
+	}
+	if (allwares[index].quantity >= quantity)
+	{
+		allwares[index].quantity -= quantity;
+		return 1;
+	}
+	else
+	{
+		printf("商品%s库存为%d，库存不足！\n", allwares[index].name, allwares[index].quantity);
+		return 0;
+	}
+}
+
 void promptaddtocart(char uname[])
 {
 	char wid[20];
@@ -668,7 +689,7 @@ void promptaddtocart(char uname[])
 
 int recharge(char uname[], int money)
 {
-	int i, money;
+	int i;
 	for (i = 0; i < alluserscount; i++)
 	{
 		if (streq(allusers[i].name, uname))
@@ -691,26 +712,7 @@ void promptrecharge()
 		printf("尊敬的客户%s，已为您充值成功，当余额为%d元！\n", currentusername, allusers[i].money);
 }
 
-//扣除库存，库存不足则返回0
-int deductwareleft(char wid[], int quantity)
-{
-	int index = getwareidexbywid(wid);
-	if (index < 0)//不可能运行到这行
-	{
-		printf("没找到识别码为%d的商品！\n", wid);
-		return 0;
-	}
-	if (allwares[index].quantity >= quantity)
-	{
-		allwares[index].quantity -= quantity;
-		return 1;
-	}
-	else
-	{
-		printf("商品%s库存为%d，库存不足！\n", allwares[index].name, allwares[index].quantity);
-		return 0;
-	}
-}
+
 
 //扣除余额，余额不足则返回0
 int deductusermoney(char uname[], float money)
