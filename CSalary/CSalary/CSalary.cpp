@@ -1,17 +1,7 @@
-//C语言课程设计，用c语言设计一户籍管理系统，求所写代码要求:
-//户籍信息包括身份证号、姓名、性别、年龄、学历、住址、电话等（身份证号不重复）。
-//试设计一户籍管理系统，该系统具有如下功能：
-//1. 户籍信息录入功能(户籍信息用文件保存，并可在电脑中直接查找并打开该文件）
-//	2．户籍信息浏览功能
-//	3．按年龄排序
-//	4．按年龄区间查询
-//	5．户籍信息删除
-//	6．户籍信息修改
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_per "s.txt"
+#define FILE_per "salary.txt"
 #define MAX_STRLEN 20
 //编号，姓名、基本工资、奖金、保险、实发工资
 typedef struct salary
@@ -42,7 +32,7 @@ int toint(char *s)
 }
 
 
-void displaysalary(salary per)
+void displaysalary(salary s)
 {
 	printf("%s\t%s\t%d\t%d\t%d\t%d\n", s.no, s.name, s.basic, s.bonus, s.insurance, s.real);
 }
@@ -50,6 +40,7 @@ void displayallsalarys()
 {
 	int i;
 	printf("所有%d位员工工资信息如下\r\n", allsalaryscount);
+	printf("编号\t姓名\t基本\t奖金\t保险\t实发\r\n", allsalaryscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < allsalaryscount; i++)
 	{
@@ -68,7 +59,7 @@ salary getsalaryfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	salary per;
+	salary s;
 	s.real = 0;
 	part = strtok(line, " \t\n");
 	while (part != NULL)
@@ -102,8 +93,8 @@ salary getsalaryfromline(char *line)
 		part = strtok(NULL, " \t\n");
 	}
 	if (s.real == 0)
-		setreal(&per);
-	return per;
+		setreal(&s);
+	return s;
 }
 
 void readallsalarys()
@@ -113,6 +104,9 @@ void readallsalarys()
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!", FILE_per);
+		printf("\n\n按任意键退出\n");
+		system("pause");
+		exit(0);
 	}
 	else
 	{
@@ -134,7 +128,7 @@ int cmpfunc(const void * b, const void * a)
 	return ((salary*)a)->basic - ((salary*)b)->basic;
 }
 
-void sortsalarysbyageanddisplay()
+void sortsalarysanddisplay()
 {
 	int i;
 	qsort(allsalarys, allsalaryscount, sizeof(salary), cmpfunc);
@@ -157,7 +151,7 @@ int getsalaryidexbyname(char name[50])
 void writeallsalarys()
 {
 	int i;
-	salary per;
+	salary s;
 	FILE *fp = fopen(FILE_per, "w+");
 	if (fp == NULL)
 	{
@@ -167,7 +161,7 @@ void writeallsalarys()
 	}
 	for (i = 0; i < allsalaryscount; i++)
 	{
-		per = allsalarys[i];
+		s = allsalarys[i];
 		fprintf(fp, "%s\t%s\t%d\t%d\t%d\t%d\n", s.no, s.name, s.basic, s.bonus, s.insurance, s.real);
 	}
 	fclose(fp);
@@ -235,46 +229,31 @@ int main()
 	while (choice != 0)
 	{
 		printf("\n\t 员工工资信息管理系统");
-		printf("\n\t 0---退出");
-		printf("\n\t 1---户籍信息录入");
-		printf("\n\t 2---户籍信息浏览");
-		printf("\n\t 3---按年龄排序");
-		printf("\n\t 4---按年龄区间查询");
-		printf("\n\t 5---户籍信息删除");
-		printf("\n\t 6---户籍信息修改");
+		printf("\n\t 2---显示工资记录");
+		printf("\n\t 5---根据姓名修改工资数据");
+		printf("\n\t 6---根据基本工资进行排序");
+		printf("\n\t 7---退出");
 		printf("\n请选择:");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
 		{
-		case '0':
+		case '7':
 			printf("\n\n 你选择了退出。");
 			fseek(stdin, 0, SEEK_END);
 			system("pause");
 			exit(0); break;
-		case '1':
-			printf("\n\n你选择了 1\n");
-			promptaddsalary();
-			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
 			displayallsalarys();
 			break;
-		case '3':
-			printf("\n\n你选择了 c\n");
-			sortsalarysbyageanddisplay();
-			break;
-		case '4':
-			printf("\n\n你选择了 d\n");
-			promptsearchbetweenage();
-			break;
 		case '5':
-			printf("\n\n你选择了 e\n");
-			promptremovesalary();
+			printf("\n\n你选择了 c\n");
+			prompteditsalary();
 			break;
 		case '6':
 			printf("\n\n你选择了 f\n");
-			prompteditsalary();
+			sortsalarysanddisplay();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
