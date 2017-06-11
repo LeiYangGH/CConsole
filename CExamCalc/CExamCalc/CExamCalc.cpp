@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_INPUT "input.txt"
-//#define FILE_INPUT "sample.txt"
+//#define FILE_INPUT "input.txt"
+#define FILE_INPUT "sample.txt"
 #define FILE_BEST "best.txt"
 #define FILE_SCORES "scores.txt"
 #define FILE_ANALYSIS "analysis.txt"
@@ -25,7 +25,7 @@ student getstudentfromline(char *line)
 	int index = 0;
 	student rec;
 	rec.total = 0;
-	part = strtok(line, ",");
+	part = strtok(line, " \t\n");
 	while (part != NULL)
 	{
 		switch (++index)
@@ -41,7 +41,7 @@ student getstudentfromline(char *line)
 		default:
 			break;
 		}
-		part = strtok(NULL, ",");
+		part = strtok(NULL, " \t\n");
 	}
 	return rec;
 }
