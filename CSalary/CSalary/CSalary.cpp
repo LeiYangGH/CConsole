@@ -11,22 +11,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_per "per.txt"
+#define FILE_per "s.txt"
 #define MAX_STRLEN 20
-typedef struct person
+//编号，姓名、基本工资、奖金、保险、实发工资
+typedef struct salary
 {
-	char id[20];
+	char no[20];
 	char name[20];
-	char sex[10];
-	int age;
-	char scholar[30];
-	char address[50];
-	char telephone[20];
+	int basic;
+	int bonus;
+	int insurance;
+	int real;
+}salary;
 
-}person;
-
-person allpersons[100];
-int allpersonscount = 0;
+salary allsalarys[100];
+int allsalaryscount = 0;
 
 //字符串相等
 int streq(char *s1, char *s2)
@@ -43,64 +42,71 @@ int toint(char *s)
 }
 
 
-void displayperson(person per)
+void displaysalary(salary per)
 {
-	printf("%s\t%s\t%s\t%d\t%s\t%s\t%s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
+	printf("%s\t%s\t%d\t%d\t%d\t%d\n", s.no, s.name, s.basic, s.bonus, s.insurance, s.real);
 }
-
-void displayallpersons()
+void displayallsalarys()
 {
 	int i;
-	printf("所有%d位居民信息如下\r\n", allpersonscount);
+	printf("所有%d位员工工资信息如下\r\n", allsalaryscount);
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allsalaryscount; i++)
 	{
-		displayperson(allpersons[i]);
+		displaysalary(allsalarys[i]);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
-//从一行文本读入并根据\t符号拆分，组合成一个person
-person getpersonfromline(char *line)
+void setreal(salary *s)
+{
+	s->real = s->basic + s->bonus - s->insurance;
+}
+
+//从一行文本读入并根据\t符号拆分，组合成一个salary
+salary getsalaryfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	person per;
+	salary per;
+	s.real = 0;
 	part = strtok(line, " \t\n");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
-			strcpy(per.id, part);
+			strcpy(s.no, part);
 			break;
 		case 2:
-			strcpy(per.name, part);
+			strcpy(s.name, part);
 			break;
 		case 3:
-			strcpy(per.sex, part);
+			s.basic = toint(part);
 			break;
 		case 4:
-			per.age = toint(part);
+			s.bonus = toint(part);
+
 			break;
 		case 5:
-			strcpy(per.scholar, part);
+			s.insurance = toint(part);
 			break;
 		case 6:
-			strcpy(per.address, part);
+			s.real = toint(part);
 			break;
 		case 7:
-			strcpy(per.telephone, part);
 			break;
 		default:
 			break;
 		}
 		part = strtok(NULL, " \t\n");
 	}
+	if (s.real == 0)
+		setreal(&per);
 	return per;
 }
 
-void readallpersons()
+void readallsalarys()
 {
 	char line[200];
 	FILE *fp = fopen(FILE_per, "r");
@@ -110,48 +116,48 @@ void readallpersons()
 	}
 	else
 	{
-		allpersonscount = 0;
+		allsalaryscount = 0;
 
 		while (fgets(line, 1024, fp) != NULL)
 		{
 			if (strlen(line) < 5)
 				continue;
-			allpersons[allpersonscount++] = getpersonfromline(line);
+			allsalarys[allsalaryscount++] = getsalaryfromline(line);
 		}
 		printf("\n已读入文件!", FILE_per);
 	}
 }
 
 //qsort是快速排序，要求如下写法，根据age排序
-int cmpfunc(const void * a, const void * b)
+int cmpfunc(const void * b, const void * a)
 {
-	return ((person*)a)->age - ((person*)b)->age;
+	return ((salary*)a)->basic - ((salary*)b)->basic;
 }
 
-void sortpersonsbyageanddisplay()
+void sortsalarysbyageanddisplay()
 {
 	int i;
-	qsort(allpersons, allpersonscount, sizeof(person), cmpfunc);
-	printf("按每个居民年龄排序后如下\r\n");
-	displayallpersons();
+	qsort(allsalarys, allsalaryscount, sizeof(salary), cmpfunc);
+	printf("按每个员工基本工资排序后如下\r\n");
+	displayallsalarys();
 }
 
 //根据编号查数组里的序号
-int getpersonidexbyno(char id[50])
+int getsalaryidexbyname(char name[50])
 {
 	int i;
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allsalaryscount; i++)
 	{
-		if (streq(allpersons[i].id, id))
+		if (streq(allsalarys[i].name, name))
 			return i;
 	}
 	return -1;//没找到
 }
 
-void writeallpersons()
+void writeallsalarys()
 {
 	int i;
-	person per;
+	salary per;
 	FILE *fp = fopen(FILE_per, "w+");
 	if (fp == NULL)
 	{
@@ -159,163 +165,76 @@ void writeallpersons()
 		getchar();
 		exit(1);
 	}
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allsalaryscount; i++)
 	{
-		per = allpersons[i];
-		fprintf(fp, "%s %s %s %d %s %s %s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
+		per = allsalarys[i];
+		fprintf(fp, "%s\t%s\t%d\t%d\t%d\t%d\n", s.no, s.name, s.basic, s.bonus, s.insurance, s.real);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
-void editperson(char id[50])
+void editsalary(char id[50])
 {
 	int i;
-	i = getpersonidexbyno(id);
+	i = getsalaryidexbyname(id);
 	if (i >= 0)
 	{
-		printf("\n请输入新的学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
-		scanf("%s%s%s", allpersons[i].scholar, allpersons[i].address, allpersons[i].telephone);
-		writeallpersons();
+		printf("\n请输入新的基本工资、奖金、保险（都是正整数），空格隔开\n");
+		scanf("%d%d%d", &allsalarys[i].basic, &allsalarys[i].bonus, &allsalarys[i].insurance);
+		setreal(&allsalarys[i]);
+		writeallsalarys();
 		printf("修改完毕。\r\n");
 	}
 	else
 	{
-		printf("没找到对应身份证号的居民。\r\n");
+		printf("没找到对应姓名的员工。\r\n");
 	}
 }
 
-void prompteditperson()
+void prompteditsalary()
 {
-	char id[50];
-	printf("请输入要修改的身份证号:");
-	scanf("%s", &id);
-	editperson(id);
-}
-
-void addperson(char id[], char name[], char sex[], int age, char scholar[], char address[], char telephone[])
-{
-	person per;
-	strcpy(per.id, id);
-	strcpy(per.name, name);
-	strcpy(per.sex, sex);
-	per.age = age;
-	strcpy(per.scholar, scholar);
-	strcpy(per.address, address);
-	strcpy(per.telephone, telephone);
-	allpersons[allpersonscount++] = per;
-	writeallpersons();
+	char name[50];
+	printf("请输入要修改工资的员工姓名:");
+	scanf("%s", &name);
+	editsalary(name);
 }
 
 
-void promptaddperson()
-{
-	char id[20];
-	char name[20];
-	char sex[10];
-	int age;
-	char scholar[30];
-	char address[50];
-	char telephone[20];
-	printf("\n请输入身份证（不重复）:\n");
-	scanf("%s", id);
-	if (getpersonidexbyno(id) >= 0)
-	{
-		printf("身份证与已有居民重复！\n");
-		return;
-	}
-	printf("\n请输入姓名、性别（都是不带空格的字符串）、年龄(正整数)，空格隔开\n");
-	scanf("%s%s%d", name, sex, &age);
-	printf("\n请输入学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
-	scanf("%s%s%s", scholar, address, telephone);
-	addperson(id, name, sex, age, scholar, address, telephone);
-	printf("完成第%d位居民录入!\r\n", allpersonscount);
-}
-
-
-void removeperson(char no[20])
-{
-	int i;
-	int index;
-	index = getpersonidexbyno(no);
-	if (index >= 0)
-	{
-		for (i = index; i < allpersonscount - 1; i++)
-			allpersons[i] = allpersons[i + 1];
-		allpersonscount--;
-		writeallpersons();
-		printf("删除完毕，剩下%d个。\r\n", allpersonscount);
-	}
-	else
-	{
-		printf("没找到对应身份证号的居民。\r\n");
-	}
-
-}
-
-void promptremoveperson()
-{
-	char id[20];
-	printf("请输入要删除的身份证号:");
-	scanf("%s", id);
-	removeperson(id);
-}
-
-
-void searcbetweenage(int from, int to)
-{
-	int i, found = 0;
-	for (i = 0; i < allpersonscount; i++)
-		if (allpersons[i].age >= from && allpersons[i].age <= to)
-		{
-			displayperson(allpersons[i]);
-			found = 1;
-		}
-	if (!found)
-		printf("没找到对应居民的信息。\r\n");
-}
-
-void promptsearchbetweenage()
-{
-	int from, to;
-	printf("请输入要查找的最低和最高年龄(正整数，空格分隔):");
-	scanf("%d%d", &from, &to);
-	searcbetweenage(from, to);
-}
 
 int main()
 {
 	char choice = -1;
 #if 0//测试用，if块可删除
-	readallpersons();
-	//addperson("05", "n5", "20170605", 41, 92, 93);
-	//addperson("06", "n6", "20170606", 46, 96, 96);
+	readallsalarys();
+	//addsalary("05", "n5", "20170605", 41, 92, 93);
+	//addsalary("06", "n6", "20170606", 46, 96, 96);
 
-	//editperson("01");
-	////printf("\n%d\n", allpersonscount);
-	displayallpersons();
-	promptaddperson();
-	displayallpersons();
+	//editsalary("01");
+	////printf("\n%d\n", allsalaryscount);
+	displayallsalarys();
+	promptaddsalary();
+	displayallsalarys();
 	//promptsearchbetweenage();
-	//prompteditperson();
-	//writeallpersons();
+	//prompteditsalary();
+	//writeallsalarys();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-	//promptremoveperson();
-	//sortpersonsbytotalanddisplay();
-	//displayallpersons();
-	//sortpersonsbytotal();
-	//prompteditperson();
-	//displayallpersons();
+	//promptremovesalary();
+	//sortsalarysbytotalanddisplay();
+	//displayallsalarys();
+	//sortsalarysbytotal();
+	//prompteditsalary();
+	//displayallsalarys();
 
 
 	system("pause");
 
 #endif
-	readallpersons();
+	readallsalarys();
 	while (choice != 0)
 	{
-		printf("\n\t 居民信息管理系统");
+		printf("\n\t 员工工资信息管理系统");
 		printf("\n\t 0---退出");
 		printf("\n\t 1---户籍信息录入");
 		printf("\n\t 2---户籍信息浏览");
@@ -335,15 +254,15 @@ int main()
 			exit(0); break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaddperson();
+			promptaddsalary();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			displayallpersons();
+			displayallsalarys();
 			break;
 		case '3':
 			printf("\n\n你选择了 c\n");
-			sortpersonsbyageanddisplay();
+			sortsalarysbyageanddisplay();
 			break;
 		case '4':
 			printf("\n\n你选择了 d\n");
@@ -351,11 +270,11 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 e\n");
-			promptremoveperson();
+			promptremovesalary();
 			break;
 		case '6':
 			printf("\n\n你选择了 f\n");
-			prompteditperson();
+			prompteditsalary();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
