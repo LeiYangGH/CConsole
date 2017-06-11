@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 
-
+int n = 0;
 //Êä³öÊı×é
 void print_arr(int arr[], int len)
 {
@@ -17,7 +17,7 @@ void print_arr(int arr[], int len)
 	printf("%d %d %d %d\n", arr[3], arr[4], arr[5], arr[6]);
 	printf("%d %d %d\n", arr[7], arr[8], arr[9]);
 	printf("\n\n");
-
+	n++;
 }
 
 
@@ -108,6 +108,7 @@ int main()
 	//swap(&a, &b);
 
 	//printf("%d %d",a,b);
+	printf("n=%d\n",n);
 
 
 	system("pause");
