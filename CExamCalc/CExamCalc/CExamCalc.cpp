@@ -1,34 +1,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-//#define FILE_INPUT "input.txt"
-#define FILE_INPUT "sample.txt"
+#define FILE_INPUT "sample.txt"//编译后放exe旁边运行，调试时放cpp旁边
 #define FILE_BEST "best.txt"
 #define FILE_SCORES "scores.txt"
 #define FILE_ANALYSIS "analysis.txt"
 #define MAX_STRLEN 20
 #define QUESTIONS_COUNT 35
 
-char best[QUESTIONS_COUNT];
+char best[QUESTIONS_COUNT];//每个问题最佳答案
 typedef struct student
 {
-	char name[MAX_STRLEN];
-	char choice[QUESTIONS_COUNT];
-	int total;
+	char name[MAX_STRLEN];//姓名
+	char choice[QUESTIONS_COUNT];//该学生每题的选项
+	int total;//总分
 }student;
-student allstudents[100];
-int allstudentscount = 0;
+student allstudents[100];//所有学生
+int allstudentscount = 0;//所有学生数量
 
+//从一行文本拆分并组合student
 student getstudentfromline(char *line)
 {
 	char *part;
 	int index = 0;
 	student rec;
 	rec.total = 0;
-	part = strtok(line, " \t\n");
+	part = strtok(line, " \t\n");//按空格或tab拆分
 	while (part != NULL)
 	{
-		switch (++index)
+		switch (++index)//列序号
 		{
 		case 1:
 			break;
@@ -46,6 +46,7 @@ student getstudentfromline(char *line)
 	return rec;
 }
 
+//读入所有学生
 void readallstudents()
 {
 	char line[200];
@@ -67,6 +68,7 @@ void readallstudents()
 	}
 }
 
+//得出每题的最佳答案
 void getbestchoices()
 {
 	int i, j, t, cnt[100] = { 0 };
@@ -88,6 +90,7 @@ void getbestchoices()
 	}
 }
 
+//每题最佳答案写入文件
 void writebestchoices()
 {
 	int i;
@@ -106,6 +109,7 @@ void writebestchoices()
 	fclose(fp);
 }
 
+//计算每个学生的总分
 void calctotal()
 {
 	int i, q, sum;
@@ -128,15 +132,19 @@ void calctotal()
 	}
 }
 
+//比较两个学生的总分
 int cmpfunc(const void * a, const void * b)
 {
 	return ((student*)a)->total - ((student*)b)->total;
 }
+//按总分把学生排序
 void sorttotal()
 {
+	//qsort是stdlib.h里的标准函数，快速排序
 	qsort(allstudents, allstudentscount, sizeof(student), cmpfunc);
 }
 
+//把每个学生的总分写入文件
 void writetotal()
 {
 	int i;
@@ -157,6 +165,7 @@ void writetotal()
 	fclose(fp);
 }
 
+//低于60分的人数
 int below60()
 {
 	int i, c = 0;
@@ -167,7 +176,7 @@ int below60()
 	}
 	return c;
 }
-
+//60-80分的人数
 int below60_80()
 {
 	int i, c = 0;
@@ -179,6 +188,8 @@ int below60_80()
 	return c;
 }
 
+
+//大于80分的人数
 int above80()
 {
 	int i, c = 0;
@@ -190,6 +201,7 @@ int above80()
 	return c;
 }
 
+//计算所有学生的平均分
 float ave()
 {
 	int i;
@@ -199,6 +211,7 @@ float ave()
 	return sum / (float)allstudentscount;
 }
 
+//计算所有各个分数段的学生的分布
 void writeanalysis()
 {
 	int i;
@@ -228,6 +241,7 @@ void writeanalysis()
 	fclose(fp);
 }
 
+//输入字符串
 void inputstring(char str[])
 {
 	int len = -1;
@@ -242,6 +256,7 @@ void inputstring(char str[])
 	strcpy(str, input);
 }
 
+//根据姓名查找某个学生
 int searchtotalbyname(char *name)
 {
 	int i;
@@ -252,6 +267,7 @@ int searchtotalbyname(char *name)
 	return 0;
 }
 
+//提示输入姓名并查找学生
 int promptsearchtotalbyname()
 {
 	char name[MAX_STRLEN] = "";
@@ -260,6 +276,7 @@ int promptsearchtotalbyname()
 	return strcmp(name, "q");
 }
 
+//主函数
 int main()
 {
 	int choice = -1;

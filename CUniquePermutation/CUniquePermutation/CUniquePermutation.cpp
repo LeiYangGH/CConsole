@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
-int n = 0;//共多少个
+int n = 0;
 void print_arr(int arr[], int len)
 {
 	int i;

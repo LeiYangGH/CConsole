@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_INPUT "stuin.txt"
+#define FILE_INPUT "stuin.txt"//
 #define FILE_ALLOUTPUT "stuout.txt"
-#define MAX_STRLEN 20
-#define GRADES_COUNT 5
+#define MAX_STRLEN 20 //最长字符串长度
+#define GRADES_COUNT 5 //等级个数
 
 typedef struct student
 {
@@ -27,12 +27,14 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+//显示一个学生成绩
 void displaystudent(student stu)
 {
 	printf("%s\t%s\t%d\n", stu.no, stu.name, stu.score);
 	fprintf(outfile, "%s\t%s\t%d\n", stu.no, stu.name, stu.score);
 }
 
+//显示所有学生成绩
 void displayallstudents()
 {
 	int i;
@@ -44,15 +46,16 @@ void displayallstudents()
 	printf("--------------------------------------------\r\n");
 }
 
+//从一行文本拆分并组合出一个学生
 student getstudentfromline(char *line)
 {
 	char *part;
 	int index = 0;
 	student stu;
-	part = strtok(line, " \n");
+	part = strtok(line, " \n");//拆分函数，按空格和回车
 	while (part != NULL)
 	{
-		switch (++index)
+		switch (++index)//index是文本的列序号
 		{
 		case 1:
 			strcpy(stu.no, part);
@@ -70,6 +73,7 @@ student getstudentfromline(char *line)
 	return stu;
 }
 
+//计算总分和平均分
 void calctotalandave()
 {
 	int i, j;
@@ -81,7 +85,7 @@ void calctotalandave()
 	averagescore = sum / (float)allstudentscount;
 }
 
-
+//从文件读所有学生
 void readallstudents()
 {
 	char line[200];
@@ -96,22 +100,27 @@ void readallstudents()
 
 	while (fgets(line, 1024, fp) != NULL)
 	{
-		if (strlen(line) < 5)
+		if (strlen(line) < 5)//如果有些行是空行或者不规范
 			continue;
 		++allstudentscount;
+	//每行一个学生
 		allstudents[allstudentscount - 1] = getstudentfromline(line);
 	}
 }
 
+//固定格式，比较分数
 int cmpstuavefunc(const void * b, const void * a)
 {
 	return (((student*)a)->score - ((student*)b)->score);
 }
+//所有学生按分数排序
 void sortstudetsbyscore()
 {
+	//qsort 快速排序函数，是标准c库里的函数
 	qsort(allstudents, allstudentscount, sizeof(student), cmpstuavefunc);
 }
 
+//显示最高分的学生
 void displayhigheststudents()
 {
 	int i = 0;
@@ -126,6 +135,7 @@ void displayhigheststudents()
 	printf("--------------------------------------------\r\n");
 }
 
+//计算并显示平均分高于、等于、低于平均分的人数
 void countanddisplaycompareaveragecount()
 {
 	int i, t, low = 0, eq = 0, high = 0;
@@ -149,6 +159,7 @@ void countanddisplaycompareaveragecount()
 	fprintf(outfile, "平均成绩等于平均成绩的人数：%d\n\n", eq);
 }
 
+//计算并显示各个分数段等级的人数和百分比
 void countanddisplaygradescountandpercent()
 {
 	int i, t;
@@ -177,7 +188,7 @@ void countanddisplaygradescountandpercent()
 	}
 }
 
-
+//主函数
 int main()
 {
 	outfile = fopen(FILE_ALLOUTPUT, "a+");
