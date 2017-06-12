@@ -34,7 +34,7 @@ typedef struct log//购买记录
 {
 	char uname[20];//消费者姓名
 	char wid[20];//商品识别码
-	float quantity;//数量
+	int quantity;//数量
 	int paid;//是否付费，1为购买，0为没购买，相当于购物车
 }log;
 
@@ -82,7 +82,7 @@ void login()
 	printf("用户名或密码错误，登录失败！\n");
 }
 
-//是否已经存在相同用户
+//是否已经存在相同用户名
 int isusernameexists(char uname[20])
 {
 	int i;
@@ -92,6 +92,19 @@ int isusernameexists(char uname[20])
 			return 1;
 	}
 	return 0;
+}
+
+//根据用户名得出数组下标
+int getuseridexbyuname(char uname[20])
+{
+	int i;
+	for (i = 0; i < alluserscount; i++)
+	{
+		user u = allusers[i];
+		if (streq(u.name, uname))
+			return i;
+	}
+	return -1;
 }
 
 //密码复杂度，暂时规定长度>=6
@@ -481,7 +494,7 @@ void addware(char wid[20], char wname[], char address[],
 	writeallwares();
 }
 
-//是否已经存在相同用户
+//是否已经存在相同商品
 int iswarewidexists(char wid[20])
 {
 	int i;
@@ -492,6 +505,8 @@ int iswarewidexists(char wid[20])
 	}
 	return 0;
 }
+
+
 
 void promptaddware()
 {
@@ -572,38 +587,264 @@ void promptsearchbyname()
 //写所有购物记录
 void writealllogs()
 {
-
+	int i;
+	char choice;
+	log l;
+	FILE *fp;
+	printf("即将往%s追加购买记录，注意最好在程序结束前一次性追加，否则多次追加会有重复记录。\n按y继续，其他键取消：", FILE_LOG);
+	fseek(stdin, 0, SEEK_END);
+	choice = getchar();
+	if (choice != 'y')
+	{
+		printf("已取消!");
+		return;
+	}
+	fp = fopen(FILE_LOG, "a");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_LOG);
+		getchar();
+		exit(1);
+	}
+	for (i = 0; i < alllogscount; i++)
+	{
+		l = alllogs[i];
+		fprintf(fp, "%s %s %d %d\n",
+			l.uname, l.wid, l.quantity, l.paid);
+	}
+	fclose(fp);
+	printf("已保存记录到商品文件。");
 }
-//每次加入购物车就检查库存如果不足则警告
-void warnlack(char wid[20])
+
+void addlog(char uname[], char wid[], int quantity, int paid)
 {
-
+	log l;
+	strcpy(l.uname, uname);
+	strcpy(l.wid, wid);
+	l.quantity = quantity;
+	l.paid = paid;
+	alllogs[alllogscount++] = l;
 }
+
 //加购物车，log里加
-void addwant(char uname[], char wid[], int quantity)
+void addtocart(char uname[], char wid[], int quantity)
 {
-
+	int i, found = 0;//found:此消费者的购物车里有相同物品，则只加数量
+	for (i = alllogscount - 1; i >= 0; i--)
+		if (streq(alllogs[i].uname, uname)
+			&& streq(alllogs[i].wid, wid)
+			&& alllogs[i].paid == 0)
+		{
+			alllogs[i].quantity += quantity;
+			found = 1;
+			break;
+		}
+	if (!found)//没有找到则添加新商品
+	{
+		addlog(uname, wid, quantity, 0);
+	}
 }
 
-//充值
-void recharge(char uname[], float money)
+//扣除库存，库存不足则返回0
+int deductwareleft(char wid[], int quantity)
 {
+	int index = getwareidexbywid(wid);
+	if (index < 0)//不可能运行到这行
+	{
+		printf("没找到识别码为%d的商品！\n", wid);
+		return 0;
+	}
+	if (allwares[index].quantity >= quantity)
+	{
+		allwares[index].quantity -= quantity;
+		return 1;
+	}
+	else
+	{
+		printf("商品%s库存为%d，库存不足！\n", allwares[index].name, allwares[index].quantity);
+		return 0;
+	}
+}
 
+void promptaddtocart(char uname[])
+{
+	char wid[20];
+	int windex, quantity;
+	printf("尊敬的客户%s，请输入加入购物车的商品识别码:", uname);
+	scanf("%s", wid);
+	windex = getwareidexbywid(wid);
+	if (windex < 0)
+	{
+		printf("尊敬的客户%s，您输入的商品识别码找不到，请检查后重新输入，谢谢。", uname);
+		return;
+	}
+	printf("尊敬的客户%s，请输入要购买的%s的数量（整数）:", uname, allwares[windex].name);
+	scanf("%d", &quantity);
+	if (deductwareleft(wid, quantity))
+	{
+		addtocart(uname, wid, quantity);
+		printf("尊敬的客户%s，您要购买的产品%s数量%d成功添加到购物车!", uname, allwares[windex].name, quantity);
+	}
+}
+
+
+int recharge(char uname[], int money)
+{
+	int i;
+	for (i = 0; i < alluserscount; i++)
+	{
+		if (streq(allusers[i].name, uname))
+		{
+			allusers[i].money += money;
+			printf("尊敬的客户%s，已为您充值成功，当余额为%d元！\n", uname, allusers[i].money);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+//充值，假定uname一定是消费者
+void promptrecharge()
+{
+	int uindex, money;
+	uindex = getuseridexbyuname(currentusername);
+	printf("尊敬的客户%s，您好！请输入要充值的金额（正整数）:", currentusername);
+	scanf("%d", &money);
+	if (recharge(currentusername, money))
+		printf("尊敬的客户%s，已为您充值成功，当余额为%.1f元！\n", currentusername, allusers[uindex].money);
+}
+
+
+
+//扣除余额，余额不足则返回0
+int deductusermoney(char uname[], float money)
+{
+	int index = getuseridexbyuname(uname);
+	if (index < 0)//不可能运行到这行
+	{
+		printf("没找到用户名为%d的消费者！\n", uname);
+		return 0;
+	}
+	if (allusers[index].money >= money)
+	{
+		allusers[index].money -= money;
+		return 1;
+	}
+	else
+	{
+		printf("尊敬的客户%s，抱歉，您余额为%.1f，余额不足！\n", allusers[index].name, allusers[index].money);
+		return 0;
+	}
+}
+
+int getlatestlogidbyuserwareandpaid(char uname[], char wid[], int paid)
+{
+	int i;
+	for (i = alllogscount - 1; i >= 0; i--)
+		if (streq(alllogs[i].uname, uname)
+			&& streq(alllogs[i].wid, wid)
+			&& alllogs[i].paid == paid)
+		{
+			return i;
+		}
+	return -1;
+}
+
+float showcarttouser(char uname[])
+{
+	int i, windex;
+	float multiple, total = 0;
+
+	printf("尊敬的客户%s，您的购物车商品信息如下\r\n", uname);
+	printf("商品\t单价\t数量\t总价\n");
+	printf("--------------------------------------------\n");
+	for (i = 0; i < alllogscount; i++)
+		if (streq(alllogs[i].uname, uname)
+			&& alllogs[i].paid == 0)
+		{
+			windex = getwareidexbywid(alllogs[i].wid);
+			ware w = allwares[windex];
+			multiple = w.price* alllogs[i].quantity;
+			total += multiple;
+			printf("%s\t%.1f\t%d\t%.1f\n",
+				w.name, w.price, alllogs[i].quantity, multiple);
+		}
+	printf("--------------------------------------------\n");
+	printf("总应付金额：%.1f\n", total);
+	return total;
 }
 
 //支付，把log里所有当前用户的未支付的全部置为支付
 void pay(char uname[])
 {
-
+	int i, found = 0;//found:此消费者的购物车里有（未支付）商品
+	float total = showcarttouser(uname);
+	printf("----按任意键支付----（主要是为了暂停屏幕让消费者看清购物车清单）！");
+	fseek(stdin, 0, SEEK_END);
+	getchar();
+	if (deductusermoney(uname, total))
+	{
+		//所有相关查找都可以算法优化，
+		//因为每次都要求购物车里的商品全部支付，
+		//因此一旦遍历到已经支付的就不用再继续了，
+		//此处没优化
+		for (i = alllogscount - 1; i >= 0; i--)
+			if (streq(alllogs[i].uname, uname)
+				&& alllogs[i].paid == 0)
+			{
+				alllogs[i].paid = 1;
+			}
+		printf("尊敬的客户%s，付款成功，欢迎您下次光临！\n", uname);
+	}
 }
 
-//退货，倒着遍历log，退货数量上限是上一次购买的数量
-void returnware(char uname[], char wid[], int quantity)
+//能退货的数量，倒着遍历log，退货数量上限是上一次购买的数量
+int maxquantitycanreturn(char uname[], char wid[])
 {
-
+	int index = getlatestlogidbyuserwareandpaid(uname, wid, 1);
+	if (index >= 0)
+		return alllogs[index].quantity;
+	else
+		return 0;
 }
 
+int returnware(char uname[], char wid[], int quantity)
+{
+	int i;
+	log l;
+	int windex = getwareidexbywid(wid);
+	if (quantity > maxquantitycanreturn(uname, wid))
+	{
+		printf("尊敬的客户%s，您要退货的商品数量大于最近一次购买的数量，退货失败！\n", uname);
+		return 0;
+	}
+	//退货是购买的逆操作，因此余额和库存都加去负数
+	deductusermoney(uname, -allwares[windex].price*quantity);
+	deductwareleft(wid, -quantity);
+	//退货操作也加入历史记录，因为影响用户癖好
+	addlog(uname, wid, -quantity, 1);
+	return 1;
+}
 
+void promptreturnware(char uname[])
+{
+	char wid[20];
+	int windex, quantity;
+	printf("尊敬的客户%s，请输入退货的商品识别码:", uname);
+	scanf("%s", wid);
+	windex = getwareidexbywid(wid);
+	if (windex < 0)
+	{
+		printf("尊敬的客户%s，您输入的商品识别码找不到，请检查后重新输入，谢谢。", uname);
+		return;
+	}
+	printf("尊敬的客户%s，请输入要退货的%s的数量（整数）:", uname, allwares[windex].name);
+	scanf("%d", &quantity);
+	if (returnware(uname, wid, quantity))
+	{
+		printf("尊敬的客户%s，退货成功，本店会努力以最好的商品报答您的支持!", uname);
+	}
+}
 
 
 int main()
@@ -611,10 +852,11 @@ int main()
 	char choice = -1;
 	readallusersandadmins();
 	readallwares();
-#if 0
-	readallusers();
-	login();
-	promptregisteruser(0);
+#if 0 //测试用
+	//login();
+	//promptregisteruser(0);
+	strcpy(currentusername, "u1");
+	addtocart("u1", "006", 2);
 #endif
 	while (choice != 'g')
 	{
@@ -628,7 +870,12 @@ int main()
 		printf("\n\t 7---添加商品");
 		printf("\n\t 8---输入识别码修改商品价格和库存");
 		printf("\n\t 9---输入识别码删除商品");
-		printf("\n\t a--显示库存不足和滞销商品");
+		printf("\n\t a---显示库存不足和滞销商品");
+		printf("\n\t b---添加商品到购物车");
+		printf("\n\t c---结帐付款");
+		printf("\n\t d---充值");
+		printf("\n\t e---退货");
+		printf("\n\t f---把本次运行的消费记录追加到文件");
 		printf("\n\t 0---退出程序\n\n");
 		printf("\n---请选择：");
 		fseek(stdin, 0, SEEK_END);
@@ -701,6 +948,46 @@ int main()
 			}
 			displaylowleftwares();
 			displaylowoutwares();
+			break;
+		case 'b':
+			if (!iscurrentuserconsumer())
+			{
+				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
+				break;
+			}
+			promptaddtocart(currentusername);
+			break;
+		case 'c':
+			if (!iscurrentuserconsumer())
+			{
+				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
+				break;
+			}
+			pay(currentusername);
+			break;
+		case 'd':
+			if (!iscurrentuserconsumer())
+			{
+				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
+				break;
+			}
+			promptrecharge();
+			break;
+		case 'e':
+			if (!iscurrentuserconsumer())
+			{
+				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
+				break;
+			}
+			promptreturnware(currentusername);
+			break;
+		case 'f':
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
+			writealllogs();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
