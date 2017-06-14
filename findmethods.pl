@@ -11,8 +11,8 @@ use File::Spec::Functions 'catfile';
  use File::Find qw(finddepth);
 
 my $testdir = 'C:/test';
- my $cdir = 'C:/G/CConsole/CStu';
-# my $cdir = 'C:/G/CConsole';
+ # my $cdir = 'C:/G/CConsole/CStu';
+my $cdir = 'C:/G/CConsole';
 my @files;
 
 finddepth(sub 
@@ -25,15 +25,17 @@ for my $f (@files)
         if(!-d $f &&  $f =~ /\.cpp$/)
         { 
         	 
-		say "-------------$f";
+		
 		   open(FILE, $f);  
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /get/ && 
-			 $_ =~ /\w+\s\w+\(.*?\)/
+			 $_ =~ /\*next/
+			# $_ =~ /get/ && 
+			 #$_ =~ /\w+\s\w+\(.*?\)/
 			 )
 			 {
+			  say "-------------$f";
 			    say "$&";
 			    # print "$fullname\n\n";
 			 }
