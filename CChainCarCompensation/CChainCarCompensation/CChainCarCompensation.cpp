@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #define FILE_COM "compensation.txt"
-#define LINE  "\n------------------------\n" 
+#define LINE  "------------------------\n" 
 typedef struct compensation
 {
 	char no[20];
@@ -16,7 +16,7 @@ typedef struct compensation
 }compensation;
 
 compensation *head;
-#define T 1
+#define T 0
 //字符串相等
 int streq(char *s1, char *s2)
 {
@@ -109,7 +109,30 @@ void gettail(compensation **tail)
 	*tail = p;
 }
 
+void writeallcompensations()
+{
+	int i;
+	compensation stu;
+	compensation *p = head->next;
+	FILE *fp = fopen(FILE_COM, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_COM);
+		getchar();
+		exit(1);
+	}
 
+
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	while (p != NULL)
+	{
+		fprintf(fp, "%s %s %s %s %d %s\n",
+			p->no, p->station, p->chassis, p->auditor, p->money, p->date);
+		p = p->next;
+	}
+
+	fclose(fp);
+}
 
 void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
 {
@@ -128,7 +151,7 @@ void addcompensation(char no[20], char station[20], char chassis[20], char audit
 
 	p->next = n;
 	n->next = NULL;
-	printf("\n%s的信息添加成功!\n", auditor);
+	writeallcompensations();
 }
 
 void findcompensationbyno(char no[20], compensation **found)
@@ -213,31 +236,7 @@ void readallcompensations()
 	}
 }
 
-void writeallcompensations()
-{
-	int i;
-	compensation stu;
-	compensation *p = head->next;
-	FILE *fp = fopen(FILE_COM, "w+");
-	if (fp == NULL)
-	{
-		printf("\n打开文件%s失败!", FILE_COM);
-		getchar();
-		exit(1);
-	}
 
-
-	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
-	while (p != NULL)
-	{
-		fprintf(fp, "%s %s %s %s %d %s\n",
-			p->no, p->station, p->chassis, p->auditor, p->money, p->date);
-		p = p->next;
-	}
-
-	fclose(fp);
-	printf("已保存记录到文件。");
-}
 void promptaddcompensation()
 {
 	char no[20];
@@ -273,7 +272,7 @@ void editcompensation(compensation *n, char station[20], char chassis[20], char 
 	strcpy(n->chassis, chassis);
 	n->money = money;
 	strcpy(n->date, date);
-
+	writeallcompensations();
 }
 
 void prompteditcompensation()
@@ -323,6 +322,7 @@ void deletecompensation(char * no)
 		{
 			p2->next = p1->next;
 			free(p1);
+			writeallcompensations();
 			printf("已删除编号为%s的索赔信息的索赔信息。\r\n", no);
 		}
 	}
@@ -431,6 +431,13 @@ void calcstationtotal(char station[20])
 		printf("没找到服务站%s的索赔信息。\n", station);
 }
 
+void promptcalcstationtotal()
+{
+	char station[20] = "";
+	inputstring(station, "要查询总索赔金额的服务站名称");
+	calcstationtotal(station);
+}
+
 void getauditbycount(char auditor[20])
 {
 	compensation *p = head->next;
@@ -451,6 +458,37 @@ void getauditbycount(char auditor[20])
 		printf("没找到审核人%s的索赔信息。\n", auditor);
 }
 
+void promptgetauditbycount()
+{
+	char auditor[20] = "";
+	inputstring(auditor, "要查询总审核索赔次数的审核人的姓名");
+	getauditbycount(auditor);
+}
+
+void displaychassiscompensations(char chassis[20])
+{
+	compensation *p = head->next;
+
+	printf("地盘编号为%的汽车的索赔历史如下\n", chassis);
+	printf(LINE);
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	printf("编号%t服务站%t底盘%t审核人%t金额%t日期\n");
+	while (p != NULL)
+	{
+		if (streq(p->chassis, chassis))
+		{
+			displaycompensation(*p);
+		}
+		p = p->next;
+	}
+	printf(LINE);
+}
+void promptdisplaychassiscompensations()
+{
+	char chassis[20] = "";
+	inputstring(chassis, "要查询索赔历史的汽车底盘编号");
+	displaychassiscompensations(chassis);
+}
 int main()
 {
 	int choice = -1;
@@ -483,11 +521,13 @@ int main()
 	{
 		printf("\n\t 索赔录管理");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 添加联系人信息");
-		printf("\n\t 2. 查看所有联系人信息");
-		printf("\n\t 3. 删除联系人信息");
-		printf("\n\t 4. 根据联系人名字查找");
-		printf("\n\t 5. 插入联系人信息");
+		printf("\n\t 1. 查看所有索赔信息");
+		printf("\n\t 2. 添加索赔信息");
+		printf("\n\t 3. 修改索赔信息");
+		printf("\n\t 4. 删除索赔信息");
+		printf("\n\t 5. 根据汽车底盘编号查询索赔历史");
+		printf("\n\t 6. 查询服务站总索赔金额");
+		printf("\n\t 7. 查询审核人总审核索赔次数");
 		printf("\n\n  请选择: ");
 		choice = getchar();
 		switch (choice)
@@ -500,25 +540,32 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			//addcompensation();
-			promptaddcompensation();
+			displayallcompensations();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			displayallcompensations();
+			promptaddcompensation();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptdeletebyauditor();
+			prompteditcompensation();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptsearchbyauditor();
+			promptdeletebyno();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
+			promptdisplaychassiscompensations();
 			break;
-
+		case '6':
+			printf("\n\n你选择了 6\n");
+			promptcalcstationtotal();
+			break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			promptgetauditbycount();
+			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
