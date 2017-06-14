@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #define FILE_COM "compensation.txt"
 #define LINE  "\n------------------------\n" 
 typedef struct compensation
@@ -22,13 +23,46 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-
 //字符串转整数
 int toint(char *s)
 {
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
+
+int getdatestringpart(char* str, int from, int to)
+{
+	int i;
+	char  x[5];
+	for (i = from; i <= to; i++)
+		x[i - from] = str[i];
+	x[to - from + 1] = 0;
+	return toint(x);
+}
+
+int  validatedate(char* str)
+{
+
+	int d, m, y;
+	int daysinmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	int legit = 0;
+	if (strlen(str) != 8)
+		return 0;
+	y = getdatestringpart(str, 0, 3);
+	m = getdatestringpart(str, 4, 5);
+	d = getdatestringpart(str, 6, 7);
+	//printf("%d\t%d\t%d\n", y, m, d);
+	if (y % 400 == 0 || (y % 100 != 0 && y % 4 == 0))
+		daysinmonth[1] = 29;
+	if (m < 13)
+	{
+		if (d <= daysinmonth[m - 1])
+			legit = 1;
+	}
+	return legit == 1;
+}
+
+
 
 void displaycompensation(compensation com)
 {
@@ -46,6 +80,16 @@ void createhead()
 	p2->next = NULL;
 }
 
+void checkandreinputdate(char expected[20], char str[20])
+{
+	while (!validatedate(str))
+	{
+		printf("请输入合法日期(8位数字，类似20170614，不足补0):");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%s", str);
+	}
+	strcpy(expected, str);
+}
 
 void inputstring(char str[], char *description)
 {
@@ -92,7 +136,7 @@ void findcompensationbyno(char no[20], compensation **found)
 	compensation *p = head;
 	while (p != NULL)
 	{
-		if (strcmp(p->no, no) == 0)
+		if (streq(p->no, no))
 		{
 			*found = p;
 			return;
@@ -103,9 +147,9 @@ void findcompensationbyno(char no[20], compensation **found)
 
 int isnoexists(char no[20])
 {
-	compensation *found;
+	compensation *found = NULL;
 	findcompensationbyno(no, &found);
-	return !found == NULL;
+	return !(found == NULL);
 }
 
 void getcompensationfromline(char *line, compensation *com)
@@ -202,6 +246,7 @@ void promptaddcompensation()
 	char auditor[20];
 	int money;
 	char date[20];
+	char expecteddate[20];
 	printf("\n请输入编号:");
 	scanf("%s", no);
 	if (isnoexists(no))
@@ -215,6 +260,7 @@ void promptaddcompensation()
 	scanf("%s%s%s", station, chassis, auditor);
 	printf("\n请输入索赔金额（整数）、索赔日期（格式20170614），空格隔开\n");
 	scanf("%d%s", &money, date);
+	checkandreinputdate(expecteddate, date);
 	addcompensation(no, station, chassis, auditor, money, date);
 	printf("完成录入!\r\n");
 }
@@ -238,7 +284,8 @@ void prompteditcompensation()
 	char auditor[20];
 	int money;
 	char date[20];
-	compensation *found;
+	char expecteddate[20];
+	compensation *found = NULL;
 	printf("\n请输入编号:");
 	scanf("%s", no);
 	findcompensationbyno(no, &found);
@@ -251,6 +298,7 @@ void prompteditcompensation()
 	scanf("%s%s%s", station, chassis, auditor);
 	printf("\n请输入索赔金额（整数）、索赔日期（格式20170614），空格隔开\n");
 	scanf("%d%s", &money, date);
+	checkandreinputdate(expecteddate, date);
 	editcompensation(found, station, chassis, auditor, money, date);
 }
 
@@ -377,8 +425,12 @@ int main()
 	//addcompensation("02", "s2", "c2", "a2", 2, "d2");
 	//addcompensation("03", "s3", "c3", "a3", 3, "d3");
 	displayallcompensations();
+	//int i = validatedate("2017x106");
+	//printf("i=%d\n", i);
+
 	//promptdeletebyno();
-	//promptaddcompensation();
+	promptaddcompensation();
+	displayallcompensations();
 
 	//findcompensationbyno("03", &found);
 	//editcompensation(found, "s-", "c-", "a-", 99, "d-");
@@ -433,7 +485,7 @@ int main()
 		}
 		fseek(stdin, 0, SEEK_END);
 		system("pause");
-}
+	}
 #endif
 	fseek(stdin, 0, SEEK_END);
 	system("pause");

@@ -24,22 +24,28 @@ for my $f (@files)
 {
         if(!-d $f &&  $f =~ /\.cpp$/)
         { 
-        	 
+        	 my $found = 0;
 		
 		   open(FILE, $f);  
+		   
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /readall/
+			 $_ =~ /strftime/
 			# $_ =~ /get/ && 
 			 #$_ =~ /\w+\s\w+\(.*?\)/
 			 )
 			 {
-			  say "-------------$f";
+			 
+			  $found = 1;
 			    say "$&";
 			    # print "$fullname\n\n";
 			 }
 		    }
+		    if($found)
+		    {
+		      say "-------------$f";
+		     }
 	}
 	}
 	
