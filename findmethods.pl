@@ -30,7 +30,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /\*next/
+			 $_ =~ /readall/
 			# $_ =~ /get/ && 
 			 #$_ =~ /\w+\s\w+\(.*?\)/
 			 )

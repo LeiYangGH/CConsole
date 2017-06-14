@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#define FILE_COM "compensation.txt"
 #define LINE  "\n------------------------\n" 
 typedef struct compensation
 {
@@ -65,6 +66,7 @@ void gettail(compensation **tail)
 }
 
 
+
 void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
 {
 	compensation *p = head;
@@ -106,6 +108,92 @@ int isnoexists(char no[20])
 	return !found == NULL;
 }
 
+void getcompensationfromline(char *line, compensation *com)
+{
+	char *part;
+	int index = 0;
+	//compensation com;
+	part = strtok(line, " \t\n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			strcpy(com->no, part);
+			break;
+		case 2:
+			strcpy(com->station, part);
+			break;
+		case 3:
+			strcpy(com->chassis, part);
+			break;
+		case 4:
+			strcpy(com->auditor, part);
+			break;
+		case 5:
+			com->money = toint(part);
+			break;
+		case 6:
+			strcpy(com->date, part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, " \t\n");
+	}
+}
+
+void readallcompensations()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_COM, "r");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_COM);
+	}
+	else
+	{
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 5)
+				continue;
+
+			//allcompensations[allcompensationscount++] = getcompensationfromline(line);
+			compensation *n = (compensation *)malloc(sizeof(compensation));
+			getcompensationfromline(line, n);
+			addcompensation(n->no, n->station, n->chassis, n->auditor,
+				n->money, n->date);
+		}
+		printf("\n已读入文件!", FILE_COM);
+	}
+}
+
+void writeallcompensations()
+{
+	int i;
+	compensation stu;
+	compensation *p = head->next;
+	FILE *fp = fopen(FILE_COM, "w+");
+	if (fp == NULL)
+	{
+		printf("\n打开文件%s失败!", FILE_COM);
+		getchar();
+		exit(1);
+	}
+
+
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	while (p != NULL)
+	{
+		fprintf(fp, "%s %s %s %s %d %s\n",
+			p->no, p->station, p->chassis, p->auditor, p->money, p->date);
+		p = p->next;
+	}
+
+	fclose(fp);
+	printf("已保存记录到文件。");
+}
 void promptaddcompensation()
 {
 	char no[20];
@@ -283,18 +371,20 @@ int main()
 	compensation *found;
 
 	createhead();
+	readallcompensations();
 #if T
-	addcompensation("01", "s1", "c1", "a1", 1, "d1");
-	addcompensation("02", "s2", "c2", "a2", 2, "d2");
-	addcompensation("03", "s3", "c3", "a3", 3, "d3");
+	//addcompensation("01", "s1", "c1", "a1", 1, "d1");
+	//addcompensation("02", "s2", "c2", "a2", 2, "d2");
+	//addcompensation("03", "s3", "c3", "a3", 3, "d3");
 	displayallcompensations();
 	//promptdeletebyno();
 	//promptaddcompensation();
 
 	//findcompensationbyno("03", &found);
 	//editcompensation(found, "s-", "c-", "a-", 99, "d-");
-	prompteditcompensation();
-	displayallcompensations();
+	//prompteditcompensation();
+	//displayallcompensations();
+	//writeallcompensations();
 
 #else
 	while (choice != 0)
@@ -343,9 +433,9 @@ int main()
 		}
 		fseek(stdin, 0, SEEK_END);
 		system("pause");
-	}
+}
 #endif
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
-	}
+}
