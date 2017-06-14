@@ -2,33 +2,46 @@
 #include <string.h>
 #include <stdio.h>
 #define LINE  "\n------------------------\n" 
-typedef struct address
+typedef struct compensation
 {
-	int no;
-	char station[30]; 
-	char name[30]; 
-	char home[30];
-	char tel[30];
-	char qq[20];
-	char email[30];
-	address *next;
-}address;
+	char no[20];
+	char station[20];
+	char chassis[20];
+	char auditor[20];
+	int money;
+	char date[20];
+	compensation *next;
+}compensation;
 
-address *head;
-
-
-void displayaddress(address add)
+compensation *head;
+#define T 1
+//字符串相等
+int streq(char *s1, char *s2)
 {
-	printf("%d\t%s\t%s\t%s\t%s\t%s\t\n", add.no, add.name, add.home, add.tel, add.qq, add.email);
+	return strcmp(s1, s2) == 0;
+}
+
+
+//字符串转整数
+int toint(char *s)
+{
+	char *end;
+	return (int)strtol(s, &end, 10);
+}
+
+void displaycompensation(compensation com)
+{
+	printf("%s\t%s\t%s\t%s\t%d\t%s\n",
+		com.no, com.station, com.chassis, com.auditor, com.money, com.date);
 }
 
 
 void createheadddresss()
 {
 	char line[200];
-	address *p1, *p2;
+	compensation *p1, *p2;
 
-	p1 = p2 = (address *)malloc(sizeof(address));
+	p1 = p2 = (compensation *)malloc(sizeof(compensation));
 	head = p1;
 
 	p2->next = NULL;
@@ -42,109 +55,119 @@ void inputstring(char str[], char *description)
 	printf("您输入的%s为 %s \n", description, str);
 }
 
-
-int getnewno(address **tail)
+void gettail(compensation **tail)
 {
 	int newno = 0;
-	address *p = head;
-	if (head->no > newno)
-		newno = head->no;
+	compensation *p = head;
+	/*if (head->no > newno)
+		newno = head->no;*/
 	while (p->next != NULL)
 	{
-		if (p->no > newno)
-			newno = p->no;
+		/*if (p->no > newno)
+			newno = p->no;*/
 		p = p->next;
 	}
-	if (p->no > newno)
-		newno = p->no;
-	newno++;
 	*tail = p;
-	return newno;
 }
 
 
-void addaddress()
+//void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
+//{
+//	compensation stu;
+//	strcpy(stu.no, no);
+//	strcpy(stu.station, station);
+//	strcpy(stu.chassis, chassis);
+//	strcpy(stu.auditor, auditor);
+//	stu.money = money;
+//	strcpy(stu.date, date);
+//	allcompensations[allcompensationscount++] = stu;
+//	writeallcompensations();
+//}
+
+//void promptaddcompensation()
+
+
+void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
 {
-	int newno = 0, score;
-	char name[30] = "";
-	char home[30] = "";
-	char tel[30] = "";
-	char qq[20] = "";
-	char email[30] = "";
-	address *p = head;
-	address *n;
 
-	inputstring(name, "姓名");
-	inputstring(home, "家庭地址");
-	inputstring(tel, "手机号");
-	inputstring(qq, "qq号");
-	inputstring(email, "邮箱");
+	compensation *p = head;
+	compensation *n;
 
-	newno = getnewno(&p);
+	/*inputstring(no, "编号");
+	inputstring(station, "station");
+	inputstring(chassis, "chassis");
+	inputstring(auditor, "auditor");
+	printf("请输入价格\n", auditor);
+	scanf("%d", &money);
+	inputstring(date, "date");*/
+	gettail(&p);
+	n = (compensation *)malloc(sizeof(compensation));
 
-	n = (address *)malloc(sizeof(address));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	strcpy(n->home, home);
-	strcpy(n->tel, tel);
-	strcpy(n->qq, qq);
-	strcpy(n->email, email);
+	strcpy(n->no, no);
+	strcpy(n->auditor, auditor);
+	strcpy(n->station, station);
+	strcpy(n->chassis, chassis);
+	n->money = money;
+	strcpy(n->date, date);
 
 	p->next = n;
 	n->next = NULL;
-	printf("\n%s的信息添加成功!\n", name);
+	printf("\n%s的信息添加成功!\n", auditor);
 }
 
-
-bool insert(address *pHead, int front, char *name, char *home, char *tel, char *qq, char *email)
+int isnoexists(char no[20])
 {
-	int i = 0, newno;
-	address *h = pHead;
-	address *t;
-	address *n;
-	address *x;
-	newno = getnewno(&x);
-	if ((front < 1) && (NULL != h))
+	compensation *p = head;
+	while (p != NULL)
 	{
-		return false;
+		if (streq(p->no, no))
+		{
+			return 1;
+		}
+		p = p->next;
 	}
-	while (i < front - 1)
-	{
-		h = h->next;
-		++i;
-	}
-	n = (address*)malloc(sizeof(address));
-
-	n->no = newno;
-	strcpy(n->name, name);
-	strcpy(n->home, home);
-	strcpy(n->tel, tel);
-	strcpy(n->qq, qq);
-	strcpy(n->email, email);
-
-	t = h->next;
-	h->next = n;
-	n->next = t;
-	return true;
-
+	return 0;
 }
 
-
-void deleteaddress(char * name)  
+void promptaddcompensation()
 {
-	address *p1 = head, *p2;
-	if (head == NULL)
+	char no[20];
+	char station[20];
+	char chassis[20];
+	char auditor[20];
+	int money;
+	char date[20];
+	printf("\n请输入编号:");
+	scanf("%s", no);
+	if (isnoexists(no))
 	{
-		printf("\n通讯信息为空!\n");
+		printf("编号%s已经存在，不能重复添加商品!", no);
 		return;
 	}
-	while (strcmp(p1->name, name) != 0 && p1->next != NULL)
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+
+	printf("\n请输入服务站名称、底盘号、审核人（都是不带空格的字符串），空格隔开\n");
+	scanf("%s%s%s", station, chassis, auditor);
+	printf("\n请输入索赔金额（整数）、索赔日期（格式20170614），空格隔开\n");
+	scanf("%d%s", &money, date);
+	addcompensation(no, station, chassis, auditor, money, date);
+	printf("完成录入!\r\n");
+}
+
+void deletecompensation(char * no)
+{
+	compensation *p1 = head, *p2;
+	if (head == NULL)
+	{
+		printf("\n索赔信息为空!\n");
+		return;
+	}
+	while (strcmp(p1->no, no) != 0 && p1->next != NULL)
 	{
 		p2 = p1;
 		p1 = p1->next;
 	}
-	if (strcmp(p1->name, name) == 0)
+	if (strcmp(p1->no, no) == 0)
 	{
 
 		if (p1 == head)
@@ -153,46 +176,46 @@ void deleteaddress(char * name)
 		{
 			p2->next = p1->next;
 			free(p1);
-			printf("已删除姓名为%s的通讯信息的通讯信息。\r\n", name);
+			printf("已删除编号为%s的索赔信息的索赔信息。\r\n", no);
 		}
 	}
 	else
-		printf("没找到姓名为%s的通讯信息!\r\n", name);
+		printf("没找到编号为%s的索赔信息!\r\n", no);
 }
 
 
 
-void displayaddress(char * name)  
+void displaycompensation(char * auditor)
 {
 	int found = 0;
-	address *p = head;
+	compensation *p = head;
 
 	while (p != NULL)
 	{
-		if (strcmp(p->name, name) == 0)
+		if (strcmp(p->auditor, auditor) == 0)
 		{
 			found = 1;
-			printf("%s的通讯信息如下\r\n", name);
+			printf("%s的索赔信息如下\r\n", auditor);
 
-			printf("序号    姓名    通讯信息\n");
+			//printf("序号    姓名    索赔信息\n");
 
-			displayaddress(*p);
+			displaycompensation(*p);
 		}
 		p = p->next;
 	}
 	if (!found)
-		printf("没找到名为%s的通讯信息\r\n", name);
+		printf("没找到名为%s的索赔信息\r\n", auditor);
 }
 
 
-void searchbyname(char * name, address **f)
+void searchbyauditor(char * auditor, compensation **f)
 {
 	int found = 0;
-	address *p = head;
+	compensation *p = head;
 
 	while (p != NULL)
 	{
-		if (strcmp(p->name, name) == 0)
+		if (strcmp(p->auditor, auditor) == 0)
 		{
 			*f = p;
 			return;
@@ -201,65 +224,44 @@ void searchbyname(char * name, address **f)
 	}
 	if (!found)
 	{
-		printf("没找到名为%s的通讯信息\r\n", name);
+		printf("没找到名为%s的索赔信息\r\n", auditor);
 		*f = NULL;
 	}
 }
 
-void displayalladdresss()  
+void displayallcompensations()
 {
-	address *p = head->next;
+	compensation *p = head->next;
 
-	printf("所有通讯信息通讯信息如下\n");
+	printf("所有索赔信息索赔信息如下\n");
 	printf(LINE);
-
-	printf("姓名%t住址%t手机号%tqq%t邮箱\n");
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	printf("编号%t服务站%t底盘%t审核人%t金额%t日期\n");
 	while (p != NULL)
 	{
-		displayaddress(*p);
+		displaycompensation(*p);
 		p = p->next;
 	}
 	printf(LINE);
 }
 
-void promptinsertbeforeno()  
+
+
+
+void promptsearchbyno()
 {
-	int no, score;
-	char name[30] = "";
-	char home[30] = "";
-	char tel[30] = "";
-	char qq[20] = "";
-	char email[30] = "";
-
-	printf("\n请输入要在哪个编号的通讯信息之后插入?\n");
-	scanf("%d", &no);
-
-	inputstring(name, "姓名");
-	inputstring(home, "家庭地址");
-	inputstring(tel, "手机号");
-	inputstring(qq, "qq号");
-	inputstring(email, "邮箱");
-
-	if (insert(head, no, name, home, tel, qq, email))
-		printf("\n插入成功！\n");
+	char no[20] = "";
+	inputstring(no, "要查找记录的编号");
+	displaycompensation(no);
 }
 
 
 
-void promptsearchbyname()  
+void promptdeletebyno()
 {
-	char name[50] = "";
-	inputstring(name, "要查找记录的姓名");
-	displayaddress(name);
-}
-
-
-
-void promptdeletebyname()  
-{
-	char name[50] = "";
-	inputstring(name, "要删除记录的姓名");
-	deleteaddress(name);
+	char no[20] = "";
+	inputstring(no, "要删除记录的编号");
+	deletecompensation(no);
 }
 
 
@@ -269,10 +271,19 @@ int main()
 	int choice = -1;
 
 	createheadddresss();
+#if T
+	addcompensation("01", "s1", "c1", "a1", 1, "d1");
+	addcompensation("02", "s2", "c2", "a2", 2, "d2");
+	addcompensation("03", "s3", "c3", "a3", 3, "d3");
+	displayallcompensations();
+	promptdeletebyno();
+	promptaddcompensation();
+	displayallcompensations();
 
+#else
 	while (choice != 0)
 	{
-		printf("\n\t 通讯录管理");
+		printf("\n\t 索赔录管理");
 		printf("\n\t 0. 退出");
 		printf("\n\t 1. 添加联系人信息");
 		printf("\n\t 2. 查看所有联系人信息");
@@ -291,23 +302,23 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			addaddress();
+			//addcompensation();
+			promptaddcompensation();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			displayalladdresss();
+			displayallcompensations();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptdeletebyname();
+			promptdeletebyauditor();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptsearchbyname();
+			promptsearchbyauditor();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			promptinsertbeforeno();
 			break;
 
 		default:
@@ -317,6 +328,7 @@ int main()
 		fseek(stdin, 0, SEEK_END);
 		system("pause");
 	}
+#endif
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
