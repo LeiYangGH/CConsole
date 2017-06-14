@@ -36,14 +36,12 @@ void displaycompensation(compensation com)
 }
 
 
-void createheadddresss()
+void createhead()
 {
 	char line[200];
 	compensation *p1, *p2;
-
 	p1 = p2 = (compensation *)malloc(sizeof(compensation));
 	head = p1;
-
 	p2->next = NULL;
 }
 
@@ -59,47 +57,19 @@ void gettail(compensation **tail)
 {
 	int newno = 0;
 	compensation *p = head;
-	/*if (head->no > newno)
-		newno = head->no;*/
 	while (p->next != NULL)
 	{
-		/*if (p->no > newno)
-			newno = p->no;*/
 		p = p->next;
 	}
 	*tail = p;
 }
 
 
-//void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
-//{
-//	compensation stu;
-//	strcpy(stu.no, no);
-//	strcpy(stu.station, station);
-//	strcpy(stu.chassis, chassis);
-//	strcpy(stu.auditor, auditor);
-//	stu.money = money;
-//	strcpy(stu.date, date);
-//	allcompensations[allcompensationscount++] = stu;
-//	writeallcompensations();
-//}
-
-//void promptaddcompensation()
-
-
 void addcompensation(char no[20], char station[20], char chassis[20], char auditor[20], int money, char date[20])
 {
-
 	compensation *p = head;
 	compensation *n;
 
-	/*inputstring(no, "编号");
-	inputstring(station, "station");
-	inputstring(chassis, "chassis");
-	inputstring(auditor, "auditor");
-	printf("请输入价格\n", auditor);
-	scanf("%d", &money);
-	inputstring(date, "date");*/
 	gettail(&p);
 	n = (compensation *)malloc(sizeof(compensation));
 
@@ -115,18 +85,25 @@ void addcompensation(char no[20], char station[20], char chassis[20], char audit
 	printf("\n%s的信息添加成功!\n", auditor);
 }
 
-int isnoexists(char no[20])
+void findcompensationbyno(char no[20], compensation **found)
 {
 	compensation *p = head;
 	while (p != NULL)
 	{
-		if (streq(p->no, no))
+		if (strcmp(p->no, no) == 0)
 		{
-			return 1;
+			*found = p;
+			return;
 		}
 		p = p->next;
 	}
-	return 0;
+}
+
+int isnoexists(char no[20])
+{
+	compensation *found;
+	findcompensationbyno(no, &found);
+	return !found == NULL;
 }
 
 void promptaddcompensation()
@@ -154,6 +131,41 @@ void promptaddcompensation()
 	printf("完成录入!\r\n");
 }
 
+
+void editcompensation(compensation *n, char station[20], char chassis[20], char auditor[20], int money, char date[20])
+{
+	strcpy(n->auditor, auditor);
+	strcpy(n->station, station);
+	strcpy(n->chassis, chassis);
+	n->money = money;
+	strcpy(n->date, date);
+
+}
+
+void prompteditcompensation()
+{
+	char no[20];
+	char station[20];
+	char chassis[20];
+	char auditor[20];
+	int money;
+	char date[20];
+	compensation *found;
+	printf("\n请输入编号:");
+	scanf("%s", no);
+	findcompensationbyno(no, &found);
+	if (found == NULL)
+	{
+		printf("编号%s不存在!", no);
+		return;
+	}
+	printf("\n请输入服务站名称、底盘号、审核人（都是不带空格的字符串），空格隔开\n");
+	scanf("%s%s%s", station, chassis, auditor);
+	printf("\n请输入索赔金额（整数）、索赔日期（格式20170614），空格隔开\n");
+	scanf("%d%s", &money, date);
+	editcompensation(found, station, chassis, auditor, money, date);
+}
+
 void deletecompensation(char * no)
 {
 	compensation *p1 = head, *p2;
@@ -169,7 +181,6 @@ void deletecompensation(char * no)
 	}
 	if (strcmp(p1->no, no) == 0)
 	{
-
 		if (p1 == head)
 			head = p1->next;
 		else
@@ -269,15 +280,20 @@ void promptdeletebyno()
 int main()
 {
 	int choice = -1;
+	compensation *found;
 
-	createheadddresss();
+	createhead();
 #if T
 	addcompensation("01", "s1", "c1", "a1", 1, "d1");
 	addcompensation("02", "s2", "c2", "a2", 2, "d2");
 	addcompensation("03", "s3", "c3", "a3", 3, "d3");
 	displayallcompensations();
-	promptdeletebyno();
-	promptaddcompensation();
+	//promptdeletebyno();
+	//promptaddcompensation();
+
+	//findcompensationbyno("03", &found);
+	//editcompensation(found, "s-", "c-", "a-", 99, "d-");
+	prompteditcompensation();
 	displayallcompensations();
 
 #else
@@ -332,4 +348,4 @@ int main()
 	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
-}
+	}
