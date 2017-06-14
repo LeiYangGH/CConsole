@@ -411,7 +411,45 @@ void promptdeletebyno()
 	deletecompensation(no);
 }
 
+void calcstationtotal(char station[20])
+{
+	compensation *p = head->next;
+	int total = 0, found = 0;
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	while (p != NULL)
+	{
+		if (streq(p->station, station))
+		{
+			found = 1;
+			total += p->money;
+		}
+		p = p->next;
+	}
+	if (found == 1)
+		printf("服务站%s总索赔金额为%d元。\n", station, total);
+	else
+		printf("没找到服务站%s的索赔信息。\n", station);
+}
 
+void getauditbycount(char auditor[20])
+{
+	compensation *p = head->next;
+	int total = 0, found = 0;
+	//索赔编号、服务站名称、底盘号、审核人、索赔金额、索赔日期
+	while (p != NULL)
+	{
+		if (streq(p->auditor, auditor))
+		{
+			found = 1;
+			total++;
+		}
+		p = p->next;
+	}
+	if (found == 1)
+		printf("审核人%s审核的索赔次数为%d。\n", auditor, total);
+	else
+		printf("没找到审核人%s的索赔信息。\n", auditor);
+}
 
 int main()
 {
@@ -425,12 +463,14 @@ int main()
 	//addcompensation("02", "s2", "c2", "a2", 2, "d2");
 	//addcompensation("03", "s3", "c3", "a3", 3, "d3");
 	displayallcompensations();
+	//calcstationtotal("s3");
+	getauditbycount("a1");
 	//int i = validatedate("2017x106");
 	//printf("i=%d\n", i);
 
 	//promptdeletebyno();
-	promptaddcompensation();
-	displayallcompensations();
+	//promptaddcompensation();
+	//displayallcompensations();
 
 	//findcompensationbyno("03", &found);
 	//editcompensation(found, "s-", "c-", "a-", 99, "d-");
