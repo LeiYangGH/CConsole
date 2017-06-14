@@ -5,23 +5,24 @@
 typedef struct address
 {
 	int no;
-	char name[30];//定义通讯录联系人姓名
-	char home[30];//定义联系人的家庭住址
-	char tel[30];//定义联系人的电话号码
-	char qq[20];//定义联系人的qq号码
-	char email[30];//定义联系人的邮箱地址
+	char station[30]; 
+	char name[30]; 
+	char home[30];
+	char tel[30];
+	char qq[20];
+	char email[30];
 	address *next;
 }address;
 
-address *head;//头结点
+address *head;
 
-//显示一个通讯信息
+
 void displayaddress(address add)
 {
 	printf("%d\t%s\t%s\t%s\t%s\t%s\t\n", add.no, add.name, add.home, add.tel, add.qq, add.email);
 }
 
-//读取所有通讯信息到链表
+
 void createheadddresss()
 {
 	char line[200];
@@ -33,7 +34,7 @@ void createheadddresss()
 	p2->next = NULL;
 }
 
-//输入某种提示的字符串
+
 void inputstring(char str[], char *description)
 {
 	printf("请输入%s:", description);
@@ -42,7 +43,6 @@ void inputstring(char str[], char *description)
 }
 
 
-//获取一个新的通讯信息信息
 int getnewno(address **tail)
 {
 	int newno = 0;
@@ -62,10 +62,10 @@ int getnewno(address **tail)
 	return newno;
 }
 
-//新增通讯信息
+
 void addaddress()
 {
-	int newno = 0, score;//新通讯信息编号，当前最大+1
+	int newno = 0, score;
 	char name[30] = "";
 	char home[30] = "";
 	char tel[30] = "";
@@ -130,8 +130,8 @@ bool insert(address *pHead, int front, char *name, char *home, char *tel, char *
 
 }
 
-//http://blog.csdn.net/iwm_next/article/details/7450734
-void deleteaddress(char * name)  //删除通讯信息
+
+void deleteaddress(char * name)  
 {
 	address *p1 = head, *p2;
 	if (head == NULL)
@@ -162,7 +162,7 @@ void deleteaddress(char * name)  //删除通讯信息
 
 
 
-void displayaddress(char * name)  //按姓名输出
+void displayaddress(char * name)  
 {
 	int found = 0;
 	address *p = head;
@@ -184,7 +184,7 @@ void displayaddress(char * name)  //按姓名输出
 		printf("没找到名为%s的通讯信息\r\n", name);
 }
 
-//根据名字查找通讯信息
+
 void searchbyname(char * name, address **f)
 {
 	int found = 0;
@@ -206,7 +206,7 @@ void searchbyname(char * name, address **f)
 	}
 }
 
-void displayalladdresss()  //输出所有通讯信息信息
+void displayalladdresss()  
 {
 	address *p = head->next;
 
@@ -222,7 +222,7 @@ void displayalladdresss()  //输出所有通讯信息信息
 	printf(LINE);
 }
 
-void promptinsertbeforeno()  //按编号插入
+void promptinsertbeforeno()  
 {
 	int no, score;
 	char name[30] = "";
@@ -246,7 +246,7 @@ void promptinsertbeforeno()  //按编号插入
 
 
 
-void promptsearchbyname()  //按姓名查找
+void promptsearchbyname()  
 {
 	char name[50] = "";
 	inputstring(name, "要查找记录的姓名");
@@ -255,7 +255,7 @@ void promptsearchbyname()  //按姓名查找
 
 
 
-void promptdeletebyname()  //按姓名删除
+void promptdeletebyname()  
 {
 	char name[50] = "";
 	inputstring(name, "要删除记录的姓名");
@@ -280,7 +280,7 @@ int main()
 		printf("\n\t 4. 根据联系人名字查找");
 		printf("\n\t 5. 插入联系人信息");
 		printf("\n\n  请选择: ");
-		choice = getchar();//输入一个字符
+		choice = getchar();
 		switch (choice)
 		{
 		case '0':
