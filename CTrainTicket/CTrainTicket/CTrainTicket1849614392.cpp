@@ -58,7 +58,7 @@ int getshiftidexbytime(int hour, int minute)
 	for (i = 0; i < allshiftscount; i++)
 	{
 		if (allshifts[i].hour == hour
-			&& allshifts[i].hour == minute)
+			&& allshifts[i].minute == minute)
 			return i;
 	}
 	return -1;
@@ -111,11 +111,23 @@ int getshiftidexbyno(char id[50])
 void editshift(char id[50])
 {
 	int i;
+	int hour;
+	int minute;
+	int exphour;
+	int expminute;
 	i = getshiftidexbyno(id);
 	if (i >= 0)
 	{
 		printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
-		scanf("%d%d", &allshifts[i].hour, &allshifts[i].minute);
+		scanf("%d%d", &hour, &minute);
+		checktimevalid(hour, minute, &exphour, &expminute);
+		if (getshiftidexbytime(exphour, expminute) >= 0)
+		{
+			printf("时间与已有班次重复！\n");
+			return;
+		}
+		allshifts[i].hour = exphour;
+		allshifts[i].minute = expminute;
 		printf("修改完毕。\r\n");
 	}
 	else
@@ -236,8 +248,8 @@ void inputnum(int *num, int max, char *description)
 		printf("\n请输入%s,(范围1~%d):", description, max);
 		scanf("%d", &input);
 		fseek(stdin, 0, SEEK_END);
-	} while (input<1 || input>max);
-	*num = input;
+} while (input<1 || input>max);
+*num = input;
 }
 
 void init()
@@ -346,7 +358,8 @@ int main()
 	//promptaddshift();
 	//promptaddshift();
 	displayallshifts();
-
+	prompteditshift();
+	displayallshifts();
 	system("pause");
 #endif
 	while (choice != 0)
