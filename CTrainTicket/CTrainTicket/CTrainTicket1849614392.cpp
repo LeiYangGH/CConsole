@@ -52,6 +52,29 @@ void displayallshifts()
 	printf("--------------------------------------------\r\n");
 }
 
+int getshiftidexbytime(int hour, int minute)
+{
+	int i;
+	for (i = 0; i < allshiftscount; i++)
+	{
+		if (allshifts[i].hour == hour
+			&& allshifts[i].hour == minute)
+			return i;
+	}
+	return -1;
+}
+
+void checktimevalid(int hour, int minute, int *exphour, int *expminute)
+{
+	while (hour > 23 || hour < 0 || minute > 59 || hour < 0)
+	{
+		printf("请输入合法时间(2个整数，类似14 5):");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%d%d", &hour, &minute);
+	}
+	*exphour = hour;
+	*expminute = minute;
+}
 
 
 //qsort是快速排序，要求如下写法，根据age排序
@@ -127,6 +150,8 @@ void promptaddshift()
 	char id[20];
 	int hour;
 	int minute;
+	int exphour;
+	int expminute;
 	printf("\n请输入班次（不重复）:\n");
 	scanf("%s", id);
 	if (getshiftidexbyno(id) >= 0)
@@ -136,8 +161,14 @@ void promptaddshift()
 	}
 	printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
 	scanf("%d%d", &hour, &minute);
-	addshift(id, hour, minute);
-	printf("完成第%d位班次录入!\r\n", allshiftscount);
+	checktimevalid(hour, minute, &exphour, &expminute);
+	if (getshiftidexbytime(exphour, expminute) >= 0)
+	{
+		printf("时间与已有班次重复！\n");
+		return;
+	}
+	addshift(id, exphour, expminute);
+	printf("完成第%d班次录入!\r\n", allshiftscount);
 }
 
 
@@ -295,13 +326,25 @@ void promptbuy()
 	buy(i - 1, j - 1, k - 1);
 }
 
-
+void add8shifts()
+{
+	addshift("k001", 6, 0);
+	addshift("k002", 7, 0);
+	addshift("k003", 9, 0);
+	addshift("k004", 10, 30);
+	addshift("k005", 14, 0);
+	addshift("k006", 15, 30);
+	addshift("k007", 16, 30);
+	addshift("k008", 17, 30);
+}
 
 int main()
 {
 	int choice = -1;
+	add8shifts();
 #if 1
-	promptaddshift();
+	//promptaddshift();
+	//promptaddshift();
 	displayallshifts();
 
 	system("pause");
