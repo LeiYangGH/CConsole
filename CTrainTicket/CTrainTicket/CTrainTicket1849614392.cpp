@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define MAX_TRAIN_COUNT 10
-#define MAX_CARRIAGE_COUNT 20
 #define SEAT_COUNT 45
 
 typedef struct shift
@@ -39,9 +37,19 @@ void displayshift(shift s)
 		s.id, s.hour, s.minute, s.start, s.end, 45, s.leftseats);
 }
 
+int cmpfunc(const void * a, const void * b)
+{
+	int ha = ((shift*)a)->hour;
+	int ma = ((shift*)a)->minute;
+	int hb = ((shift*)b)->hour;
+	int mb = ((shift*)b)->minute;
+	return (ha - hb) * 60 + ma - mb;
+}
+
 void displayallshifts()
 {
 	int i;
+	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
 	printf("所有%d位班次信息如下\r\n", allshiftscount);
 	printf("班次\t时间\t起点\t终点\t座位\t余票\n"),
 		printf("--------------------------------------------\r\n");
@@ -77,25 +85,6 @@ void checktimevalid(int hour, int minute, int *exphour, int *expminute)
 }
 
 
-//qsort是快速排序，要求如下写法，根据age排序
-int cmpfunc(const void * a, const void * b)
-{
-	int ha = ((shift*)a)->hour;
-	int ma = ((shift*)a)->minute;
-	int hb = ((shift*)b)->hour;
-	int mb = ((shift*)b)->minute;
-	return (ha - hb) * 60 + ma - mb;
-}
-
-void sortshiftsbyageanddisplay()
-{
-	int i;
-	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
-	printf("按每个班次年龄排序后如下\r\n");
-	displayallshifts();
-}
-
-//根据编号查数组里的序号
 int getshiftidexbyno(char id[50])
 {
 	int i;
@@ -107,7 +96,6 @@ int getshiftidexbyno(char id[50])
 	return -1;//没找到
 }
 
-
 void editshift(char id[50])
 {
 	int i;
@@ -118,6 +106,11 @@ void editshift(char id[50])
 	i = getshiftidexbyno(id);
 	if (i >= 0)
 	{
+		if (allshifts[i].leftseats < SEAT_COUNT)
+		{
+			printf("本次列车已经有票售出，无法修改时间！\n");
+			return;
+		}
 		printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
 		scanf("%d%d", &hour, &minute);
 		checktimevalid(hour, minute, &exphour, &expminute);
@@ -139,7 +132,7 @@ void editshift(char id[50])
 void prompteditshift()
 {
 	char id[50];
-	printf("请输入要修改的班次:");
+	printf("请输入要修改时间的班次:");
 	scanf("%s", &id);
 	editshift(id);
 }
@@ -155,7 +148,6 @@ void addshift(char id[], int hour, int minute)
 	s.leftseats = SEAT_COUNT;
 	allshifts[allshiftscount++] = s;
 }
-
 
 void promptaddshift()
 {
@@ -191,10 +183,15 @@ void removeshift(char no[20])
 	index = getshiftidexbyno(no);
 	if (index >= 0)
 	{
+		if (allshifts[index].leftseats < SEAT_COUNT)
+		{
+			printf("本次列车已经有票售出，无法删除！\n");
+			return;
+		}
 		for (i = index; i < allshiftscount - 1; i++)
 			allshifts[i] = allshifts[i + 1];
 		allshiftscount--;
-		printf("删除完毕，剩下%d个。\r\n", allshiftscount);
+		printf("删除完毕，剩下%d次。\r\n", allshiftscount);
 	}
 	else
 	{
@@ -211,131 +208,43 @@ void promptremoveshift()
 	removeshift(id);
 }
 
-
-void searcbetweenage(int from, int to)
-{
-	//int i, found = 0;
-	//for (i = 0; i < allshiftscount; i++)
-	//	if (allshifts[i].age >= from && allshifts[i].age <= to)
-	//	{
-	//		displayshift(allshifts[i]);
-	//		found = 1;
-	//	}
-	//if (!found)
-	//	printf("没找到对应班次的信息。\r\n");
-}
-
-void promptsearchbetweenage()
-{
-	int from, to;
-	printf("请输入要查找的最低和最高年龄(正整数，空格分隔):");
-	scanf("%d%d", &from, &to);
-	searcbetweenage(from, to);
-}
-
-int order[MAX_TRAIN_COUNT][MAX_CARRIAGE_COUNT][SEAT_COUNT];
-int traincount = 0;
-int carriagecount = 0;
-int seatcount = 0;
-int initdone = 0;
-#define TEST 0
-
-void inputnum(int *num, int max, char *description)
-{
-	int input = 0;
-	do
-	{
-		printf("\n请输入%s,(范围1~%d):", description, max);
-		scanf("%d", &input);
-		fseek(stdin, 0, SEEK_END);
-} while (input<1 || input>max);
-*num = input;
-}
-
-void init()
-{
-	int i, j, k;
-#if TEST
-	traincount = 2;
-	carriagecount = 2;
-	seatcount = 2;
-#else
-	if (initdone)
-	{
-		printf("已经初始化过，不能再初始化\n");
-		return;
-	}
-	inputnum(&traincount, MAX_TRAIN_COUNT, "车次数");
-	inputnum(&carriagecount, MAX_CARRIAGE_COUNT, "每车次的车厢数");
-	inputnum(&seatcount, SEAT_COUNT, "每车厢的座位数");
-	for (i = 0; i < traincount; i++)
-		for (j = 0; j < carriagecount; j++)
-			for (k = 0; k < seatcount; k++)
-				order[i][j][k] = 0;
-	initdone = 1;
-
-#endif
-}
-
-void showavailableseats(int trainid, int carriageid)
-{
-	int train, i, j, k;
-	printf("第%d车次 第%d车厢剩余座位号如下:\n", trainid + 1, carriageid + 1);
-	printf("--------------------------------------------\n");
-	for (k = 0; k < seatcount; k++)
-	{
-		if (order[trainid][carriageid][k] == 0)
-		{
-			printf("%d\t", k + 1);
-		}
-	}
-	printf("\n--------------------------------------------\n");
-}
-
-
-
-void showavailable(int trainid)
-{
-	int j;
-	for (j = 0; j < carriagecount; j++)
-		showavailableseats(trainid, j);
-}
-
-void promptshowavailable()
+void searchandbuy(int hour, int minute)
 {
 	int i;
-	if (!initdone)
+	char c;
+	i = getshiftidexbytime(hour, minute);
+	if (i >= 0)
 	{
-		printf("请先初始化再执行其他操作\n");
-		return;
-	}
-	inputnum(&i, carriagecount, "要查询余票的车次");
-	showavailable(i - 1);
-}
-
-void buy(int trainid, int carriageid, int seatid)
-{
-	if (order[trainid][carriageid][seatid] == 0)
-	{
-		order[trainid][carriageid][seatid] = 1;
-		printf("售票成功！第%d车次 第%d车厢 第%d号座位。\n", trainid + 1, carriageid + 1, seatid + 1);
+		printf("查到此班次信息如下：\r\n");
+		displayshift(allshifts[i]);
+		if (allshifts[i].leftseats > 0)
+		{
+			printf("要购买车票吗？输入y购买，其他键取消:");
+			fseek(stdin, 0, SEEK_END);
+			c = getchar();
+			if (c == 'y' || c == 'Y')
+			{
+				allshifts[i].leftseats--;
+				printf("成功购买车票！\n");
+			}
+		}
+		else
+			printf("抱歉，此车次票已售完。");
 	}
 	else
-		printf("此票已经卖出！");
+	{
+		printf("没找到对应班次的班次。\r\n");
+	}
+
 }
 
-void promptbuy()
+void promptsearchandbuy()
 {
-	int i, j, k;
-	if (!initdone)
-	{
-		printf("请先初始化再执行其他操作\n");
-		return;
-	}
-	inputnum(&i, traincount, "要购买的车次");
-	inputnum(&j, carriagecount, "要购买的车厢");
-	inputnum(&k, seatcount, "要购买的座位");
-	buy(i - 1, j - 1, k - 1);
+	int hour;
+	int minute;
+	printf("请输入要查询的发车时间（24小时制时 分，空格隔开）：");
+	scanf("%d%d", &hour, &minute);
+	searchandbuy(hour, minute);
 }
 
 void add8shifts()
@@ -354,11 +263,15 @@ int main()
 {
 	int choice = -1;
 	add8shifts();
-#if 1
-	//promptaddshift();
+#if 0
 	//promptaddshift();
 	displayallshifts();
-	prompteditshift();
+	allshifts[1].leftseats = 44;
+	promptaddshift();
+	//prompteditshift();
+	//promptsearchandbuy();
+	//searchandbuy(7, 0);
+	//promptremoveshift();
 	displayallshifts();
 	system("pause");
 #endif
@@ -366,10 +279,11 @@ int main()
 	{
 		printf("\n\t 火车订票系统");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 初始化");
-		printf("\n\t 2. 查询");
-		printf("\n\t 3. 售票");
-		//printf("\n\t 4. 退票");
+		printf("\n\t 1. 添加车次");
+		printf("\n\t 2. 修改发车时间");
+		printf("\n\t 3. 删除");
+		printf("\n\t 4. 查询");
+		printf("\n\t 5. 浏览");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -383,19 +297,23 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			init();
+			promptaddshift();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			promptshowavailable();
+			prompteditshift();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptbuy();
+			promptremoveshift();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			//promptcancel();
+			promptsearchandbuy();
+			break;
+		case '5':
+			printf("\n\n你选择了 5\n");
+			displayallshifts();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
