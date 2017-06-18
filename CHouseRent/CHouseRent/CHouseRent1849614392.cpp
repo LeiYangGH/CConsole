@@ -3,18 +3,21 @@
 #include <stdio.h>
 #define SEAT_COUNT 45
 
-typedef struct shift
+//1.李明，保定市，北市区，中华小区，2-5-203，100，三室一厅，1500，13700000001；
+typedef struct house
 {
-	char id[20];
-	int hour;
-	int minute;
-	char start[20];
-	char end[20];
-	int leftseats;
-}shift;
+	//int id;
+	char name[20];
+	char location[50];
+	char area[20];
+	char type[20];
+	int price;
+	char telephone[20];
+	int isrent;
+}house;
 
-shift allshifts[20];
-int allshiftscount = 0;
+house allhouses[20];
+int allhousescount = 0;
 
 //字符串相等
 int streq(char *s1, char *s2)
@@ -30,45 +33,51 @@ int toint(char *s)
 	return (int)strtol(s, &end, 10);
 }
 
+//char *isrentstring[2] = { "未租","已租" };
 
-void displayshift(shift s)
+char *isrentstring(int index)
 {
-	printf("%s\t%02d:%02d\t%s\t%s\t%d\t%d\n",
-		s.id, s.hour, s.minute, s.start, s.end, 45, s.leftseats);
+	return allhouses[index].isrent ? "已租" : "未租";
 }
 
-int cmpfunc(const void * a, const void * b)
+void displayhouse(int i)
 {
-	int ha = ((shift*)a)->hour;
-	int ma = ((shift*)a)->minute;
-	int hb = ((shift*)b)->hour;
-	int mb = ((shift*)b)->minute;
-	return (ha - hb) * 60 + ma - mb;
+	house s = allhouses[i];
+	printf("%4d %4s %20s %3s %6s %5d %11s %s\n",
+		i + 1, s.name, s.location, s.area, s.type, s.price, s.telephone, isrentstring(i));
 }
 
-void displayallshifts()
+int cmpfunc(const void * b, const void * a)
+{
+	return ((house*)a)->price - ((house*)b)->price;
+}
+
+void displayallhouses()
 {
 	int i;
-	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
-	printf("所有%d位班次信息如下\r\n", allshiftscount);
-	printf("班次\t时间\t起点\t终点\t座位\t余票\n"),
-		printf("--------------------------------------------\r\n");
-	for (i = 0; i < allshiftscount; i++)
+	//qsort(allhouses, allhousescount, sizeof(house), cmpfunc);
+	printf("所有%d位班次信息如下\r\n", allhousescount);
+	//出租者姓名，房屋地址（城市、区、小区、门牌号）（房屋地址看成一个字段），房屋面积、房屋格局（例如：一室一厅）、出租价格、联系电话
+	//printf("序号\t姓名\t地址\t面积\t格局\t价格\t电话\n");
+	printf("%4s %4s %20s %3s %6s %5s %11s %s\n", "序号",
+		"姓名", "地址", "面积", "格局", "价格", "电话", "状态");
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < allhousescount; i++)
 	{
-		displayshift(allshifts[i]);
+		displayhouse(i);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
-int getshiftidexbytime(int hour, int minute)
+int gethouseidexbytime(int hour, int minute)
 {
 	int i;
-	for (i = 0; i < allshiftscount; i++)
-	{
-		if (allshifts[i].hour == hour
-			&& allshifts[i].minute == minute)
-			return i;
-	}
+	//for (i = 0; i < allhousescount; i++)
+	//{
+	//	if (allhouses[i].hour == hour
+	//		&& allhouses[i].minute == minute)
+	//		return i;
+	//}
 	return -1;
 }
 
@@ -85,113 +94,106 @@ void checktimevalid(int hour, int minute, int *exphour, int *expminute)
 }
 
 
-int getshiftidexbyno(char id[50])
+int gethouseidexbyno(char id[50])
 {
 	int i;
-	for (i = 0; i < allshiftscount; i++)
-	{
-		if (streq(allshifts[i].id, id))
-			return i;
-	}
+	//for (i = 0; i < allhousescount; i++)
+	//{
+	//	if (streq(allhouses[i].id, id))
+	//		return i;
+	//}
 	return -1;//没找到
 }
 
-void editshift(char id[50])
+void edithouse(char id[50])
 {
 	int i;
 	int hour;
 	int minute;
 	int exphour;
 	int expminute;
-	i = getshiftidexbyno(id);
-	if (i >= 0)
-	{
-		if (allshifts[i].leftseats < SEAT_COUNT)
-		{
-			printf("本次列车已经有票售出，无法修改时间！\n");
-			return;
-		}
-		printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
-		scanf("%d%d", &hour, &minute);
-		checktimevalid(hour, minute, &exphour, &expminute);
-		if (getshiftidexbytime(exphour, expminute) >= 0)
-		{
-			printf("时间与已有班次重复！\n");
-			return;
-		}
-		allshifts[i].hour = exphour;
-		allshifts[i].minute = expminute;
-		printf("修改完毕。\r\n");
-	}
-	else
-	{
-		printf("没找到对应班次的班次。\r\n");
-	}
+	i = gethouseidexbyno(id);
+	//if (i >= 0)
+	//{
+	//	if (allhouses[i].price < SEAT_COUNT)
+	//	{
+	//		printf("本次列车已经有票售出，无法修改时间！\n");
+	//		return;
+	//	}
+	//	printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
+	//	scanf("%d%d", &hour, &minute);
+	//	checktimevalid(hour, minute, &exphour, &expminute);
+	//	if (gethouseidexbytime(exphour, expminute) >= 0)
+	//	{
+	//		printf("时间与已有班次重复！\n");
+	//		return;
+	//	}
+	//	allhouses[i].hour = exphour;
+	//	allhouses[i].minute = expminute;
+	//	printf("修改完毕。\r\n");
+	//}
+	//else
+	//{
+	//	printf("没找到对应班次的班次。\r\n");
+	//}
 }
 
-void prompteditshift()
+void promptedithouse()
 {
 	char id[50];
 	printf("请输入要修改时间的班次:");
 	scanf("%s", &id);
-	editshift(id);
+	edithouse(id);
 }
 
-void addshift(char id[], int hour, int minute)
+void addhouse(char location[50], char area[20], char type[20], int price)
 {
-	shift s;
-	strcpy(s.id, id);
-	s.hour = hour;
-	s.minute = minute;
-	strcpy(s.start, "保定");
-	strcpy(s.end, "北京");
-	s.leftseats = SEAT_COUNT;
-	allshifts[allshiftscount++] = s;
+	house s;
+	strcpy(s.name, "?");
+	strcpy(s.location, location);
+	strcpy(s.area, area);
+	strcpy(s.type, type);
+	s.price = price;
+	strcpy(s.telephone, "?");
+	s.isrent = 0;
+	allhouses[allhousescount++] = s;
 }
 
-void promptaddshift()
+void promptaddhouse()
 {
-	char id[20];
-	int hour;
-	int minute;
-	int exphour;
-	int expminute;
-	printf("\n请输入班次（不重复）:\n");
-	scanf("%s", id);
-	if (getshiftidexbyno(id) >= 0)
-	{
-		printf("班次与已有班次重复！\n");
-		return;
-	}
-	printf("\n请输入新发车时间（24小时制时 分，空格隔开）：");
-	scanf("%d%d", &hour, &minute);
-	checktimevalid(hour, minute, &exphour, &expminute);
-	if (getshiftidexbytime(exphour, expminute) >= 0)
+	char location[50];
+	char area[20];
+	char type[20];
+	int price;
+	printf("\n请输入地址 面积 格局（都是不带空格的字符串) 和价格(整数), 空格隔开：\n");
+	scanf("%s%s%s%d", location, area, type, &price);
+	/*checktimevalid(hour, minute, &exphour, &expminute);
+	if (gethouseidexbytime(exphour, expminute) >= 0)
 	{
 		printf("时间与已有班次重复！\n");
 		return;
-	}
-	addshift(id, exphour, expminute);
-	printf("完成第%d班次录入!\r\n", allshiftscount);
+	}*/
+	addhouse(location, area, type, price);
+	printf("完成第%d班次录入!\r\n", allhousescount);
 }
 
 
-void removeshift(char no[20])
+void removehouse(char no[20])
 {
 	int i;
 	int index;
-	index = getshiftidexbyno(no);
+	index = gethouseidexbyno(no);
 	if (index >= 0)
 	{
-		if (allshifts[index].leftseats < SEAT_COUNT)
+		if (allhouses[index].price < SEAT_COUNT)
 		{
 			printf("本次列车已经有票售出，无法删除！\n");
 			return;
 		}
-		for (i = index; i < allshiftscount - 1; i++)
-			allshifts[i] = allshifts[i + 1];
-		allshiftscount--;
-		printf("删除完毕，剩下%d次。\r\n", allshiftscount);
+		for (i = index; i < allhousescount - 1; i++)
+			allhouses[i] = allhouses[i + 1];
+		allhousescount--;
+		printf("删除完毕，剩下%d次。\r\n", allhousescount);
 	}
 	else
 	{
@@ -200,41 +202,41 @@ void removeshift(char no[20])
 
 }
 
-void promptremoveshift()
+void promptremovehouse()
 {
-	char id[20];
-	printf("请输入要删除的班次:");
-	scanf("%s", id);
-	removeshift(id);
+	int id;
+	//printf("请输入要删除的班次:");
+	//scanf("%s", id);
+	//removehouse(id);
 }
 
 void searchandbuy(int hour, int minute)
 {
 	int i;
 	char c;
-	i = getshiftidexbytime(hour, minute);
-	if (i >= 0)
-	{
-		printf("查到此班次信息如下：\r\n");
-		displayshift(allshifts[i]);
-		if (allshifts[i].leftseats > 0)
-		{
-			printf("要购买车票吗？输入y购买，其他键取消:");
-			fseek(stdin, 0, SEEK_END);
-			c = getchar();
-			if (c == 'y' || c == 'Y')
-			{
-				allshifts[i].leftseats--;
-				printf("成功购买车票！\n");
-			}
-		}
-		else
-			printf("抱歉，此车次票已售完。");
-	}
-	else
-	{
-		printf("没找到对应班次的班次。\r\n");
-	}
+	i = gethouseidexbytime(hour, minute);
+	//if (i >= 0)
+	//{
+	//	printf("查到此班次信息如下：\r\n");
+	//	displayhouse(allhouses[i]);
+	//	if (allhouses[i].price > 0)
+	//	{
+	//		printf("要购买车票吗？输入y购买，其他键取消:");
+	//		fseek(stdin, 0, SEEK_END);
+	//		c = getchar();
+	//		if (c == 'y' || c == 'Y')
+	//		{
+	//			allhouses[i].price--;
+	//			printf("成功购买车票！\n");
+	//		}
+	//	}
+	//	else
+	//		printf("抱歉，此车次票已售完。");
+	//}
+	//else
+	//{
+	//	printf("没找到对应班次的班次。\r\n");
+	//}
 
 }
 
@@ -247,32 +249,26 @@ void promptsearchandbuy()
 	searchandbuy(hour, minute);
 }
 
-void add8shifts()
+void add8houses()
 {
-	addshift("k001", 6, 0);
-	addshift("k002", 7, 0);
-	addshift("k003", 9, 0);
-	addshift("k004", 10, 30);
-	addshift("k005", 14, 0);
-	addshift("k006", 15, 30);
-	addshift("k007", 16, 30);
-	addshift("k008", 17, 30);
+	addhouse("保定市北市区中华小区2-5-203", "100", "三室一厅", 1500);
+
 }
 
 int main()
 {
 	int choice = -1;
-	add8shifts();
-#if 0
-	//promptaddshift();
-	displayallshifts();
-	allshifts[1].leftseats = 44;
-	promptaddshift();
-	//prompteditshift();
+	//add8houses();
+#if 1
+	promptaddhouse();
+	//displayallhouses();
+	//allhouses[1].leftseats = 44;
+	//promptaddhouse();
+	//promptedithouse();
 	//promptsearchandbuy();
 	//searchandbuy(7, 0);
-	//promptremoveshift();
-	displayallshifts();
+	//promptremovehouse();
+	displayallhouses();
 	system("pause");
 #endif
 	while (choice != 0)
@@ -297,15 +293,15 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaddshift();
+			promptaddhouse();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			prompteditshift();
+			promptedithouse();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptremoveshift();
+			promptremovehouse();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
@@ -313,7 +309,7 @@ int main()
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
-			displayallshifts();
+			displayallhouses();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
