@@ -53,8 +53,9 @@ void displayallhouses(int isrent, char location[50], char type[20])
 	for (i = 0; i < allhousescount; i++)
 	{
 		if (isrent == allhouses[i].isrent
-			&& (streq(location, "") || streq(allhouses[i].address, location))
-			&& (streq(type, "") || streq(allhouses[i].type, type)))
+			&& (streq(location, "") || strstr(allhouses[i].address, location) != NULL)
+			&& (streq(type, "") || strstr(allhouses[i].type, type) != NULL)
+			)
 		{
 			displayhouse(i);
 			filteredindex[filteredindexcount++] = i;
@@ -228,7 +229,7 @@ void menu22()
 			return;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			printf("请输入要查询的房屋地址（必须精确匹配）：");
+			printf("请输入要查询的房屋地址（支持模糊匹配）：");
 			scanf("%s", location);
 			qsort(allhouses, allhousescount, sizeof(house), cmpprice);
 			displayallhouses(0, location, "");
@@ -239,7 +240,7 @@ void menu22()
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			printf("请输入要查询的房屋格局（必须精确匹配）：");
+			printf("请输入要查询的房屋格局（支持模糊匹配）：");
 			scanf("%s", type);
 			qsort(allhouses, allhousescount, sizeof(house), cmpprice);
 			displayallhouses(0, "", type);
@@ -297,7 +298,7 @@ int main()
 	add4houses();
 #if 0
 	displayallhouses(0, "", "");
-
+	displayallhouses(0, "", "x");
 	//promptaddhouse();
 	//displayallhouses();
 	//allhouses[1].leftseats = 44;
@@ -306,8 +307,8 @@ int main()
 	//promptsearchandrent();
 	//searchandrent(7, 0);
 	//promptremovehouse();
-	promptremovehouse();
-	displayallhouses(0, "", "");
+	//promptremovehouse();
+	//displayallhouses(0, "", "");
 	system("pause");
 #endif
 	while (choice != 0)
