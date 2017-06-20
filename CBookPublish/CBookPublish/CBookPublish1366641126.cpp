@@ -1,32 +1,30 @@
-//C语言课程设计，用c语言设计一户籍管理系统，求所写代码要求:
-//户籍信息包括身份证号、姓名、性别、年龄、学历、住址、电话等（身份证号不重复）。
-//试设计一户籍管理系统，该系统具有如下功能：
-//1. 户籍信息录入功能(户籍信息用文件保存，并可在电脑中直接查找并打开该文件）
-//	2．户籍信息浏览功能
-//	3．按年龄排序
-//	4．按年龄区间查询
-//	5．户籍信息删除
-//	6．户籍信息修改
-
+//图书信息管理系统
+//图书信息包括：图书编号、书名、作者名、出版单位、出版时间、价格等、试设计一图书信息管理系统，使之能提供以下功能：
+//1.图书信息录入（图书信息用文件保存，并可在电脑上直接查找并打开该文件）
+//2.图书信息浏览
+//3.按作者名排序
+//4.查询
+//a.按出版单位查询
+//b.按书名查询
+//5.图书信息的删除
+//5.图是信息的修改
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define FILE_per "per.txt"
+#define FILE_BOOK "book.txt"
 #define MAX_STRLEN 20
-typedef struct person
+typedef struct book
 {
 	char id[20];
 	char name[20];
-	char sex[10];
-	int age;
-	char scholar[30];
-	char address[50];
-	char telephone[20];
+	char author[10];
+	char publisher[30];
+	char publishdate[50];
+	int price;
+}book;
 
-}person;
-
-person allpersons[100];
-int allpersonscount = 0;
+book allbooks[100];
+int allbookscount = 0;
 
 //字符串相等
 int streq(char *s1, char *s2)
@@ -43,286 +41,296 @@ int toint(char *s)
 }
 
 
-void displayperson(person per)
+void displaybook(book b)
 {
-	printf("%s\t%s\t%s\t%d\t%s\t%s\t%s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
+	printf("%s\t%8s%10s%16s%10s\t%d\n",
+		b.id, b.name, b.author, b.publisher, b.publishdate, b.price);
 }
 
-void displayallpersons()
+int cmpfunc(const void * a, const void * b)
+{
+	return ((book*)a)->author - ((book*)b)->author;
+}
+
+void displayallbooks()
 {
 	int i;
-	printf("所有%d位居民信息如下\r\n", allpersonscount);
+	qsort(allbooks, allbookscount, sizeof(book), cmpfunc);
+	printf("所有%d条图书信息如下\r\n", allbookscount);
 	printf("--------------------------------------------\r\n");
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allbookscount; i++)
 	{
-		displayperson(allpersons[i]);
+		displaybook(allbooks[i]);
 	}
 	printf("--------------------------------------------\r\n");
 }
 
-//从一行文本读入并根据\t符号拆分，组合成一个person
-person getpersonfromline(char *line)
+//从一行文本读入并根据\t符号拆分，组合成一个book
+book getbookfromline(char *line)
 {
 	char *part;
 	int index = 0;
-	person per;
+	book b;
 	part = strtok(line, " \t\n");
 	while (part != NULL)
 	{
 		switch (++index)
 		{
 		case 1:
-			strcpy(per.id, part);
+			strcpy(b.id, part);
 			break;
 		case 2:
-			strcpy(per.name, part);
+			strcpy(b.name, part);
 			break;
 		case 3:
-			strcpy(per.sex, part);
+			strcpy(b.author, part);
 			break;
 		case 4:
-			per.age = toint(part);
+			strcpy(b.publisher, part);
 			break;
 		case 5:
-			strcpy(per.scholar, part);
+			strcpy(b.publishdate, part);
 			break;
 		case 6:
-			strcpy(per.address, part);
-			break;
-		case 7:
-			strcpy(per.telephone, part);
+			b.price = toint(part);
 			break;
 		default:
 			break;
 		}
 		part = strtok(NULL, " \t\n");
 	}
-	return per;
+	return b;
 }
 
-void readallpersons()
+void readallbooks()
 {
 	char line[200];
-	FILE *fp = fopen(FILE_per, "r");
+	FILE *fp = fopen(FILE_BOOK, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_per);
+		printf("\n打开文件%s失败!", FILE_BOOK);
 	}
 	else
 	{
-		allpersonscount = 0;
+		allbookscount = 0;
 
 		while (fgets(line, 1024, fp) != NULL)
 		{
 			if (strlen(line) < 5)
 				continue;
-			allpersons[allpersonscount++] = getpersonfromline(line);
+			allbooks[allbookscount++] = getbookfromline(line);
 		}
-		printf("\n已读入文件!", FILE_per);
+		printf("\n已读入文件!", FILE_BOOK);
 	}
 }
 
-//qsort是快速排序，要求如下写法，根据age排序
-int cmpfunc(const void * a, const void * b)
-{
-	return ((person*)a)->age - ((person*)b)->age;
-}
 
-void sortpersonsbyageanddisplay()
+int getbookidexbyno(char id[50])
 {
 	int i;
-	qsort(allpersons, allpersonscount, sizeof(person), cmpfunc);
-	printf("按每个居民年龄排序后如下\r\n");
-	displayallpersons();
-}
-
-//根据编号查数组里的序号
-int getpersonidexbyno(char id[50])
-{
-	int i;
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allbookscount; i++)
 	{
-		if (streq(allpersons[i].id, id))
+		if (streq(allbooks[i].id, id))
 			return i;
 	}
 	return -1;//没找到
 }
 
-void writeallpersons()
+void writeallbooks()
 {
 	int i;
-	person per;
-	FILE *fp = fopen(FILE_per, "w+");
+	book b;
+	FILE *fp = fopen(FILE_BOOK, "w+");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_per);
+		printf("\n打开文件%s失败!", FILE_BOOK);
 		getchar();
 		exit(1);
 	}
-	for (i = 0; i < allpersonscount; i++)
+	for (i = 0; i < allbookscount; i++)
 	{
-		per = allpersons[i];
-		fprintf(fp, "%s %s %s %d %s %s %s\n", per.id, per.name, per.sex, per.age, per.scholar, per.address, per.telephone);
+		b = allbooks[i];
+		fprintf(fp, "%s %s %s %s %s %d\n",
+			b.id, b.name, b.author, b.publisher, b.publishdate, b.price);
 	}
 	fclose(fp);
 	printf("已保存记录到文件。");
 }
 
-void editperson(char id[50])
+void editbook(char id[50])
 {
 	int i;
-	i = getpersonidexbyno(id);
+	i = getbookidexbyno(id);
 	if (i >= 0)
 	{
-		printf("\n请输入新的学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
-		scanf("%s%s%s", allpersons[i].scholar, allpersons[i].address, allpersons[i].telephone);
-		writeallpersons();
+		printf("\n请输入新的出版单位、出版时间、价格，空格隔开\n");
+		scanf("%s%s%d", allbooks[i].publisher, allbooks[i].publishdate, &allbooks[i].price);
+		writeallbooks();
 		printf("修改完毕。\r\n");
 	}
 	else
 	{
-		printf("没找到对应身份证号的居民。\r\n");
+		printf("没找到对应图书编号号的图书。\r\n");
 	}
 }
 
-void prompteditperson()
+void prompteditbook()
 {
 	char id[50];
-	printf("请输入要修改的身份证号:");
+	printf("请输入要修改的图书编号号:");
 	scanf("%s", &id);
-	editperson(id);
+	editbook(id);
 }
 
-void addperson(char id[], char name[], char sex[], int age, char scholar[], char address[], char telephone[])
+void addbook(char id[], char name[], char author[], char publisher[], char publishdate[], int price)
 {
-	person per;
-	strcpy(per.id, id);
-	strcpy(per.name, name);
-	strcpy(per.sex, sex);
-	per.age = age;
-	strcpy(per.scholar, scholar);
-	strcpy(per.address, address);
-	strcpy(per.telephone, telephone);
-	allpersons[allpersonscount++] = per;
-	writeallpersons();
+	book b;
+	strcpy(b.id, id);
+	strcpy(b.name, name);
+	strcpy(b.author, author);
+	strcpy(b.publisher, publisher);
+	strcpy(b.publishdate, publishdate);
+	b.price = price;
+	allbooks[allbookscount++] = b;
+	writeallbooks();
 }
 
 
-void promptaddperson()
+void promptaddbook()
 {
 	char id[20];
 	char name[20];
-	char sex[10];
-	int age;
-	char scholar[30];
-	char address[50];
+	char author[10];
+	int price;
+	char publisher[30];
+	char publishdate[50];
 	char telephone[20];
-	printf("\n请输入身份证（不重复）:\n");
+	printf("\n请输入图书编号（不重复）:\n");
 	scanf("%s", id);
-	if (getpersonidexbyno(id) >= 0)
+	if (getbookidexbyno(id) >= 0)
 	{
-		printf("身份证与已有居民重复！\n");
+		printf("图书编号与已有图书重复！\n");
 		return;
 	}
-	printf("\n请输入姓名、性别（都是不带空格的字符串）、年龄(正整数)，空格隔开\n");
-	scanf("%s%s%d", name, sex, &age);
-	printf("\n请输入学历、住址、电话（都是不带空格的字符串，尽量简短），空格隔开\n");
-	scanf("%s%s%s", scholar, address, telephone);
-	addperson(id, name, sex, age, scholar, address, telephone);
-	printf("完成第%d位居民录入!\r\n", allpersonscount);
+	printf("\n请输入书名、作者名、出版单位、出版时间（都是不带空格的字符串）、价格(整数)，空格隔开\n");
+	scanf("%s%s%s%s%d", name, author, publisher, publishdate, &price);
+	addbook(id, name, author, publisher, publishdate, price);
+	printf("完成第%d种图书录入!\r\n", allbookscount);
 }
 
 
-void removeperson(char no[20])
+void removebook(char no[20])
 {
 	int i;
 	int index;
-	index = getpersonidexbyno(no);
+	index = getbookidexbyno(no);
 	if (index >= 0)
 	{
-		for (i = index; i < allpersonscount - 1; i++)
-			allpersons[i] = allpersons[i + 1];
-		allpersonscount--;
-		writeallpersons();
-		printf("删除完毕，剩下%d个。\r\n", allpersonscount);
+		for (i = index; i < allbookscount - 1; i++)
+			allbooks[i] = allbooks[i + 1];
+		allbookscount--;
+		writeallbooks();
+		printf("删除完毕，剩下%d个。\r\n", allbookscount);
 	}
 	else
 	{
-		printf("没找到对应身份证号的居民。\r\n");
+		printf("没找到对应图书编号号的图书。\r\n");
 	}
 
 }
 
-void promptremoveperson()
+void promptremovebook()
 {
 	char id[20];
-	printf("请输入要删除的身份证号:");
+	printf("请输入要删除的图书编号号:");
 	scanf("%s", id);
-	removeperson(id);
+	removebook(id);
 }
 
 
-void searcbetweenage(int from, int to)
+void searchbyname(char name[20])
 {
 	int i, found = 0;
-	for (i = 0; i < allpersonscount; i++)
-		if (allpersons[i].age >= from && allpersons[i].age <= to)
+	for (i = 0; i < allbookscount; i++)
+		if (strstr(allbooks[i].name, name) != NULL)
 		{
-			displayperson(allpersons[i]);
+			displaybook(allbooks[i]);
 			found = 1;
 		}
 	if (!found)
-		printf("没找到对应居民的信息。\r\n");
+		printf("没找到对应图书的信息。\r\n");
 }
 
-void promptsearchbetweenage()
+void promptsearchbyname()
 {
-	int from, to;
-	printf("请输入要查找的最低和最高年龄(正整数，空格分隔):");
-	scanf("%d%d", &from, &to);
-	searcbetweenage(from, to);
+	char name[20];
+	printf("请输入要查找的书名:");
+	scanf("%s", name);
+	searchbyname(name);
+}
+
+void searchbypublisher(char publisher[20])
+{
+	int i, found = 0;
+	for (i = 0; i < allbookscount; i++)
+		if (strstr(allbooks[i].publisher, publisher) != NULL)
+		{
+			displaybook(allbooks[i]);
+			found = 1;
+		}
+	if (!found)
+		printf("没找到对应图书的信息。\r\n");
+}
+
+void promptsearchbypublisher()
+{
+	char publisher[20];
+	printf("请输入要查找的出版社:");
+	scanf("%s", publisher);
+	searchbypublisher(publisher);
 }
 
 int main()
 {
 	char choice = -1;
 #if 0//测试用，if块可删除
-	readallpersons();
-	//addperson("05", "n5", "20170605", 41, 92, 93);
-	//addperson("06", "n6", "20170606", 46, 96, 96);
+	readallbooks();
+	//addbook("01", "三国演义", "罗贯中", "人民出版社", "1950-4-3", 99);
+	//addbook("02", "C语言", "谭浩强", "机械出版社", "1995-12-1", 50);
 
-	//editperson("01");
-	////printf("\n%d\n", allpersonscount);
-	displayallpersons();
-	promptaddperson();
-	displayallpersons();
-	//promptsearchbetweenage();
-	//prompteditperson();
-	//writeallpersons();
+	//editbook("01");
+	////printf("\n%d\n", allbookscount);
+	displayallbooks();
+	//promptsearchbypublisher();
+	promptsearchbyname();
+	//prompteditbook();
+	//promptremovebook();
+	//promptaddbook();
+	//promptsearchbyname();
+	//writeallbooks();
 	////promptsearchtotalbyname();
 	////promptsearchtotalbyno();
-	//promptremoveperson();
-	//sortpersonsbytotalanddisplay();
-	//displayallpersons();
-	//sortpersonsbytotal();
-	//prompteditperson();
-	//displayallpersons();
+	//sortbooksbytotalanddisplay();
+	//displayallbooks();
+	//sortbooksbytotal();
+	//prompteditbook();
+	////displayallbooks();
 
 
 	system("pause");
 
 #endif
-	readallpersons();
+	readallbooks();
 	while (choice != 0)
 	{
-		printf("\n\t 居民信息管理系统");
+		printf("\n\t 图书信息管理系统");
 		printf("\n\t 0---退出");
-		printf("\n\t 1---户籍信息录入");
-		printf("\n\t 2---户籍信息浏览");
-		printf("\n\t 3---按年龄排序");
-		printf("\n\t 4---按年龄区间查询");
-		printf("\n\t 5---户籍信息删除");
-		printf("\n\t 6---户籍信息修改");
+		printf("\n\t 1---图书信息录入");
+		printf("\n\t 2---图书信息浏览");
+		printf("\n\t 3---按出版单位查询");
+		printf("\n\t 4---按书名查询");
+		printf("\n\t 5---图书信息删除");
+		printf("\n\t 6---图书信息修改");
 		printf("\n请选择:");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -335,27 +343,27 @@ int main()
 			exit(0); break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaddperson();
+			promptaddbook();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			displayallpersons();
+			displayallbooks();
 			break;
 		case '3':
 			printf("\n\n你选择了 c\n");
-			sortpersonsbyageanddisplay();
+			promptsearchbypublisher();
 			break;
 		case '4':
 			printf("\n\n你选择了 d\n");
-			promptsearchbetweenage();
+			promptsearchbyname();
 			break;
 		case '5':
 			printf("\n\n你选择了 e\n");
-			promptremoveperson();
+			promptremovebook();
 			break;
 		case '6':
 			printf("\n\n你选择了 f\n");
-			prompteditperson();
+			prompteditbook();
 			break;
 		default:
 			printf("\n\n输入有误，请重选\n");
