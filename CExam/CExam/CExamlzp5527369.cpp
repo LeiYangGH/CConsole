@@ -9,7 +9,7 @@
 #define MAX 100
 #define TEST 0
 #define NOANSWER 0 //不用用户回答，只显示题 1或者0
-#define LESSLOOP 1 //减少循环次数 1或者0
+#define LESSLOOP 0 //减少循环次数 1或者0
 //1
 
 typedef struct single
@@ -184,19 +184,9 @@ void singletest()
 void displaysingleresult()
 {
 	int i;
-	printf("-----------考试淘汰名单---------\n");
-	for (i = 0; i < allsinglescount; i++)
-	{
-		if (allsingles[i].total < 60)
-			printf("%s\n", allsingles[i].name);
-	}
-	printf("-----------考试入围名单---------\n");
-	for (i = 0; i < allsinglescount; i++)
-	{
-		if (allsingles[i].total > 90)
-			printf("%s\n", allsingles[i].name);
-	}
-	printf("-----------按任意键回到主界面---------\n");
+	printf("-----------考试结果---------\n");
+	single s = allsingles[0];
+	printf("考生姓名：%s 总分：%d 正确率%.1f\n", s.name, s.total, s.total / 100.0);
 	fseek(stdin, 0, SEEK_END);
 	getchar();
 	system("cls");
@@ -218,7 +208,7 @@ int main()
 	strcpy(allsingles[0].name, "匿名");
 	allsingles[0].total = 0;
 	allsinglescount = 1;
-	FILE *fp = fopen(FILE_BOOK, "w+");
+	fp = fopen(FILE_BOOK, "a+");
 	if (fp == NULL)
 	{
 		printf("\n打开文件%s失败!", FILE_BOOK);
@@ -256,10 +246,6 @@ int main()
 		printf("\n\t 心算练习/竞赛系统");
 		printf("\n\t 1. 退出");
 		printf("\n\t 2. 单人考试");
-		//printf("\n\t 3. 模块3 多运算符四则运算");
-		//printf("\n\t 4. 模块4 多运算符四则运算");
-		//printf("\n\t 5. 模块5 从分组数据文件获得参赛小组成绩，输出排序结果");
-		//printf("\n\t 6. 模块6 考试");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -275,20 +261,7 @@ int main()
 			printf("\n\n你选择了 2\n");
 			modulesingletest();
 			break;
-			//case '3':
-			//	printf("\n\n你选择了 3\n");
-			//	testoneperson(0);
-			//	break;
-			//case '4':
-			//	printf("\n\n你选择了 4\n");
-			//	break;
-			//case '5':
-			//	printf("\n\n你选择了 5\n");
-			//	break;
-			//case '6':
-			//	printf("\n\n你选择了 5\n");
-			//	modulesingletest();
-			//	break;
+
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
