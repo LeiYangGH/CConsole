@@ -31,7 +31,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /== 'y/
+			 $_ =~ /book/
 			# $_ =~ /get/ && 
 			 #$_ =~ /\w+\s\w+\(.*?\)/
 			 )
