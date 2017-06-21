@@ -10,6 +10,7 @@
 #define TEST 0
 #define NOANSWER 0 //不用用户回答，只显示题 1或者0
 #define LESSLOOP 1 //减少循环次数 1或者0
+#define RETRY 0 //允许答错后重做 1或者0
 //1
 
 typedef struct single
@@ -115,19 +116,13 @@ void displayallsingles()
 
 int testone()
 {
-	int i, re, input, judge;
+	int i, re, input = -65535, judge, retryleft = 2;
 	int a = randomminmax();
 	int b = randomminmax();
 	int opidrange[4] = { 0,1,2,3, };
 	opr op = alloprators[opidrange[random(0, 3)]];
-	char exp[50] = "";
-	char str[4] = "";
-	itoa(a, str, 10);
-	strcat(exp, str);
-	strcat(exp, op.str);
-	itoa(b, str, 10);
-	strcat(exp, str);
-	printf("%s =? ", exp);
+	printf("%d %s %d = ? ", a, op.str, b);
+
 #if NOANSWER
 	printf("\n");
 
@@ -136,6 +131,14 @@ int testone()
 
 	re = op.op(a, b);
 	scanf("%d", &input);
+#if RETRY
+	while (re != input && retryleft-- > 0)
+	{
+		printf("Wrong！retry : ");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%d", &input);
+	}
+#endif
 	if (re == input)
 	{
 		printf("Right！\n\n");
