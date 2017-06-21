@@ -10,7 +10,7 @@
 #define TEST 0
 #define NOANSWER 0 //不用用户回答，只显示题 1或者0
 #define LESSLOOP 1 //减少循环次数 1或者0
-#define RETRY 0 //允许答错后重做 1或者0
+#define RETRY 1 //允许答错后重做 1或者0
 //1
 
 typedef struct single
@@ -120,6 +120,7 @@ int testone()
 	int a = randomminmax();
 	int b = randomminmax();
 	int opidrange[4] = { 0,1,2,3, };
+	char *leftmsg = RETRY ? "You have tried three times！Test over！" : "";
 	opr op = alloprators[opidrange[random(0, 3)]];
 	printf("%d %s %d = ? ", a, op.str, b);
 
@@ -146,7 +147,8 @@ int testone()
 	}
 	else
 	{
-		printf("Wrong！should be %d\n\n", re);
+		printf("Wrong！%s", leftmsg);
+		printf("(should be %d)\n\n", re);
 		judge = 0;
 	}
 	fprintf(fp, "%d %s %d = %d\n", a, op.str, b, re);
