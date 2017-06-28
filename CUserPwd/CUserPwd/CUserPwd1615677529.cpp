@@ -196,13 +196,6 @@ void registeruser(char name[20], char password[20], char gender[20], char birthd
 	allusers[alluserscount++] = u;
 }
 
-//当前用户是否管理员
-//int iscurrentuseradmin()
-//{
-//	return streq(currentusername, ADMIN);
-//}
-
-
 void promptregisteruser()
 {
 	char name[20];//姓名
@@ -284,15 +277,6 @@ void edituser(char name[50])
 		printf("没找到对应用户名的用户。\r\n");
 	}
 }
-
-
-//登出
-//void logout()
-//{
-//	strcpy(currentusername, "");
-//	printf("登出成功!");
-//}
-
 
 void menu22()
 {
@@ -381,10 +365,11 @@ void menu2()
 int main()
 {
 	char choice = -1;
+	//添加测试数据，可删除
 	registeruser("u1", "p1", "g1", "b1", "e1");
 	registeruser("u3", "p3", "g3", "b3", "e3");
 	registeruser("u2", "p2", "g2", "b2", "e2");
-#if 0 //测试用
+#if 0 //测试用，整块可删除
 	//login();
 	registeruser("u1", "p1", "g1", "b1", "e1");
 	registeruser("u3", "p3", "g3", "b3", "e3");
