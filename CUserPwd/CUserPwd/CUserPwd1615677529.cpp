@@ -52,7 +52,7 @@ float tofloat(char *s)
 void displayuser(user u)
 {
 	printf("%s\t%s\t%s\t%s\n",
-		  u.name, u.gender, u.birthday, u.email);
+		u.name, u.gender, u.birthday, u.email);
 }
 
 //int cmpfunc(const void * a, const void * b)
@@ -75,7 +75,49 @@ void displayallusers()
 
 
 //登录
-void login()
+void userlogin()
+{
+	int i, retryleft = 2;
+	char name[20] = "";
+	char pwd[20] = "^";
+	char exppwd[20] = "";
+
+
+	printf("\n请输入用户名\n");
+	scanf("%s", name);
+	if (!isusernameexists(name))
+	{
+		printf("\n用户名不存在\n");
+		return;
+	}
+	for (i = 0; i < alluserscount; i++)
+	{
+		if (streq(name, allusers[i].name))
+		{
+			strcpy(exppwd, allusers[i].password);
+		}
+	}
+	printf("请输入密码: ");
+	fseek(stdin, 0, SEEK_END);
+	scanf("%s", pwd);
+	while (!streq(exppwd, pwd) && retryleft-- > 0)
+	{
+		printf("密码错误,请重新输入:");
+		fseek(stdin, 0, SEEK_END);
+		scanf("%s", pwd);
+	}
+	if (streq(exppwd, pwd))
+	{
+		printf("%s登录成功！\n", name);
+		strcpy(currentusername, name);
+	}
+	else
+	{
+		printf("抱歉，用户%s已被锁定", name);
+	}
+}
+
+void adminlogin()
 {
 	int i;
 	char uname[20] = "";
@@ -84,15 +126,13 @@ void login()
 	scanf("%s", uname);
 	printf("\n请输入密码\n");
 	scanf("%s", pwd);
-	for (i = 0; i < alluserscount; i++)
+
+	if (streq(uname, ADMIN)
+		&& streq(pwd, ADMIN))
 	{
-		if (streq(uname, allusers[i].name)
-			&& streq(pwd, allusers[i].password))
-		{
-			printf("%s登录成功！\n", uname);
-			strcpy(currentusername, uname);
-			return;
-		}
+		printf("%s登录成功！\n", uname);
+		strcpy(currentusername, ADMIN);
+		return;
 	}
 	printf("用户名或密码错误，登录失败！\n");
 }
@@ -339,7 +379,7 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			login();
+			userlogin();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
@@ -389,9 +429,9 @@ int main()
 				break;
 			}
 			break;
-		 
-		 
-	  
+
+
+
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
