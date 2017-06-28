@@ -55,15 +55,15 @@ void displayuser(user u)
 		u.name, u.gender, u.birthday, u.email);
 }
 
-//int cmpfunc(const void * a, const void * b)
-//{
-//	return ((user*)a)->author - ((user*)b)->author;
-//}
+int cmpfunc(const void * a, const void * b)
+{
+	return ((user*)a)->name - ((user*)b)->name;
+}
 
 void displayallusers()
 {
 	int i;
-	//qsort(allusers, alluserscount, sizeof(user), cmpfunc);
+	qsort(allusers, alluserscount, sizeof(user), cmpfunc);
 	printf("所有%d位用户信息如下\r\n", alluserscount);
 	printf("--------------------------------------------\r\n");
 	for (i = 0; i < alluserscount; i++)
@@ -72,6 +72,21 @@ void displayallusers()
 	}
 	printf("--------------------------------------------\r\n");
 }
+
+void displayalllockedusers()
+{
+	int i;
+	qsort(allusers, alluserscount, sizeof(user), cmpfunc);
+	printf("所有被锁定用户信息如下\r\n", alluserscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < alluserscount; i++)
+	{
+		if (allusers[i].islocked)
+			displayuser(allusers[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
 //是否已经存在相同用户名
 int isusernameexists(char uname[20])
 {
@@ -98,7 +113,7 @@ int getuseridexbyuname(char uname[20])
 }
 
 //登录
-void userlogin()
+int userlogin()
 {
 	int i, index, retryleft = 2;
 	char name[20] = "";
@@ -106,19 +121,19 @@ void userlogin()
 	char exppwd[20] = "";
 
 
-	printf("\n请输入用户名\n");
+	printf("\n请输入用户名：");
 	scanf("%s", name);
 	index = getuseridexbyuname(name);
 	if (index < 0)
 	{
 		printf("\n用户名不存在\n");
-		return;
+		return 0;
 	}
 
 	if (allusers[index].islocked)
 	{
 		printf("\n用户%s为锁定状态，请联系管理员解锁\n", name);
-		return;
+		return 0;
 	}
 
 	strcpy(exppwd, allusers[index].password);
@@ -136,22 +151,24 @@ void userlogin()
 	{
 		printf("%s登录成功！\n", name);
 		strcpy(currentusername, name);
+		return 1;
 	}
 	else
 	{
 		allusers[index].islocked = 1;
 		printf("抱歉，用户%s已被锁定", name);
+		return 0;
 	}
 }
 
-void adminlogin()
+int adminlogin()
 {
 	int i;
 	char uname[20] = "";
 	char pwd[20] = "";
-	printf("\n请输入用户名\n");
+	printf("\n请输入管理员用户名：");
 	scanf("%s", uname);
-	printf("\n请输入密码\n");
+	printf("\n请输入管理员密码：");
 	scanf("%s", pwd);
 
 	if (streq(uname, ADMIN)
@@ -159,17 +176,12 @@ void adminlogin()
 	{
 		printf("%s登录成功！\n", uname);
 		strcpy(currentusername, ADMIN);
-		return;
+		return 1;
 	}
 	printf("用户名或密码错误，登录失败！\n");
+	return 0;
 }
 
-
-
-//int ispassowrdcomplicated(char password[20])
-//{
-//	return strlen(password) >= 6;
-//}
 
 int isemailvalid(char email[20])
 {
@@ -253,6 +265,8 @@ void promptunlockuser()
 {
 	int index;
 	char name[20];//姓名
+	printf("\n请输入要解锁的用户名:");
+	scanf("%s", name);
 	index = getuseridexbyuname(name);
 	if (index < 0)
 	{
@@ -287,14 +301,6 @@ void edituser(char name[50])
 	}
 }
 
-//void promptedituser()
-//{
-//	char name[50];
-//	printf("请输入要修改的用户名:");
-//	scanf("%s", &name);
-//	edituser(name);
-//}
-
 
 //登出
 void logout()
@@ -305,16 +311,99 @@ void logout()
 
 
 #pragma endregion
- 
 
+
+void menu22()
+{
+	int choice = -1;
+	char location[50];
+	char type[20];
+	while (choice != 0)
+	{
+		printf("\n\t 用户管理");
+		printf("\n\t 0. 返回上级菜单");
+		printf("\n\t    登录");
+		printf("\n\t\t   管理员登录");
+		printf("\n\t\t\t   1.显示所有用户");
+		printf("\n\t\t\t   2.显示锁定用户");
+		printf("\n\t\t\t   3.锁定用户解锁");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
+		choice = getchar();
+		switch (choice)
+		{
+		case '0':
+			fseek(stdin, 0, SEEK_END);
+			return;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			displayallusers();
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			displayalllockedusers();
+			break;
+		case '3':
+			printf("\n\n你选择了 3\n");
+			promptunlockuser();
+			break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
+		}
+	}
+}
+
+
+void menu2()
+{
+	int choice = -1;
+	while (choice != 0)
+	{
+		printf("\n\t 用户管理");
+		printf("\n\t 0. 返回上级菜单");
+		printf("\n\t    登录");
+		printf("\n\t\t   1.普通用户登录（并修改自己的基本信息）");
+		printf("\n\t\t   2.管理员登录");
+		printf("\n\t\t\t   显示所有用户");
+		printf("\n\t\t\t   显示锁定用户");
+		printf("\n\t\t\t   锁定用户解锁");
+		printf("\n\n  请选择: ");
+		fseek(stdin, 0, SEEK_END);
+		choice = getchar();
+		switch (choice)
+		{
+		case '0':
+			fseek(stdin, 0, SEEK_END);
+			return;
+		case '1':
+			printf("\n\n你选择了 1\n");
+			if (userlogin())
+			{
+				edituser(currentusername);
+			}
+			break;
+		case '2':
+			printf("\n\n你选择了 2\n");
+			if (adminlogin())
+				menu22();
+			break;
+		default:
+			printf("\n\n输入有误，请重选\n");
+			break;
+		}
+	}
+}
 
 
 
 int main()
 {
 	char choice = -1;
-
-#if 1 //测试用
+	registeruser("u1", "p1", "g1", "b1", "e1");
+	registeruser("u3", "p3", "g3", "b3", "e3");
+	registeruser("u2", "p2", "g2", "b2", "e2");
+#if 0 //测试用
 	//login();
 	registeruser("u1", "p1", "g1", "b1", "e1");
 	registeruser("u3", "p3", "g3", "b3", "e3");
@@ -325,26 +414,18 @@ int main()
 	displayallusers();
 	strcpy(currentusername, "u1");
 #endif
-	while (choice != 'g')
+	while (choice != 0)
 	{
-		printf("\n\t 超市管理系统");
-		printf("\n\t 1---用户登录");
-		printf("\n\t 2---用户登出");
-		printf("\n\t 3---注册消费者");
-		printf("\n\t 4---注册管理员");
-		printf("\n\t 5---查看所有商品信息");
-		printf("\n\t 6---根据名称查找商品");
-		printf("\n\t 7---添加商品");
-		printf("\n\t 8---输入识别码修改商品价格和库存");
-		printf("\n\t 9---输入识别码删除商品");
-		printf("\n\t a---显示库存不足和滞销商品");
-		printf("\n\t b---添加商品到购物车");
-		printf("\n\t c---结帐付款");
-		printf("\n\t d---充值");
-		printf("\n\t e---退货");
-		printf("\n\t f---把本次运行的消费记录追加到文件");
-		printf("\n\t 0---退出程序\n\n");
-		printf("\n---请选择：");
+		printf("\n\t 用户管理");
+		printf("\n\t 0. 退出");
+		printf("\n\t 1. 注册");
+		printf("\n\t 2. 登录");
+		printf("\n\t\t   普通用户登录（并修改自己的基本信息）");
+		printf("\n\t\t   管理员登录");
+		printf("\n\t\t\t   显示所有用户");
+		printf("\n\t\t\t   显示锁定用户");
+		printf("\n\t\t\t   锁定用户解锁");
+		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
 		switch (choice)
@@ -357,65 +438,18 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			userlogin();
+			promptregisteruser();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			logout();
+			menu2();
 			break;
-		case '3':
-			printf("\n\n你选择了 3\n");
-			break;
-		case '4':
-			printf("\n\n你选择了 4\n");
-			break;
-		case '5':
-			printf("\n\n你选择了 5\n");
-			break;
-		case '6':
-			printf("\n\n你选择了 6\n");
-			break;
-		case '7':
-			printf("\n\n你选择了 7\n");
-			if (!iscurrentuseradmin())
-			{
-				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case '8':
-			printf("\n\n你选择了 8\n");
-			if (!iscurrentuseradmin())
-			{
-				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case '9':
-			printf("\n\n你选择了 9\n");
-			if (!iscurrentuseradmin())
-			{
-				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case 'a':
-			printf("\n\n你选择了 a\n");
-			if (!iscurrentuseradmin())
-			{
-				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-
-
-
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
 		}
 	}
-	printf("\n\n按任意键退出\n");
+	fseek(stdin, 0, SEEK_END);
 	system("pause");
 	return 0;
 }
