@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#define ADMIN "admin"
 typedef struct shift
 {
 	char id[20];
@@ -27,12 +27,97 @@ typedef struct shift
 shift allshifts[20];
 int allshiftscount = 0;
 
+typedef struct user//用户
+{
+	char name[20];//姓名
+	char password[20];//密码
+}user;
+user allusers[20];
+int alluserscount = 0;
+
+char currentusername[20] = "";
+
 //字符串相等
 int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
 
+int getuseridexbyuname(char uname[20])
+{
+	int i;
+	for (i = 0; i < alluserscount; i++)
+	{
+		user u = allusers[i];
+		if (streq(u.name, uname))
+			return i;
+	}
+	return -1;
+}
+void registeruser(char name[20], char password[20])
+{
+	user u;
+	strcpy(u.name, name);
+	strcpy(u.password, password);
+	allusers[alluserscount++] = u;
+}
+
+int userlogin()
+{
+	int i, index, retryleft = 2;
+	char name[20] = "";
+	char pwd[20] = "^";
+	char exppwd[20] = "";
+
+
+	printf("\n请输入用户名：");
+	scanf("%s", name);
+	index = getuseridexbyuname(name);
+	if (index < 0)
+	{
+		printf("\n用户名不存在\n");
+		return 0;
+	}
+
+	strcpy(exppwd, allusers[index].password);
+
+	printf("请输入密码: ");
+	fseek(stdin, 0, SEEK_END);
+	scanf("%s", pwd);
+
+	if (streq(exppwd, pwd))
+	{
+		printf("%s登录成功！\n", name);
+		strcpy(currentusername, name);
+		return 1;
+	}
+	else
+	{
+		printf("抱歉，密码错误登录失败");
+		return 0;
+	}
+}
+
+int adminlogin()
+{
+	int i;
+	char uname[20] = "";
+	char pwd[20] = "";
+	printf("\n请输入管理员用户名：");
+	scanf("%s", uname);
+	printf("\n请输入管理员密码：");
+	scanf("%s", pwd);
+
+	if (streq(uname, ADMIN)
+		&& streq(pwd, ADMIN))
+	{
+		printf("%s登录成功！\n", uname);
+		strcpy(currentusername, ADMIN);
+		return 1;
+	}
+	printf("用户名或密码错误，登录失败！\n");
+	return 0;
+}
 
 //字符串转整数
 int toint(char *s)
@@ -40,6 +125,7 @@ int toint(char *s)
 	char *end;
 	return (int)strtol(s, &end, 10);
 }
+
 
 
 void displayshift(shift s)
@@ -279,11 +365,14 @@ int main()
 {
 	int choice = -1;
 	addsampleshifts();
-#if 0
+	registeruser("u1", "p1");
+	registeruser("u3", "p3");
+	registeruser("u2", "p2");
+#if 1
 	//promptaddshift();
-	displayallshifts();
-	allshifts[1].leftseats = 44;
-	promptaddshift();
+	//displayallshifts();
+	//allshifts[1].leftseats = 44;
+	//promptaddshift();
 	//prompteditshift();
 	//promptsearchandbuy();
 	//searchandbuy(7, 0);
