@@ -77,7 +77,7 @@ void displayallusers()
 //登录
 void userlogin()
 {
-	int i, retryleft = 2;
+	int i, index, retryleft = 2;
 	char name[20] = "";
 	char pwd[20] = "^";
 	char exppwd[20] = "";
@@ -85,18 +85,21 @@ void userlogin()
 
 	printf("\n请输入用户名\n");
 	scanf("%s", name);
-	if (!isusernameexists(name))
+	index = getuseridexbyuname(name);
+	if (index < 0)
 	{
 		printf("\n用户名不存在\n");
 		return;
 	}
-	for (i = 0; i < alluserscount; i++)
+
+	if (allusers[index].islocked)
 	{
-		if (streq(name, allusers[i].name))
-		{
-			strcpy(exppwd, allusers[i].password);
-		}
+		printf("\n用户%s为锁定状态，请联系管理员解锁\n", name);
+		return;
 	}
+
+	strcpy(exppwd, allusers[index].password);
+
 	printf("请输入密码: ");
 	fseek(stdin, 0, SEEK_END);
 	scanf("%s", pwd);
@@ -113,6 +116,7 @@ void userlogin()
 	}
 	else
 	{
+		allusers[index].islocked = 1;
 		printf("抱歉，用户%s已被锁定", name);
 	}
 }
@@ -244,6 +248,52 @@ void promptregisteruser()
 	registeruser(name, password, gender, birthday, email);
 	printf("新用户注册成功!");
 }
+
+void promptunlockuser()
+{
+	int index;
+	char name[20];//姓名
+	index = getuseridexbyuname(name);
+	if (index < 0)
+	{
+		printf("\n用户名不存在\n");
+		return;
+	}
+
+	if (allusers[index].islocked)
+	{
+		allusers[index].islocked = 0;
+		printf("\n为用户%s解锁成功\n", name);
+	}
+	else
+		printf("\n用户%s当前为活跃状态，不需要解锁\n", name);
+}
+
+void edituser(char name[50])
+{
+	int i;
+	char gender[20];//性别
+	char birthday[20];//出生年月	i = getuseridexbyuname(name);
+	if (i >= 0)
+	{
+		printf("\n请输入新的性别、出生年月\n");
+		scanf("%s%s", allusers[i].gender, allusers[i].birthday);
+		printf("修改完毕。\r\n");
+	}
+	else
+	{
+		printf("没找到对应用户名的用户。\r\n");
+	}
+}
+
+//void promptedituser()
+//{
+//	char name[50];
+//	printf("请输入要修改的用户名:");
+//	scanf("%s", &name);
+//	edituser(name);
+//}
+
 
 //登出
 void logout()
