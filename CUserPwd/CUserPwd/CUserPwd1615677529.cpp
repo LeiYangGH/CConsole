@@ -72,7 +72,30 @@ void displayallusers()
 	}
 	printf("--------------------------------------------\r\n");
 }
+//是否已经存在相同用户名
+int isusernameexists(char uname[20])
+{
+	int i;
+	for (i = 0; i < alluserscount; i++)
+	{
+		if (streq(uname, allusers[i].name))
+			return 1;
+	}
+	return 0;
+}
 
+//根据用户名得出数组下标
+int getuseridexbyuname(char uname[20])
+{
+	int i;
+	for (i = 0; i < alluserscount; i++)
+	{
+		user u = allusers[i];
+		if (streq(u.name, uname))
+			return i;
+	}
+	return -1;
+}
 
 //登录
 void userlogin()
@@ -141,30 +164,7 @@ void adminlogin()
 	printf("用户名或密码错误，登录失败！\n");
 }
 
-//是否已经存在相同用户名
-int isusernameexists(char uname[20])
-{
-	int i;
-	for (i = 0; i < alluserscount; i++)
-	{
-		if (streq(uname, allusers[i].name))
-			return 1;
-	}
-	return 0;
-}
 
-//根据用户名得出数组下标
-int getuseridexbyuname(char uname[20])
-{
-	int i;
-	for (i = 0; i < alluserscount; i++)
-	{
-		user u = allusers[i];
-		if (streq(u.name, uname))
-			return i;
-	}
-	return -1;
-}
 
 //int ispassowrdcomplicated(char password[20])
 //{
@@ -271,13 +271,14 @@ void promptunlockuser()
 
 void edituser(char name[50])
 {
-	int i;
+	int index;
 	char gender[20];//性别
 	char birthday[20];//出生年月	i = getuseridexbyuname(name);
-	if (i >= 0)
+	index = getuseridexbyuname(name);
+	if (index >= 0)
 	{
 		printf("\n请输入新的性别、出生年月\n");
-		scanf("%s%s", allusers[i].gender, allusers[i].birthday);
+		scanf("%s%s", allusers[index].gender, allusers[index].birthday);
 		printf("修改完毕。\r\n");
 	}
 	else
@@ -304,81 +305,7 @@ void logout()
 
 
 #pragma endregion
-
-#pragma region ware
-
-
-
-
-
-//
-////修改商品只允许修改价格和库存
-//void editware(char wid[50])
-//{
-//	int i;
-//	char pwd[20] = "";
-//	i = getwareidexbywid(wid);
-//	if (i >= 0)
-//	{
-//		printf("\n请输入新的价格（整数或浮点数）和库存（整数），空格隔开\n");
-//		scanf("%f%d", &allwares[i].price, &allwares[i].quantity);
-//		writeallwares();
-//		printf("修改完毕。\r\n");
-//	}
-//	else
-//	{
-//		printf("没找到对应识别码的商品。\r\n");
-//	}
-//}
-//
-//void prompteditware()
-//{
-//	char wid[50];
-//	printf("请输入要修改的识别码:");
-//	scanf("%s", &wid);
-//	editware(wid);
-//}
-
-////添加商品
-//void addware(char wid[20], char wname[], char address[],
-//	float price, int quantity, int leastleft, int leastout)
-//{
-//	ware w;
-//	strcpy(w.wid, wid);
-//	strcpy(w.name, wname);
-//	strcpy(w.address, address);
-//	w.price = price;
-//	w.quantity = quantity;
-//	w.leastleft = leastleft;
-//	w.leastout = leastout;
-//	allwares[allwarescount++] = w;
-//	writeallwares();
-//}
-
-
-//通过名称查找商品
-//void searchwarebyname(char *name)
-//{
-//	int i;
-//	for (i = 0; i < allwarescount; i++)
-//		if (strcmp(name, allwares[i].name) == 0)
-//		{
-//			displayware(allwares[i]);
-//			return;
-//		}
-//	printf("没找到对应商品的信息。\r\n");
-//}
-////用户输入名称并查找商品信息
-//void promptsearchbyname()
-//{
-//	char name[20];
-//	printf("请输入要查找的商品名称:");
-//	scanf("%s", name);
-//	searchwarebyname(name);
-//}
-
-
-#pragma endregion
+ 
 
 
 
@@ -392,8 +319,9 @@ int main()
 	registeruser("u1", "p1", "g1", "b1", "e1");
 	registeruser("u3", "p3", "g3", "b3", "e3");
 	registeruser("u2", "p2", "g2", "b2", "e2");
-	promptregisteruser();
 	//promptregisteruser();
+	//promptregisteruser();
+	edituser("u1");
 	displayallusers();
 	strcpy(currentusername, "u1");
 #endif
