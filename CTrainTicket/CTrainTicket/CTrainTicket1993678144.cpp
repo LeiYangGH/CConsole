@@ -37,6 +37,15 @@ int alluserscount = 0;
 
 char currentusername[20] = "";
 
+
+typedef struct buy//用户
+{
+	char id[20];
+	char name[20];
+}buy;
+buy allbuys[20];
+int allbuyscount = 0;
+
 //字符串相等
 int streq(char *s1, char *s2)
 {
@@ -156,6 +165,34 @@ void displayallshifts()
 	}
 	printf("--------------------------------------------\r\n");
 }
+int getshiftidexbyno(char id[50])
+{
+	int i;
+	for (i = 0; i < allshiftscount; i++)
+	{
+		if (streq(allshifts[i].id, id))
+			return i;
+	}
+	return -1;//没找到
+}
+
+void displaymyshifts(char name[20])
+{
+	int i, j;
+	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
+	printf("旅客%s购买的所有班次信息如下\n", name);
+	printf("班次\t时间\t起点\t终点\t座位\t余票\n"),
+		printf("--------------------------------------------\r\n");
+	for (i = 0; i < allbuyscount; i++)
+	{
+		if (streq(allbuys[i].name, name))
+		{
+			j = getshiftidexbyno(allbuys[i].id);
+			displayshift(allshifts[j]);
+		}
+	}
+	printf("--------------------------------------------\r\n");
+}
 
 int getshiftidexbytime(int hour, int minute)
 {
@@ -182,16 +219,7 @@ void checktimevalid(int hour, int minute, int *exphour, int *expminute)
 }
 
 
-int getshiftidexbyno(char id[50])
-{
-	int i;
-	for (i = 0; i < allshiftscount; i++)
-	{
-		if (streq(allshifts[i].id, id))
-			return i;
-	}
-	return -1;//没找到
-}
+
 
 void editshift(char id[50])
 {
@@ -315,11 +343,24 @@ void promptremoveshift()
 	removeshift(id);
 }
 
-void searchandbuy(int hour, int minute)
+
+void addbuy(char id[20], char name[20])
+{
+	int i;
+	buy b;
+	strcpy(b.id, id);
+	strcpy(b.name, name);
+	i = getshiftidexbyno(id);
+	allshifts[i].leftseats--;
+	allbuys[allbuyscount++] = b;
+}
+
+
+void searchandbuy(char id[20])
 {
 	int i;
 	char c;
-	i = getshiftidexbytime(hour, minute);
+	i = getshiftidexbyno(id);
 	if (i >= 0)
 	{
 		printf("查到此班次信息如下：\r\n");
@@ -331,7 +372,7 @@ void searchandbuy(int hour, int minute)
 			c = getchar();
 			if (c == 'y' || c == 'Y')
 			{
-				allshifts[i].leftseats--;
+				addbuy(id, currentusername);
 				printf("成功购买车票！\n");
 			}
 		}
@@ -347,11 +388,10 @@ void searchandbuy(int hour, int minute)
 
 void promptsearchandbuy()
 {
-	int hour;
-	int minute;
-	printf("请输入要查询的发车时间（24小时制时 分，空格隔开）：");
-	scanf("%d%d", &hour, &minute);
-	searchandbuy(hour, minute);
+	char id[20];
+	printf("请输入要购买的车次：");
+	scanf("%s", id);
+	searchandbuy(id);
 }
 
 void addsampleshifts()
@@ -369,8 +409,18 @@ int main()
 	registeruser("u3", "p3");
 	registeruser("u2", "p2");
 #if 1
+	displayallshifts();
+
+	strcpy(currentusername, "u1");
+	searchandbuy("d001");
+	searchandbuy("k002");
+	displaymyshifts(currentusername);
+
+	strcpy(currentusername, "u2");
+	searchandbuy("d001");
+	displaymyshifts(currentusername);
+
 	//promptaddshift();
-	//displayallshifts();
 	//allshifts[1].leftseats = 44;
 	//promptaddshift();
 	//prompteditshift();
