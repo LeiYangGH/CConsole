@@ -1,7 +1,16 @@
+//管理员登录
+//录入火车信息（起点终点，起发时间，到达时间，车次，席别，余票）
+//增删信息 修改信息
+//用户登录（ 判断密码和ID是否正确）
+//通过 车次 查询车辆
+//输入要购买的票的车次
+//查看已购买的票
+//若付款成功，且系统时间距出发时间大于两小时
+//退票：相关车票余额－１，扣除手续费退还至账户
+//改签：重复买票阶段，相关车票余额 - 1，扣除手续费
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define SEAT_COUNT 45
 
 typedef struct shift
 {
@@ -10,6 +19,8 @@ typedef struct shift
 	int minute;
 	char start[20];
 	char end[20];
+	char seattype[20];
+	int totalseats;
 	int leftseats;
 }shift;
 
@@ -34,7 +45,7 @@ int toint(char *s)
 void displayshift(shift s)
 {
 	printf("%s\t%02d:%02d\t%s\t%s\t%d\t%d\n",
-		s.id, s.hour, s.minute, s.start, s.end, 45, s.leftseats);
+		s.id, s.hour, s.minute, s.start, s.end, s.totalseats, s.leftseats);
 }
 
 int cmpfunc(const void * a, const void * b)
@@ -106,7 +117,7 @@ void editshift(char id[50])
 	i = getshiftidexbyno(id);
 	if (i >= 0)
 	{
-		if (allshifts[i].leftseats < SEAT_COUNT)
+		if (allshifts[i].leftseats < allshifts[i].totalseats)
 		{
 			printf("本次列车已经有票售出，无法修改时间！\n");
 			return;
@@ -137,15 +148,17 @@ void prompteditshift()
 	editshift(id);
 }
 
-void addshift(char id[], int hour, int minute)
+void addshift(char id[], int hour, int minute, char start[20], char end[20], char seattype[20], int totalseats)
 {
 	shift s;
 	strcpy(s.id, id);
 	s.hour = hour;
 	s.minute = minute;
-	strcpy(s.start, "保定");
-	strcpy(s.end, "北京");
-	s.leftseats = SEAT_COUNT;
+	strcpy(s.start, start);
+	strcpy(s.end, end);
+	strcpy(s.seattype, seattype);
+	s.totalseats = totalseats;
+	s.leftseats = totalseats;
 	allshifts[allshiftscount++] = s;
 }
 
@@ -155,7 +168,11 @@ void promptaddshift()
 	int hour;
 	int minute;
 	int exphour;
+	char start[20];
+	char end[20];
+	char seattype[20];
 	int expminute;
+	int totalseats;
 	printf("\n请输入班次（不重复）:\n");
 	scanf("%s", id);
 	if (getshiftidexbyno(id) >= 0)
@@ -171,7 +188,11 @@ void promptaddshift()
 		printf("时间与已有班次重复！\n");
 		return;
 	}
-	addshift(id, exphour, expminute);
+	printf("\n请输入始发站和终点站(空格隔开）：");
+	scanf("%s%s", start, end);
+	printf("\n请输入席别和座位数(空格隔开）：");
+	scanf("%s%d", seattype, &totalseats);
+	addshift(id, exphour, expminute, start, end, seattype, totalseats);
 	printf("完成第%d班次录入!\r\n", allshiftscount);
 }
 
@@ -183,7 +204,7 @@ void removeshift(char no[20])
 	index = getshiftidexbyno(no);
 	if (index >= 0)
 	{
-		if (allshifts[index].leftseats < SEAT_COUNT)
+		if (allshifts[index].leftseats < allshifts[index].totalseats)
 		{
 			printf("本次列车已经有票售出，无法删除！\n");
 			return;
@@ -247,22 +268,17 @@ void promptsearchandbuy()
 	searchandbuy(hour, minute);
 }
 
-void add8shifts()
+void addsampleshifts()
 {
-	addshift("k001", 6, 0);
-	addshift("k002", 7, 0);
-	addshift("k003", 9, 0);
-	addshift("k004", 10, 30);
-	addshift("k005", 14, 0);
-	addshift("k006", 15, 30);
-	addshift("k007", 16, 30);
-	addshift("k008", 17, 30);
+	addshift("d001", 6, 0, "北京", "上海", "硬座", 3);
+	addshift("k002", 11, 20, "成都", "重庆", "硬卧", 6);
+	addshift("k003", 15, 0, "长沙", "广州", "软卧", 9);
 }
 
 int main()
 {
 	int choice = -1;
-	add8shifts();
+	addsampleshifts();
 #if 0
 	//promptaddshift();
 	displayallshifts();
