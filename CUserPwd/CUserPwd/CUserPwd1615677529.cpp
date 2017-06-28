@@ -1,13 +1,30 @@
+//1、 设计并实现一个用户管理，实现用户的管理。要求实现两种角色：普通用户和管理员（用户名admin，密码：admin）。一级菜单：
+//1)       注册
+//2)       登录
+//请选择：
+//选择1.注册后，要求输入用户基本信息：用户名、密码、确认密码、性别、出生年月以及验证信息（邮箱）；要求①验证信息必须是邮箱，且不能重复注册，若输入的邮箱不正确，请重新输入。提示：邮箱必须有@和.，@在.前面，且@不能开头，.不能结尾。②密码以及确认密码应该保持一致，若不一样，请重新输入。
+//选择2.登录后，实现二级菜单：
+//1)       普通用户登录
+//2)       管理员登录
+//请选择：
+//选择1.普通用户登录后，输入用户名以及密码，密码有三次输入机会，若三次都输入错误，用户被锁定不可以再进行登录；若登录成功，用户可以修改自己的基本信息（邮箱不能修改）。
+//选择2.管理员登录后，输入用户名（admin）密码（admin）后，实现三级菜单：
+//1)       显示所有用户（按照用户名排序）
+//2)       显示锁定用户（按照用户名排序）
+//选择2.显示锁定用户后，实现如下功能：按照用户名进行查询后，若存在该用户，将该用户的锁定状态解除。
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#define ADMIN "admin"
 #pragma region typedef
 typedef struct user//用户
 {
 	char name[20];//姓名
 	char password[20];//密码
-	int isadmin;//是否管理员
-	float money;//余额
+	char gender[20];//性别
+	char birthday[20];//出生年月
+	char email[20];//验证邮箱
+	int islocked;
 }user;
 user allusers[20];
 int alluserscount = 0;
@@ -32,6 +49,31 @@ float tofloat(char *s)
 	return (float)strtol(s, &end, 10);
 }
 #pragma region users
+void displayuser(user u)
+{
+	printf("%s\t%s\t%s\t%s\n",
+		  u.name, u.gender, u.birthday, u.email);
+}
+
+//int cmpfunc(const void * a, const void * b)
+//{
+//	return ((user*)a)->author - ((user*)b)->author;
+//}
+
+void displayallusers()
+{
+	int i;
+	//qsort(allusers, alluserscount, sizeof(user), cmpfunc);
+	printf("所有%d位用户信息如下\r\n", alluserscount);
+	printf("--------------------------------------------\r\n");
+	for (i = 0; i < alluserscount; i++)
+	{
+		displayuser(allusers[i]);
+	}
+	printf("--------------------------------------------\r\n");
+}
+
+
 //登录
 void login()
 {
@@ -80,77 +122,87 @@ int getuseridexbyuname(char uname[20])
 	return -1;
 }
 
-//密码复杂度，暂时规定长度>=6
-int ispassowrdcomplicated(char password[20])
+//int ispassowrdcomplicated(char password[20])
+//{
+//	return strlen(password) >= 6;
+//}
+
+int isemailvalid(char email[20])
 {
-	return strlen(password) >= 6;
+	int i, len = strlen(email), iat = -1, idot = -1;
+	for (i = 0; i < len; i++)
+	{
+		if (email[i] == '@')
+			iat = i;
+		else if (email[i] == '.')
+			idot = i;
+	}
+	return iat != -1 && idot != -1
+		&& iat < idot
+		&& iat != 0 && idot != len - 1;
 }
 
 
 //注册用户，已经通过验证的参数
-void registeruser(char uname[20], char password[20], int isadmin)
+void registeruser(char name[20], char password[20], char gender[20], char birthday[20], char email[20])
 {
 	user u;
-	strcpy(u.name, uname);
+	strcpy(u.name, name);
 	strcpy(u.password, password);
-	u.isadmin = isadmin;
-	u.money = 0;//余额开始都为0
+	strcpy(u.gender, gender);
+	strcpy(u.birthday, birthday);
+	strcpy(u.email, email);
+	u.islocked = 0;
 	allusers[alluserscount++] = u;
 }
 
 //当前用户是否管理员
 int iscurrentuseradmin()
 {
-	int i;
-	for (i = 0; i < alluserscount; i++)
-	{
-		if (allusers[i].isadmin
-			&& streq(currentusername, allusers[i].name))
-			return 1;
-	}
-	return 0;
+	return streq(currentusername, ADMIN);
 }
 
-//当前用户是否消费者
-int iscurrentuserconsumer()
-{
-	int i;
-	for (i = 0; i < alluserscount; i++)
-	{
-		if (!allusers[i].isadmin
-			&& streq(currentusername, allusers[i].name))
-			return 1;
-	}
-	return 0;
-}
 
-//prompt交互式提示用户输入
-void promptregisteruser(int willbeadmin)
+void promptregisteruser()
 {
-	char uname[20];
-	char password[20];
-	char *role = willbeadmin ? "管理员" : "消费者";
-	if (willbeadmin && !iscurrentuseradmin())
+	char name[20];//姓名
+	char password[20] = "1";//密码
+	char password1[20] = "2";//密码
+	char gender[20];//性别
+	char birthday[20];//出生年月
+	char email[20];//验证邮箱
+
+	printf("\n请输入要注册的的用户名:");
+	scanf("%s", name);
+	if (isusernameexists(name))
 	{
-		printf("当前用户%s不是管理员，不能注册管理员!", currentusername);
+		printf("%s已经存在，不能重复注册!", name);
 		return;
 	}
-	printf("请输入要注册的%s的用户名:", role);
-	scanf("%s", uname);
-	if (isusernameexists(uname))
+	while (!streq(password, password1))
 	{
-		printf("%s已经存在，不能重复注册!", uname);
-		return;
+		printf("请输入要注册的密码:");
+		scanf("%s", password);
+		printf("请再次输入要注册的密码:");
+		scanf("%s", password1);
+		if (!streq(password, password1))
+		{
+			printf("两次输入的密码不一致！");
+		}
 	}
-	printf("请输入要注册的密码:");
-	scanf("%s", password);
-	if (!ispassowrdcomplicated(password))
+	printf("请输入性别和生日，空格隔开:");
+	scanf("%s%s", gender, birthday);
+	while (!isemailvalid(email))
 	{
-		printf("密码%s太简单，至少6位!", password);
-		return;
+		printf("请输入验证邮箱:");
+		scanf("%s", email);
+		if (!isemailvalid(email))
+		{
+			printf("邮箱必须有@和.，@在.前面，且@不能开头，.不能结尾!");
+		}
 	}
-	registeruser(uname, password, willbeadmin);
-	printf("新%注册成功!", role);
+	registeruser(name, password, gender, birthday, email);
+	printf("新用户注册成功!");
 }
 
 //登出
@@ -159,16 +211,16 @@ void logout()
 	strcpy(currentusername, "");
 	printf("登出成功!");
 }
- 
- 
+
+
 #pragma endregion
 
 #pragma region ware
 
 
- 
- 
- 
+
+
+
 //
 ////修改商品只允许修改价格和库存
 //void editware(char wid[50])
@@ -213,7 +265,7 @@ void logout()
 //	writeallwares();
 //}
 
- 
+
 //通过名称查找商品
 //void searchwarebyname(char *name)
 //{
@@ -237,19 +289,23 @@ void logout()
 
 
 #pragma endregion
- 
- 
- 
- 
+
+
+
+
 int main()
 {
 	char choice = -1;
- 
-#if 0 //测试用
+
+#if 1 //测试用
 	//login();
-	//promptregisteruser(0);
+	registeruser("u1", "p1", "g1", "b1", "e1");
+	registeruser("u3", "p3", "g3", "b3", "e3");
+	registeruser("u2", "p2", "g2", "b2", "e2");
+	promptregisteruser();
+	//promptregisteruser();
+	displayallusers();
 	strcpy(currentusername, "u1");
-	addtocart("u1", "006", 2);
 #endif
 	while (choice != 'g')
 	{
@@ -291,11 +347,9 @@ int main()
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptregisteruser(0);
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptregisteruser(1);
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
@@ -335,41 +389,9 @@ int main()
 				break;
 			}
 			break;
-		case 'b':
-			if (!iscurrentuserconsumer())
-			{
-				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case 'c':
-			if (!iscurrentuserconsumer())
-			{
-				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case 'd':
-			if (!iscurrentuserconsumer())
-			{
-				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case 'e':
-			if (!iscurrentuserconsumer())
-			{
-				printf("当前用户%s不是消费者，没有权限操作!", currentusername);
-				break;
-			}
-			break;
-		case 'f':
-			if (!iscurrentuseradmin())
-			{
-				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
-				break;
-			}
-			break;
+		 
+		 
+	  
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
