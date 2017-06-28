@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 #define ADMIN "admin"
-#pragma region typedef
+
 typedef struct user//用户
 {
 	char name[20];//姓名
@@ -24,13 +24,10 @@ typedef struct user//用户
 	char gender[20];//性别
 	char birthday[20];//出生年月
 	char email[20];//验证邮箱
-	int islocked;
+	int islocked;//是否被锁定
 }user;
 user allusers[20];
 int alluserscount = 0;
-
-
-#pragma endregion
 
 char currentusername[20] = "";
 
@@ -38,17 +35,8 @@ int streq(char *s1, char *s2)
 {
 	return strcmp(s1, s2) == 0;
 }
-int toint(char *s)
-{
-	char *end;
-	return (int)strtol(s, &end, 10);
-}
-float tofloat(char *s)
-{
-	char *end;
-	return (float)strtol(s, &end, 10);
-}
-#pragma region users
+
+
 void displayuser(user u)
 {
 	printf("%s\t%s\t%s\t%s\n",
@@ -87,7 +75,6 @@ void displayalllockedusers()
 	printf("--------------------------------------------\r\n");
 }
 
-//是否已经存在相同用户名
 int isusernameexists(char uname[20])
 {
 	int i;
@@ -99,7 +86,6 @@ int isusernameexists(char uname[20])
 	return 0;
 }
 
-//根据用户名得出数组下标
 int getuseridexbyuname(char uname[20])
 {
 	int i;
@@ -112,7 +98,6 @@ int getuseridexbyuname(char uname[20])
 	return -1;
 }
 
-//登录
 int userlogin()
 {
 	int i, index, retryleft = 2;
@@ -199,7 +184,6 @@ int isemailvalid(char email[20])
 }
 
 
-//注册用户，已经通过验证的参数
 void registeruser(char name[20], char password[20], char gender[20], char birthday[20], char email[20])
 {
 	user u;
@@ -213,10 +197,10 @@ void registeruser(char name[20], char password[20], char gender[20], char birthd
 }
 
 //当前用户是否管理员
-int iscurrentuseradmin()
-{
-	return streq(currentusername, ADMIN);
-}
+//int iscurrentuseradmin()
+//{
+//	return streq(currentusername, ADMIN);
+//}
 
 
 void promptregisteruser()
@@ -287,7 +271,7 @@ void edituser(char name[50])
 {
 	int index;
 	char gender[20];//性别
-	char birthday[20];//出生年月	i = getuseridexbyuname(name);
+	char birthday[20];//出生年月
 	index = getuseridexbyuname(name);
 	if (index >= 0)
 	{
@@ -303,14 +287,11 @@ void edituser(char name[50])
 
 
 //登出
-void logout()
-{
-	strcpy(currentusername, "");
-	printf("登出成功!");
-}
-
-
-#pragma endregion
+//void logout()
+//{
+//	strcpy(currentusername, "");
+//	printf("登出成功!");
+//}
 
 
 void menu22()
