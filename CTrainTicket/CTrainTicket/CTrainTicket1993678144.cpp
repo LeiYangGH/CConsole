@@ -19,7 +19,7 @@ typedef struct shift
 	int minute;
 	char start[20];
 	char end[20];
-	char seattype[20];
+	int price;
 	int totalseats;
 	int leftseats;
 }shift;
@@ -31,6 +31,7 @@ typedef struct user//用户
 {
 	char name[20];//姓名
 	char password[20];//密码
+	int money;//余额
 }user;
 user allusers[20];
 int alluserscount = 0;
@@ -52,26 +53,51 @@ int streq(char *s1, char *s2)
 	return strcmp(s1, s2) == 0;
 }
 
-int getuseridexbyuname(char uname[20])
+int getuseridexbyname(char name[20])
 {
 	int i;
 	for (i = 0; i < alluserscount; i++)
 	{
 		user u = allusers[i];
-		if (streq(u.name, uname))
+		if (streq(u.name, name))
 			return i;
 	}
 	return -1;
 }
+
+int getbuyidbyshiftuser(char name[], char id[])
+{
+	int i;
+	for (i = allbuyscount - 1; i >= 0; i--)
+		if (streq(allbuys[i].name, name)
+			&& streq(allbuys[i].id, id))
+		{
+			return i;
+		}
+	return -1;
+}
+
+int iscurrentuseradmin()
+{
+	return streq(currentusername, ADMIN);
+}
+
+int iscurrentuserpassenger()
+{
+	int i = getuseridexbyname(currentusername);
+	return i >= 0;
+}
+
 void registeruser(char name[20], char password[20])
 {
 	user u;
 	strcpy(u.name, name);
 	strcpy(u.password, password);
+	u.money = 1000;
 	allusers[alluserscount++] = u;
 }
 
-int userlogin()
+int userbuyin()
 {
 	int i, index, retryleft = 2;
 	char name[20] = "";
@@ -81,7 +107,7 @@ int userlogin()
 
 	printf("\n请输入用户名：");
 	scanf("%s", name);
-	index = getuseridexbyuname(name);
+	index = getuseridexbyname(name);
 	if (index < 0)
 	{
 		printf("\n用户名不存在\n");
@@ -107,20 +133,20 @@ int userlogin()
 	}
 }
 
-int adminlogin()
+int adminbuyin()
 {
 	int i;
-	char uname[20] = "";
+	char name[20] = "";
 	char pwd[20] = "";
 	printf("\n请输入管理员用户名：");
-	scanf("%s", uname);
+	scanf("%s", name);
 	printf("\n请输入管理员密码：");
 	scanf("%s", pwd);
 
-	if (streq(uname, ADMIN)
+	if (streq(name, ADMIN)
 		&& streq(pwd, ADMIN))
 	{
-		printf("%s登录成功！\n", uname);
+		printf("%s登录成功！\n", name);
 		strcpy(currentusername, ADMIN);
 		return 1;
 	}
@@ -139,8 +165,8 @@ int toint(char *s)
 
 void displayshift(shift s)
 {
-	printf("%s\t%02d:%02d\t%s\t%s\t%d\t%d\n",
-		s.id, s.hour, s.minute, s.start, s.end, s.totalseats, s.leftseats);
+	printf("%s\t%02d:%02d\t%s\t%s\t%d\t%d\t%d\n",
+		s.id, s.hour, s.minute, s.start, s.end, s.price, s.totalseats, s.leftseats);
 }
 
 int cmpfunc(const void * a, const void * b)
@@ -157,7 +183,7 @@ void displayallshifts()
 	int i;
 	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
 	printf("所有%d位班次信息如下\r\n", allshiftscount);
-	printf("班次\t时间\t起点\t终点\t座位\t余票\n"),
+	printf("班次\t时间\t起点\t终点\t价格\t总票数\t余票\n"),
 		printf("--------------------------------------------\r\n");
 	for (i = 0; i < allshiftscount; i++)
 	{
@@ -178,10 +204,10 @@ int getshiftidexbyno(char id[50])
 
 void displaymyshifts(char name[20])
 {
-	int i, j;
+	int i, j, u;
 	qsort(allshifts, allshiftscount, sizeof(shift), cmpfunc);
 	printf("旅客%s购买的所有班次信息如下\n", name);
-	printf("班次\t时间\t起点\t终点\t座位\t余票\n"),
+	printf("班次\t时间\t起点\t终点\t价格\t总票数\t余票\n"),
 		printf("--------------------------------------------\r\n");
 	for (i = 0; i < allbuyscount; i++)
 	{
@@ -192,6 +218,9 @@ void displaymyshifts(char name[20])
 		}
 	}
 	printf("--------------------------------------------\r\n");
+	u = getuseridexbyname(name);
+	printf("旅客%s的余额为%d\n", name, allusers[u].money);
+
 }
 
 int getshiftidexbytime(int hour, int minute)
@@ -228,6 +257,7 @@ void editshift(char id[50])
 	int minute;
 	int exphour;
 	int expminute;
+	int price;
 	i = getshiftidexbyno(id);
 	if (i >= 0)
 	{
@@ -244,8 +274,11 @@ void editshift(char id[50])
 			printf("时间与已有班次重复！\n");
 			return;
 		}
+		printf("\n请输入新价格（正整数）：");
+		scanf("%d", &price);
 		allshifts[i].hour = exphour;
 		allshifts[i].minute = expminute;
+		allshifts[i].price = price;
 		printf("修改完毕。\r\n");
 	}
 	else
@@ -257,12 +290,13 @@ void editshift(char id[50])
 void prompteditshift()
 {
 	char id[50];
+	int price;
 	printf("请输入要修改时间的班次:");
 	scanf("%s", &id);
 	editshift(id);
 }
 
-void addshift(char id[], int hour, int minute, char start[20], char end[20], char seattype[20], int totalseats)
+void addshift(char id[], int hour, int minute, char start[20], char end[20], int price, int totalseats)
 {
 	shift s;
 	strcpy(s.id, id);
@@ -270,7 +304,7 @@ void addshift(char id[], int hour, int minute, char start[20], char end[20], cha
 	s.minute = minute;
 	strcpy(s.start, start);
 	strcpy(s.end, end);
-	strcpy(s.seattype, seattype);
+	s.price = price;
 	s.totalseats = totalseats;
 	s.leftseats = totalseats;
 	allshifts[allshiftscount++] = s;
@@ -284,7 +318,7 @@ void promptaddshift()
 	int exphour;
 	char start[20];
 	char end[20];
-	char seattype[20];
+	int price;
 	int expminute;
 	int totalseats;
 	printf("\n请输入班次（不重复）:\n");
@@ -304,9 +338,9 @@ void promptaddshift()
 	}
 	printf("\n请输入始发站和终点站(空格隔开）：");
 	scanf("%s%s", start, end);
-	printf("\n请输入席别和座位数(空格隔开）：");
-	scanf("%s%d", seattype, &totalseats);
-	addshift(id, exphour, expminute, start, end, seattype, totalseats);
+	printf("\n请输入价格和座位数(正整数，空格隔开）：");
+	scanf("%d%d", &price, &totalseats);
+	addshift(id, exphour, expminute, start, end, price, totalseats);
 	printf("完成第%d班次录入!\r\n", allshiftscount);
 }
 
@@ -358,7 +392,7 @@ void addbuy(char id[20], char name[20])
 
 void searchandbuy(char id[20])
 {
-	int i;
+	int i, uindex;
 	char c;
 	i = getshiftidexbyno(id);
 	if (i >= 0)
@@ -372,8 +406,15 @@ void searchandbuy(char id[20])
 			c = getchar();
 			if (c == 'y' || c == 'Y')
 			{
+				uindex = getuseridexbyname(currentusername);
+				if (allusers[uindex].money < allshifts[i].price)
+				{
+					printf("旅客%s，抱歉，您的余额不足(%d元)，购票失败！\n", currentusername, allusers[uindex].money);
+					return;
+				}
 				addbuy(id, currentusername);
-				printf("成功购买车票！\n");
+				allusers[uindex].money -= allshifts[i].price;
+				printf("旅客%s，购买车次%s成功，余额%d！\n", currentusername, id, allusers[uindex].money);
 			}
 		}
 		else
@@ -394,21 +435,157 @@ void promptsearchandbuy()
 	searchandbuy(id);
 }
 
-void addsampleshifts()
+
+
+int returnticket(char name[], char id[])
 {
-	addshift("d001", 6, 0, "北京", "上海", "硬座", 3);
-	addshift("k002", 11, 20, "成都", "重庆", "硬卧", 6);
-	addshift("k003", 15, 0, "长沙", "广州", "软卧", 9);
+	int i, sindex, uindex;
+	int bindex = getbuyidbyshiftuser(name, id);
+	buy b = allbuys[bindex];
+	if (bindex < 0)
+	{
+		printf("旅客%s，抱歉，没有查到您购买车次%s的记录，退票失败！\n", name, id);
+		return 0;
+	}
+
+
+	for (i = bindex; i < allbuyscount - 1; i++)
+		allbuys[i] = allbuys[i + 1];
+	allbuyscount--;
+
+	sindex = getshiftidexbyno(id);
+	allshifts[sindex].leftseats++;
+
+	uindex = getuseridexbyname(name);
+	allusers[uindex].money += allshifts[sindex].price*0.15;
+	printf("旅客%s，退票车次%s成功，余额%d！\n", name, id, allusers[uindex].money);
+
+	return 1;
+}
+
+void promptreturnticket()
+{
+	char id[20];
+	int sindex, quantity;
+	printf("尊敬的旅客%s，请输入退票的车次:", currentusername);
+	scanf("%s", id);
+	sindex = getshiftidexbyno(id);
+	if (sindex < 0)
+	{
+		printf("尊敬的旅客%s，您输入的车次找不到，请检查后重新输入，谢谢。", currentusername);
+		return;
+	}
+	returnticket(currentusername, id);
+}
+
+
+//id0 id1 valid
+int changeticket(char name[], char id0[], char id1[])
+{
+	int i, sindex0, sindex1, uindex, reducemoney;
+	int bindex0 = getbuyidbyshiftuser(name, id0);
+	int bindex1 = getbuyidbyshiftuser(name, id1);
+	if (bindex0 < 0)
+	{
+		printf("旅客%s，抱歉，没有查到您购买车次%s的记录，改签失败！\n", name, id0);
+		return 0;
+	}
+
+	if (bindex1 >= 0)
+	{
+		printf("旅客%s，抱歉，改签的车次%s不能和已经购买的车次一样一样，改签失败！\n", name, id0);
+		return 0;
+	}
+
+
+	uindex = getuseridexbyname(name);
+	sindex0 = getshiftidexbyno(id0);
+	sindex1 = getshiftidexbyno(id1);
+	reducemoney = (allshifts[sindex1].price - allshifts[sindex0].price) + allshifts[sindex0].price*0.15;
+	if (allusers[uindex].money < reducemoney)
+	{
+		printf("旅客%s，抱歉，您的余额不足（%d），改签失败！\n", name, allusers[uindex].money);
+		return 0;
+	}
+
+
+	allshifts[sindex0].leftseats++;
+
+	allshifts[sindex1].leftseats--;
+
+	strcpy(allbuys[bindex0].id, id1);
+
+	allusers[uindex].money -= reducemoney;
+	printf("旅客%s，改签车次%s为%s成功，余额%d！\n", name, id0, id1, allusers[uindex].money);
+
+	return 1;
+}
+
+void promptchangeticket()
+{
+	char id0[20], id1[20];
+	int sindex0, sindex1, quantity;
+	printf("尊敬的旅客%s，请输入您已购买并需要改签的车次:", currentusername);
+	scanf("%s", id0);
+	sindex0 = getshiftidexbyno(id0);
+	if (sindex0 < 0)
+	{
+		printf("尊敬的旅客%s，您输入的车次找不到，请检查后重新输入，谢谢。", currentusername);
+		return;
+	}
+	printf("尊敬的旅客%s，请输入改签为哪个车次:", currentusername);
+	scanf("%s", id1);
+	sindex1 = getshiftidexbyno(id1);
+	if (sindex1 < 0)
+	{
+		printf("尊敬的旅客%s，您输入的车次找不到，请检查后重新输入，谢谢。", currentusername);
+		return;
+	}
+	changeticket(currentusername, id0, id1);
+}
+
+int login()
+{
+	int i;
+	char name[20] = "";
+	char pwd[20] = "";
+	printf("\n请输入用户名：");
+	scanf("%s", name);
+	printf("\n请输入密码：");
+	scanf("%s", pwd);
+
+	if (streq(name, ADMIN)
+		&& streq(pwd, ADMIN))
+	{
+		printf("%s管理员登录成功！\n", name);
+		strcpy(currentusername, ADMIN);
+		return 1;
+	}
+
+	i = getuseridexbyname(name);
+	if (streq(allusers[i].password, pwd))
+	{
+		printf("%s旅客登录成功！\n", name);
+		strcpy(currentusername, name);
+		return 1;
+	}
+
+	printf("用户名或密码错误，登录失败！\n");
+	return 0;
 }
 
 int main()
 {
 	int choice = -1;
-	addsampleshifts();
+	//示例列车数据，可删除
+	addshift("d001", 6, 0, "北京", "上海", 200, 3);
+	addshift("k002", 11, 20, "成都", "重庆", 150, 6);
+	addshift("k003", 15, 0, "长沙", "广州", 500, 9);
+	//示例用户，由于需求没有写用户管理，因此写死3个用户
 	registeruser("u1", "p1");
 	registeruser("u3", "p3");
 	registeruser("u2", "p2");
-#if 1
+#if 0
 	displayallshifts();
 
 	strcpy(currentusername, "u1");
@@ -420,6 +597,8 @@ int main()
 	searchandbuy("d001");
 	displaymyshifts(currentusername);
 
+	//changeticket(currentusername, "d001", "k002");
+	returnticket(currentusername, "d001");
 	//promptaddshift();
 	//allshifts[1].leftseats = 44;
 	//promptaddshift();
@@ -434,11 +613,15 @@ int main()
 	{
 		printf("\n\t 火车订票系统");
 		printf("\n\t 0. 退出");
-		printf("\n\t 1. 添加车次");
-		printf("\n\t 2. 修改发车时间");
-		printf("\n\t 3. 删除");
-		printf("\n\t 4. 查询");
-		printf("\n\t 5. 浏览");
+		printf("\n\t 1. 登录");
+		printf("\n\t 2. 添加车次");
+		printf("\n\t 3. 修改发车时间和价格");
+		printf("\n\t 4. 删除车次");
+		printf("\n\t 5. 浏览所有车次");
+		printf("\n\t 6. 查询车次并购票");
+		printf("\n\t 7. 退票");
+		printf("\n\t 8. 改签");
+		printf("\n\t 9. 查询我的余额和已购买的车票");
 		printf("\n\n  请选择: ");
 		fseek(stdin, 0, SEEK_END);
 		choice = getchar();
@@ -452,24 +635,76 @@ int main()
 			break;
 		case '1':
 			printf("\n\n你选择了 1\n");
-			promptaddshift();
+			login();
 			break;
 		case '2':
 			printf("\n\n你选择了 2\n");
-			prompteditshift();
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
+			promptaddshift();
 			break;
 		case '3':
 			printf("\n\n你选择了 3\n");
-			promptremoveshift();
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
+			prompteditshift();
 			break;
 		case '4':
 			printf("\n\n你选择了 4\n");
-			promptsearchandbuy();
+			if (!iscurrentuseradmin())
+			{
+				printf("当前用户%s不是管理员，没有权限操作!", currentusername);
+				break;
+			}
+			promptremoveshift();
 			break;
 		case '5':
 			printf("\n\n你选择了 5\n");
 			displayallshifts();
 			break;
+		case '6':
+			printf("\n\n你选择了 6\n");
+			if (!iscurrentuserpassenger())
+			{
+				printf("当前用户%s不是旅客，没有权限操作!", currentusername);
+				break;
+			}
+			promptsearchandbuy();
+			break;
+		case '7':
+			printf("\n\n你选择了 7\n");
+			if (!iscurrentuserpassenger())
+			{
+				printf("当前用户%s不是旅客，没有权限操作!", currentusername);
+				break;
+			}
+			promptreturnticket();
+			break;
+		case '8':
+			printf("\n\n你选择了 8\n");
+			if (!iscurrentuserpassenger())
+			{
+				printf("当前用户%s不是旅客，没有权限操作!", currentusername);
+				break;
+			}
+			promptchangeticket();
+			break;
+		case '9':
+			printf("\n\n你选择了 9\n");
+			if (!iscurrentuserpassenger())
+			{
+				printf("当前用户%s不是旅客，没有权限操作!", currentusername);
+				break;
+			}
+			displaymyshifts(currentusername);
+			break;
+
 		default:
 			printf("\n\n输入有误，请重选\n");
 			break;
