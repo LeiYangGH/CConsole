@@ -1,9 +1,7 @@
-#include "math.h"
 #include "string.h"
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
-#include <algorithm>
 
 unsigned char *bitmapImage;
 int w=1024;
