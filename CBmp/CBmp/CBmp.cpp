@@ -151,6 +151,6 @@ int main()
 
 	char fname[] = "test.bmp\0";
 	SaveImage(fname, bitmapImage, w, h);
-	system("pause");
+	//system("pause");
 	return 0;
 }
