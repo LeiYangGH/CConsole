@@ -88,60 +88,45 @@ void setPixel(int x, int y, RGB rgb)
 	bitmapImage[ptr+1] = rgb.g;
 	bitmapImage[ptr+2] = rgb.r;
 }
-
-void Line(  float x1,  float y1,  float x2,  float y2,  RGB color )
+int gcnt = 15;
+int gw = w/gcnt;
+void Line( )
 {
-    // Bresenham's line algorithm
-/*
-    const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
-    if(steep)
-    {
-        std::swap(x1, y1);
-        std::swap(x2, y2);
-    }
-    
-    if(x1 > x2)
-    {
-        std::swap(x1, x2);
-        std::swap(y1, y2);
-    }
-    
-    const float dx = x2 - x1;
-    const float dy = fabs(y2 - y1);
-    
-    float error = dx / 2.0f;
-    const int ystep = (y1 < y2) ? 1 : -1;
-    int y = (int)y1;
-    
-    const int maxX = (int)x2;
-    
-    for(int x=(int)x1; x<maxX; x++)
-    {
-        if(steep)
-        {
-            setPixel(y,x, color);
-        }
-        else
-        {
-            setPixel(x,y, color);
-        }
-        
-        error -= dy;
-        if(error < 0)
-        {
-            y += ystep;
-            error += dx;
-        }
-    }
-*/
 int i,j;
 for(i=0;i<w;i++)
-for(j=0;j<h;j++)
+for(j=0;j<h/4;j++)
 {
 RGB rgb;
-rgb.r=200;
-rgb.g=200;
-rgb.b=200;
+rgb.r=255;
+rgb.g=(int)(255.0f/(i/gw+1));
+rgb.b=(int)(255.0f/(i/gw+1));
+setPixel(i,j,rgb);
+}
+for(i=0;i<w;i++)
+for(j=h/4;j<h/4*2.0f;j++)
+{
+RGB rgb;
+rgb.r=255/(i/gw+1);
+rgb.g=255;
+rgb.b=255/(i/gw+1);
+setPixel(i,j,rgb);
+}
+for(i=0;i<w;i++)
+for(j=h/4*2.0f;j<h/4*3.0f;j++)
+{
+RGB rgb;
+rgb.r=255/(i/gw+1);
+rgb.g=255/(i/gw+1);
+rgb.b=255;
+setPixel(i,j,rgb);
+}
+for(i=0;i<w;i++)
+for(j=h/4*3.0f;j<h;j++)
+{
+RGB rgb;
+rgb.r=255/(i/gw+1);
+rgb.g=255/(i/gw+1);
+rgb.b=255/(i/gw+1);
 setPixel(i,j,rgb);
 }
 }
@@ -154,7 +139,7 @@ int main()
     RGB color;
     color.r=255;
     
-    Line(0,0,w,h,color);
+    Line();
     color.g=255;
 
     char fname[] = "test.bmp\0";
