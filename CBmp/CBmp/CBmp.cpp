@@ -1,4 +1,5 @@
-#include "string.h"
+#include "memory.h"
+#include "math.h"
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
@@ -84,47 +85,57 @@ void setPixel(int x, int y, RGB rgb)
 	bitmapImage[ptr + 1] = rgb.g;
 	bitmapImage[ptr + 2] = rgb.r;
 }
+
 int gcnt = 15;
 int gw = w / gcnt;
+int full = 255;
+//调整下面的参数可以调颜色
+int depth[15] = { 254,189,151,124,103,86,71,59,48,38,29,21,13,6,0 };
 void Line()
 {
-	int i, j;
+	int i, j, c;
+	RGB rgb;
 	for (i = 0; i < w; i++)
+	{
+		rgb.r = full;
+		c = depth[i / gw];
+		rgb.g = c;
+		rgb.b = c;
+		//printf("%d\n", c);
 		for (j = 0; j < h / 4; j++)
-		{
-			RGB rgb;
-			rgb.r = 255;
-			rgb.g = (int)(255.0f / (i / gw + 1));
-			rgb.b = (int)(255.0f / (i / gw + 1));
 			setPixel(i, j, rgb);
-		}
+	}
+
 	for (i = 0; i < w; i++)
+	{
+		rgb.g = full;
+		c = depth[i / gw];
+		rgb.r = c;
+		rgb.b = c;
 		for (j = h / 4; j < h / 4 * 2.0f; j++)
-		{
-			RGB rgb;
-			rgb.r = 255 / (i / gw + 1);
-			rgb.g = 255;
-			rgb.b = 255 / (i / gw + 1);
 			setPixel(i, j, rgb);
-		}
+	}
+
 	for (i = 0; i < w; i++)
+	{
+		rgb.b = full;
+		c = depth[i / gw];
+		rgb.r = c;
+		rgb.g = c;
 		for (j = h / 4 * 2.0f; j < h / 4 * 3.0f; j++)
-		{
-			RGB rgb;
-			rgb.r = 255 / (i / gw + 1);
-			rgb.g = 255 / (i / gw + 1);
-			rgb.b = 255;
 			setPixel(i, j, rgb);
-		}
+	}
+
 	for (i = 0; i < w; i++)
+	{
+		c = depth[i / gw];
+		rgb.r = c;
+		rgb.g = c;
+		rgb.b = c;
 		for (j = h / 4 * 3.0f; j < h; j++)
-		{
-			RGB rgb;
-			rgb.r = 255 / (i / gw + 1);
-			rgb.g = 255 / (i / gw + 1);
-			rgb.b = 255 / (i / gw + 1);
 			setPixel(i, j, rgb);
-		}
+	}
+
 }
 
 int main()
@@ -140,5 +151,6 @@ int main()
 
 	char fname[] = "test.bmp\0";
 	SaveImage(fname, bitmapImage, w, h);
+	system("pause");
 	return 0;
 }
