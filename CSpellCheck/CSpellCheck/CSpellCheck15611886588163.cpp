@@ -4,29 +4,28 @@
 #include <stdio.h>
 #include <locale.h>
 
-#define MAX_WORDS 1000
-//char en[MAX_WORDS][20];
-//int encount[MAX_WORDS];
-//int encnt = 0;
+#define MAX_WORD_Length 30 //单词最长长度
+#define MAX_WRONGWORD_COUNT 100 //最多多少个错误单词
+#define MAX_DIC_COUNT 100 //最多多少个字典单词
+#define FILE_DICTIONARY "dictionary.txt" //最多多少个字典单词
+#define FILE_ARTICAL "article.txt" //最多多少个字典单词
+
 
 typedef struct
 {
-	char word[20];
-	long int indexes[20];
+	char word[MAX_WORD_Length];
+	long int indexes[MAX_WORD_Length];
 	int count;
 }wrong;
-wrong allwrongs[100];
+wrong allwrongs[MAX_WRONGWORD_COUNT];
 int allwrongscount = 0;
 
-int maxcount = 0;
-FILE *fp;
+FILE *fpa;
 
-char dic[100][20];// = { "i","am","is","be" };
+char dic[MAX_WRONGWORD_COUNT][MAX_WORD_Length];// = { "i","am","is","be" };
 int diclen = 0;
 
-//int place = 0;
-
-void spell_check(char word[20], long int place)
+void spell_check(char word[MAX_WORD_Length], long int place)
 {
 	int i, found = 0, recorded = 0;
 	for (i = 0; i < strlen(word); i++)
@@ -63,39 +62,34 @@ void spell_check(char word[20], long int place)
 	}
 }
 
-char *getword()
+char *getword(char word1[MAX_WORD_Length], long int *place)
 {
-	char word[100];
+	char w[MAX_WORD_Length];
 	int ch, i = 0;
 
-	while (EOF != (ch = fgetc(fp)) && !isalpha(ch));
+	while (EOF != (ch = fgetc(fpa)) && !isalpha(ch));
 	if (ch == EOF)
 		return NULL;
 	do
 	{
-		word[i++] = tolower(ch);
-	} while (EOF != (ch = fgetc(fp)) && isalpha(ch));
-	word[i] = '\0';
-	long int tell = ftell(fp) - strlen(word);
+		w[i++] = tolower(ch);
+	} while (EOF != (ch = fgetc(fpa)) && isalpha(ch));
+	w[i] = '\0';
+	*place = ftell(fpa) - strlen(w);
 	//printf("%s\t%ld\n", word, tell);
-	spell_check(word, tell);
-	//puts(word);
-	return strdup(word);
+	strcpy(word1, strdup(w));
 }
-
-
 
 void interate_words()
 {
 	int i, exist;
-	char *word;
+	long int place;
+	char word[MAX_WORD_Length];
 
-	while (word = getword())
+	while (getword(word, &place))
 	{
-		//puts(word);
+		spell_check(word, place);
 	}
-
-
 }
 
 void init()
@@ -124,42 +118,37 @@ void showresult()
 
 void readdic()
 {
-	char line[200];
-	FILE *fpd = fopen("dictionary.txt", "r");
+	char d[MAX_DIC_COUNT];
+	FILE *fpd = fopen(FILE_DICTIONARY, "r");
 	if (fpd == NULL)
 	{
-		printf("\n打开文件%s失败!", "dictionary.txt");
+		printf("\n打开文件%s失败!", FILE_DICTIONARY);
 	}
 	else
 	{
 		diclen = 0;
-
-		while (fgets(line, 20, fpd) != NULL)
+		while (fgets(d, MAX_WORD_Length, fpd) != NULL)
 		{
-			line[strcspn(line, "\r\n")] = 0;
-			strcpy(dic[diclen++], line);
+			d[strcspn(d, "\r\n")] = 0;
+			strcpy(dic[diclen++], d);
 		}
-		//printf("\n已读入字典文件!");
 	}
 	fclose(fpd);
 }
 
 int main(int argc, char *argv[])
 {
-	int i, j, exist;
-
 	readdic();
-
-	fp = fopen("article.txt", "r");
-	if (fp == NULL)
+	fpa = fopen(FILE_ARTICAL, "r");
+	if (fpa == NULL)
 	{
-		printf("\n打开文件%s失败!");
+		printf("\n打开文件%s失败!", FILE_ARTICAL);
 		getchar();
 		exit(1);
 	}
 	init();
 	interate_words();
-	fclose(fp);
+	fclose(fpa);
 	showresult();
 	system("pause");
 	return 0;
