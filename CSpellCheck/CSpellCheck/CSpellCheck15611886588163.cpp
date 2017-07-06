@@ -9,6 +9,7 @@
 #define MAX_DIC_COUNT 100 //最多多少个字典单词
 #define FILE_DICTIONARY "dictionary.txt" //最多多少个字典单词
 #define FILE_ARTICAL "article.txt" //最多多少个字典单词
+#define FILE_MISS "misspelling.txt" //最多多少个字典单词
 
 
 typedef struct
@@ -105,15 +106,20 @@ void init()
 void showresult()
 {
 	int i, j;
+	FILE *fpr = fopen(FILE_MISS, "w");
 	for (i = 0; i < allwrongscount; i++)
 	{
 		printf("%s ", allwrongs[i].word);
+		fprintf(fpr,"%s ", allwrongs[i].word);
 		for (j = 0; j < allwrongs[i].count; j++)
 		{
 			printf("%ld ", allwrongs[i].indexes[j]);
+			fprintf(fpr, "%ld ", allwrongs[i].indexes[j]);
 		}
 		printf("\n");
+		fprintf(fpr, "\n");
 	}
+	fclose(fpr);
 }
 
 void readdic()
