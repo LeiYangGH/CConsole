@@ -5,15 +5,25 @@
 #include <locale.h>
 
 #define MAX_WORDS 1000
-char en[MAX_WORDS][20];
-int encount[MAX_WORDS];
-int encnt = 0;
+//char en[MAX_WORDS][20];
+//int encount[MAX_WORDS];
+//int encnt = 0;
 
+typedef struct
+{
+	char word[20];
+	int indexes[20];
+	int count;
+}user;
 
 
 int maxcount = 0;
-
 FILE *fp;
+
+char *dic[] = { "will","at","is","be" };
+int diclen = 4;
+
+//int place = 0;
 
 char *getword()
 {
@@ -27,45 +37,25 @@ char *getword()
 	{
 		word[i++] = tolower(ch);
 	} while (EOF != (ch = fgetc(fp)) && isalpha(ch));
-
 	word[i] = '\0';
+	long int tell = ftell(fp) - strlen(word);
+	printf("%s\t%ld\n", word, tell);
+	//puts(word);
 	return strdup(word);
 }
 
 
-void count_enwords()
+void spell_check()
 {
 	int i, exist;
 	char *word;
 
 	while (word = getword())
 	{
-		exist = 0;
-		for (i = 0; i < encnt; i++)
-		{
-			if (strcmp(en[i], word) == 0)
-			{
-				encount[i]++;
-				exist = 1;
-				break;
-			}
-		}
-		if (!exist)
-		{
-			strcpy(en[encnt], word);
-			encount[encnt] = 1;
-			encnt++;
-		}
+		//puts(word);
 	}
 
 
-	for (i = 0; i < encnt; i++)
-	{
-		if (maxcount < encount[i])
-			maxcount = encount[i];
-		//printf("%s\t%d\n", en[i], encount[i]);
-
-	}
 }
 
 
@@ -83,20 +73,12 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	count_enwords();
+	spell_check();
 	fclose(fp);
 
 
 
-	for (i = maxcount; i > 0; i--)
-	{
-		for (j = 0; j < encnt; j++)
-		{
-			if (encount[j] == i)
-				printf("%s\t\t\t%d\n", en[j], encount[j]);
-		}
 
-	}
 
 	system("pause");
 	return 0;
