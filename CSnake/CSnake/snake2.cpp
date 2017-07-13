@@ -17,8 +17,8 @@ of course, I referred to other programs on the Internet.
 /*
 ***宏定义
 */
-#define  MAP_WIDTH  30  
-#define  MAP_HEIGHT 30  
+#define  MAP_WIDTH  15  
+#define  MAP_HEIGHT 15  
 #define  UP         1  
 #define  DOWN       2  
 #define  LEFT       3  
@@ -36,7 +36,7 @@ typedef struct snake//蛇身的一个节点
 ***全局变量
 */
 unsigned int Score = 0, Score_Add = 10;
-unsigned int Direction, Time_sleep = 300;
+unsigned int Direction, Time_sleep = 1000;
 SNAKE *head, *food;//蛇头指针，食物指针 
 SNAKE *q;//遍历和判断蛇的时候用到的指针 
 unsigned char Game_status = 0;// 游戏结束的情况：：撞到墙；：咬到自己；：主动退出游戏。 
