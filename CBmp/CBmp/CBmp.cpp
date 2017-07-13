@@ -86,7 +86,7 @@ void setPixel(int x, int y, RGB rgb)
 	bitmapImage[ptr + 2] = rgb.r;
 }
 
-int gcnt = 15;
+int / = 15;
 int gw = w / gcnt;
 int full = 255;
 //调整下面的参数可以调颜色
@@ -115,7 +115,6 @@ void Line()
 		for (j = h / 4; j < h / 4 * 2.0f; j++)
 			setPixel(i, j, rgb);
 	}
-
 	for (i = 0; i < w; i++)
 	{
 		rgb.b = full;
