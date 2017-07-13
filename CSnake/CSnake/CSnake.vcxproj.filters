@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="snake2.cpp">
+    <ClCompile Include="snake2compile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
