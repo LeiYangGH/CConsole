@@ -348,7 +348,7 @@ void Snake_Move(void)
 		head_next->x = head->x + 2;
 		head_next->y = head->y;
 	}
-	Wall_Cross(head_next);//是否撞墙 
+	//Wall_Cross(head_next);//是否撞墙 
 	if (Bit_Self(head_next) == 1)//是否咬到自己 
 	{
 		Game_status = 2;
@@ -419,11 +419,11 @@ void Snake_Move2(void)
 		head_next2->y = head2->y;
 	}
 	//Wall_Cross2(head_next2);//是否撞墙 
-	//if (Bit_Self2(head_next2) == 1)//是否咬到自己 
-	//{
-	//	Game_status = 2;
-	//	Game_End();
-	//}
+	if (Bit_Self2(head_next2) == 1)//是否咬到自己 
+	{
+		Game_status = 2;
+		Game_End();
+	}
 	if (head_next2->x == food2->x && head_next2->y == food2->y)//有食物 
 	{
 
@@ -476,14 +476,17 @@ void Game_Control(void)
 	Pos_Set(64, 16);
 	printf("ESC:   退出游戏，SPACE:  暂停游戏");
 	Direction = DOWN;
+	Direction2 = DOWN;
 	while (1)
 	{
 		Pos_Set(64, 10);
 		printf("得分: %d分", Score);
 		Pos_Set(64, 11);
 		printf("每个食物得分: %d", Score_Add);
-
-		if (GetAsyncKeyState(VK_UP) && (Direction != DOWN))
+		if (0)
+		{
+		}
+		else if (GetAsyncKeyState(VK_UP) && (Direction != DOWN))
 		{
 			Direction = UP;
 		}
