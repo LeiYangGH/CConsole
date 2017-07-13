@@ -19,6 +19,8 @@ of course, I referred to other programs on the Internet.
 */
 #define  MAP_WIDTH  25  
 #define  MAP_HEIGHT 15  
+#define H2D 17
+
 #define  UP         1  
 #define  DOWN       2  
 #define  LEFT       3  
@@ -36,9 +38,12 @@ typedef struct snake//蛇身的一个节点
 ***全局变量
 */
 unsigned int Score = 0, Score_Add = 10;
-unsigned int Direction, Time_sleep = 2000;
+unsigned int Direction, Time_sleep = 1000;
+unsigned int Direction2;
 SNAKE *head, *food;//蛇头指针，食物指针 
+SNAKE *head2, *food2;//蛇头指针，食物指针 
 SNAKE *q;//遍历和判断蛇的时候用到的指针 
+SNAKE *q2;//遍历和判断蛇的时候用到的指针 
 unsigned char Game_status = 0;// 游戏结束的情况：：撞到墙；：咬到自己；：主动退出游戏。 
 							  /*
 							  ***函数声明
@@ -49,12 +54,17 @@ void Snake_Init(void);
 void Pause(void);
 void Game_Control(void);
 void Game_Init(void);
-void Game_Init2(void);
 void Game_End(void);
 void Wall_Cross(SNAKE *s);
 void Snake_Move(void);
 unsigned char Bit_Self(SNAKE *s);
-void Debug(void);
+
+void Map_Create2(void);
+void Snake_Init2(void);
+void Game_Init2(void);
+void Wall_Cross2(SNAKE *s);
+void Snake_Move2(void);
+unsigned char Bit_Self2(SNAKE *s);
 /*
 ***主函数
 */
@@ -109,20 +119,19 @@ void Map_Create(void)
 void Map_Create2(void)
 {
 	unsigned int i = 0;
-	int hd = MAP_HEIGHT + 2;
 	for (i = 0; i <= MAP_WIDTH; i++) // 上下边框 
 	{
-		Pos_Set(2 * i, 0 + hd);
+		Pos_Set(2 * i, 0 + H2D);
 		printf("+");
-		Pos_Set(2 * i, MAP_HEIGHT + hd);
+		Pos_Set(2 * i, MAP_HEIGHT + H2D);
 		printf("+");
 	}
 
 	for (i = 0; i <= MAP_HEIGHT; i++)
 	{
-		Pos_Set(0, i + hd);
+		Pos_Set(0, i + H2D);
 		printf("+");
-		Pos_Set(2 * MAP_WIDTH, i + hd);
+		Pos_Set(2 * MAP_WIDTH, i + H2D);
 		printf("+");
 	}
 }
@@ -161,6 +170,35 @@ void Snake_Init(void)
 		q = q->next;
 	}
 }
+
+void Snake_Init2(void)
+{
+	SNAKE *tail2;
+	unsigned int i = 0;
+	head2 = (SNAKE *)malloc(sizeof(SNAKE));
+	head2->x = 12 * 2;
+	head2->y = 12 + H2D;
+	head2->next = NULL;
+	q2 = head2;
+
+	for (i = 1; i <= 1; i++)
+	{
+		tail2 = (SNAKE *)malloc(sizeof(SNAKE));
+		tail2->x = 12 * 2 + 2 * i;
+		tail2->y = 12 + H2D;
+		q2->next = tail2; //上一节点的next指向tail2  
+		q2 = q2->next;//or q2 = tail2 //q2移动指向tail2          q2充当指挥者 
+	}
+	tail2->next = NULL;
+	q2 = head2;//q2 指向头 
+
+	while (q2 != NULL)
+	{
+		Pos_Set(q2->x, q2->y);
+		printf("*");
+		q2 = q2->next;
+	}
+}
 /****************************************************************
 * Function Name: Food_Create()
 * Description  : 创造食物
@@ -194,6 +232,34 @@ void Food_Create(void)
 	printf("★");
 	food = food_1;
 }
+
+void Food_Create2(void)
+{
+	SNAKE *food_2;
+	srand((unsigned)time(NULL));
+	food_2 = (SNAKE *)malloc(sizeof(SNAKE));
+	food_2->x = 2 * (rand() % (MAP_WIDTH - 1) + 1);
+	food_2->y = rand() % (MAP_HEIGHT - 1) + 1 + H2D;
+	q2 = head2;
+
+	while (q2 != NULL)
+	{
+		if (q2->x == food_2->x && q2->y == food_2->y)
+		{
+			food_2->x = 2 * (rand() % (MAP_WIDTH - 1) + 1);
+			food_2->y = rand() % (MAP_HEIGHT - 1) + 1 + H2D;
+			q2 = head2;
+		}
+		else
+		{
+			q2 = q2->next;
+		}
+	}
+
+	Pos_Set(food_2->x, food_2->y);
+	printf("★");
+	food2 = food_2;
+}
 /****************************************************************
 * Function Name: Wall_Cross
 * Description  : 判断是否撞墙
@@ -204,6 +270,15 @@ void Wall_Cross(SNAKE *s)
 {
 
 	if (s->x == 0 || s->x == MAP_WIDTH * 2 || s->y == 0 || s->y == MAP_HEIGHT)
+	{
+		Game_status = 1;
+		Game_End();
+	}
+}
+void Wall_Cross2(SNAKE *s)
+{
+
+	if (s->x == 0 || s->x == MAP_WIDTH * 2 || s->y == 0 + H2D || s->y == MAP_HEIGHT + H2D)
 	{
 		Game_status = 1;
 		Game_End();
@@ -226,6 +301,19 @@ unsigned char Bit_Self(SNAKE *s)
 			return 1;
 		}
 		q = q->next;
+	}
+	return 0;
+}
+unsigned char Bit_Self2(SNAKE *s)
+{
+	q2 = head2;
+	while (q2 != NULL)
+	{
+		if ((q2->x == s->x) && (q2->y == s->y))
+		{
+			return 1;
+		}
+		q2 = q2->next;
 	}
 	return 0;
 }
@@ -280,11 +368,11 @@ void Snake_Move(void)
 		}
 		Score += Score_Add;
 		Food_Create();
-		if (Time_sleep > 20)
-		{
-			Time_sleep -= 20;
-			Score_Add += 5;
-		}
+		//if (Time_sleep > 20)
+		//{
+		//	Time_sleep -= 20;
+		//	Score_Add += 5;
+		//}
 	}
 	else//没有食物 
 	{
@@ -301,6 +389,76 @@ void Snake_Move(void)
 		printf(" ");
 		free(q->next);
 		q->next = NULL;
+	}
+}
+
+
+void Snake_Move2(void)
+{
+	SNAKE * head_next2;
+	head_next2 = (SNAKE *)malloc(sizeof(SNAKE));
+
+	if (Direction2 == UP)
+	{
+		head_next2->x = head2->x;
+		head_next2->y = head2->y - 1;
+	}
+	else if (Direction2 == DOWN)
+	{
+		head_next2->x = head2->x;
+		head_next2->y = head2->y + 1;
+	}
+	else if (Direction2 == LEFT)
+	{
+		head_next2->x = head2->x - 2;
+		head_next2->y = head2->y;
+	}
+	else if (Direction2 == RIGHT)
+	{
+		head_next2->x = head2->x + 2;
+		head_next2->y = head2->y;
+	}
+	//Wall_Cross2(head_next2);//是否撞墙 
+	//if (Bit_Self2(head_next2) == 1)//是否咬到自己 
+	//{
+	//	Game_status = 2;
+	//	Game_End();
+	//}
+	if (head_next2->x == food2->x && head_next2->y == food2->y)//有食物 
+	{
+
+		head_next2->next = head2;
+		head2 = head_next2;
+		q2 = head2;
+		while (q2 != NULL)//加上新蛇头，全都画 
+		{
+			Pos_Set(q2->x, q2->y);
+			printf("*");
+			q2 = q2->next;
+		}
+		Score += Score_Add;
+		Food_Create2();
+		//if (Time_sleep > 20)
+		//{
+		//	Time_sleep -= 20;
+		//	Score_Add += 5;
+		//}
+	}
+	else//没有食物 
+	{
+		head_next2->next = head2;
+		head2 = head_next2;
+		q2 = head2;
+		while (q2->next->next != NULL)//加上新蛇头，最后一个尾巴不画 
+		{
+			Pos_Set(q2->x, q2->y);
+			printf("*");
+			q2 = q2->next;
+		}
+		Pos_Set(q2->next->x, q2->next->y);
+		printf(" ");
+		free(q2->next);
+		q2->next = NULL;
 	}
 }
 /****************************************************************
@@ -341,6 +499,24 @@ void Game_Control(void)
 		{
 			Direction = RIGHT;
 		}
+		//2--
+		else if (GetAsyncKeyState('W') && (Direction2 != DOWN))
+		{
+			Direction2 = UP;
+		}
+		else if (GetAsyncKeyState('S') && (Direction2 != UP))
+		{
+			Direction2 = DOWN;
+		}
+		else if (GetAsyncKeyState('A') && (Direction2 != RIGHT))
+		{
+			Direction2 = LEFT;
+		}
+		else if (GetAsyncKeyState('D') && (Direction2 != LEFT))
+		{
+			Direction2 = RIGHT;
+		}
+		//--2
 		else if (GetAsyncKeyState(VK_SPACE))
 		{
 			Pause();
@@ -351,6 +527,7 @@ void Game_Control(void)
 		}
 		Sleep(Time_sleep);
 		Snake_Move();
+		Snake_Move2();
 	}
 }
 /****************************************************************
@@ -434,10 +611,8 @@ void Game_Init(void)
 
 void Game_Init2(void)
 {
-	//system("mode  con  cols=100  lines=100");
-	//WelcomeToGame();
 	Map_Create2();
-	//Snake_Init();
-	//Food_Create();
+	Snake_Init2();
+	Food_Create2();
 }
 
