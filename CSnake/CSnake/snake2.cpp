@@ -37,8 +37,8 @@ typedef struct snake//蛇身的一个节点
 /*
 ***全局变量
 */
-unsigned int Score = 0, Score_Add = 10;
-unsigned int Direction, Time_sleep = 1000;
+unsigned int Score = 0, Score2 = 0, Score_Add = 10;
+unsigned int Direction, Time_sleep = 300;
 unsigned int Direction2;
 SNAKE *head, *food;//蛇头指针，食物指针 
 SNAKE *head2, *food2;//蛇头指针，食物指针 
@@ -348,7 +348,7 @@ void Snake_Move(void)
 		head_next->x = head->x + 2;
 		head_next->y = head->y;
 	}
-	//Wall_Cross(head_next);//是否撞墙 
+	Wall_Cross(head_next);//是否撞墙 
 	if (Bit_Self(head_next) == 1)//是否咬到自己 
 	{
 		Game_status = 2;
@@ -368,11 +368,11 @@ void Snake_Move(void)
 		}
 		Score += Score_Add;
 		Food_Create();
-		//if (Time_sleep > 20)
-		//{
-		//	Time_sleep -= 20;
-		//	Score_Add += 5;
-		//}
+		if (Time_sleep > 20)
+		{
+			Time_sleep -= 20;
+			Score_Add += 5;
+		}
 	}
 	else//没有食物 
 	{
@@ -418,7 +418,7 @@ void Snake_Move2(void)
 		head_next2->x = head2->x + 2;
 		head_next2->y = head2->y;
 	}
-	//Wall_Cross2(head_next2);//是否撞墙 
+	Wall_Cross2(head_next2);//是否撞墙 
 	if (Bit_Self2(head_next2) == 1)//是否咬到自己 
 	{
 		Game_status = 2;
@@ -436,13 +436,13 @@ void Snake_Move2(void)
 			printf("*");
 			q2 = q2->next;
 		}
-		Score += Score_Add;
+		Score2 += Score_Add;
 		Food_Create2();
-		//if (Time_sleep > 20)
-		//{
-		//	Time_sleep -= 20;
-		//	Score_Add += 5;
-		//}
+		if (Time_sleep > 20)
+		{
+			Time_sleep -= 20;
+			Score_Add += 5;
+		}
 	}
 	else//没有食物 
 	{
@@ -480,7 +480,9 @@ void Game_Control(void)
 	while (1)
 	{
 		Pos_Set(64, 10);
-		printf("得分: %d分", Score);
+		printf("选手1得分: %d分", Score);
+		Pos_Set(64, 10 + H2D);
+		printf("选手2得分: %d分", Score2);
 		Pos_Set(64, 11);
 		printf("每个食物得分: %d", Score_Add);
 		if (0)
