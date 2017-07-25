@@ -31,7 +31,7 @@ for my $f (@files)
 		    while (<FILE>) 
 		    {
 			 if (
-			 $_ =~ /admin/
+			 $_ =~ /localtime/
 			# $_ =~ /get/ && 
 			 #$_ =~ /\w+\s\w+\(.*?\)/
 			 )
