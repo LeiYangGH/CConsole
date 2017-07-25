@@ -45,7 +45,7 @@ void readallcolorsg()
 	FILE *fp = fopen(FILE_g, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_g);
+		printf("\n error open g!");
 	}
 	else
 	{
@@ -57,7 +57,6 @@ void readallcolorsg()
 				continue;
 			allcolorsg[allcolorsgcount++] = getcolorfromline(line);
 		}
-		printf("\n已读入文件!", FILE_g);
 	}
 }
 
@@ -67,7 +66,7 @@ void readallcolorsb()
 	FILE *fp = fopen(FILE_b, "r");
 	if (fp == NULL)
 	{
-		printf("\n打开文件%s失败!", FILE_b);
+		printf("\n error open b!");
 	}
 	else
 	{
@@ -79,7 +78,6 @@ void readallcolorsb()
 				continue;
 			allcolorsb[allcolorsbcount++] = getcolorfromline(line);
 		}
-		printf("\n已读入文件!", FILE_g);
 	}
 }
 
@@ -91,7 +89,7 @@ float getcolorgidexbyno(int  id)
 		if (allcolorsg[i].id == id)
 			return allcolorsg[i].value;
 	}
-	return 0;//没找到
+	return 0;
 }
 
 float getcolorbidexbyno(int  id)
@@ -102,7 +100,7 @@ float getcolorbidexbyno(int  id)
 		if (allcolorsb[i].id == id)
 			return allcolorsb[i].value;
 	}
-	return 0;//没找到
+	return 0;
 }
 
 int main()
@@ -112,7 +110,7 @@ int main()
 	readallcolorsb();
 	for (i = 0; i < 3; i++)
 	{
-		printf("请输入g列1的值：");
+		printf("input g id ");
 		fseek(stdin, 0, SEEK_END);
 		scanf("%d", &id);
 		float v = getcolorgidexbyno(id);
@@ -120,7 +118,7 @@ int main()
 	}
 	for (i = 0; i < 3; i++)
 	{
-		printf("请输入b列1的值：");
+		printf("input b id ");
 		fseek(stdin, 0, SEEK_END);
 		scanf("%d", &id);
 		float v = getcolorbidexbyno(id);
