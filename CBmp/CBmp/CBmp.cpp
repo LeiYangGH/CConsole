@@ -138,7 +138,14 @@
 //	}
 //
 //}
+void setPixel(BYTE bytes[], int w, int x, int y, int r, int g, int b)
+{
+	int ptr = ((x + (y*w)) * 3);
 
+	bytes[ptr] = b;
+	bytes[ptr + 1] = g;
+	bytes[ptr + 2] = r;
+}
 int main()
 {
 	//bitmapImage = (unsigned char*)malloc(w*h * 3);
@@ -156,11 +163,35 @@ int main()
 
 	BMP bmp;
 
-	bmp.load("test_w1024_h768_15.bmp");
-	int w = bmp.width();
-	int h = bmp.height();
-	printf("w=%d\t h=%d\n", w, h);
+	bmp.load("bmp1024768.bmp");
+	int width = bmp.width();
+	int height = bmp.height();
+	int ch = bmp.channels;
+	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch);
+	//printf("r=%d\t c=%d\n", bmp.rows, bmp.cols);
 	//bmp.save("test.bmp");
+	BYTE* bytes = bmp.data();
+
+
+	for (int w = 0; w < width / 2; w++)
+	{
+		for (int h = 0; h < height; h++)
+		{
+			setPixel(bytes, width, w, h, 0, 0, 255);
+		}
+
+	}
+	for (int w = width / 2; w < width; w++)
+	{
+		for (int h = 0; h < height; h++)
+		{
+			setPixel(bytes, width, w, h, 0, 0, 0);
+		}
+	}
+
+
+	//printf("%d\t", bytes[height*w*ch + 0]);
+	bmp.save("test.bmp");
 
 	system("pause");
 	return 0;
