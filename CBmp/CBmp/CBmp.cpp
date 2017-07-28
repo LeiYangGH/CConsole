@@ -157,8 +157,11 @@ int main()
 	BMP bmp;
 
 	bmp.load("test_w1024_h768_15.bmp");
-	bmp.save("test.bmp");
+	int w = bmp.width();
+	int h = bmp.height();
+	printf("w=%d\t h=%d\n", w, h);
+	//bmp.save("test.bmp");
 
-	//system("pause");
+	system("pause");
 	return 0;
 }
