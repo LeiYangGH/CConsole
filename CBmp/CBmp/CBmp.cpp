@@ -4,140 +4,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "bmp.h"
-//
-//unsigned char *bitmapImage;
-//int w = 1024;
-//int h = 768;
-//#pragma pack(1)    
-//struct RGB
-//{
-//	uint8_t r, g, b;
-//};
-//
-//
-//
-//
-//#define BI_RGB        0L
-//
-//typedef   struct {
-//	uint16_t Signature;
-//	uint32_t Size;
-//	uint32_t Reserved;
-//	uint32_t BitsOffset;
-//} BITMAPFILEHEADER;
-//
-//#define BITMAP_FILEHEADER_SIZE 14
-//
-//typedef   struct {
-//	uint32_t HeaderSize;
-//	int32_t Width;
-//	int32_t Height;
-//	uint16_t Planes;
-//	uint16_t BitCount;
-//	uint32_t Compression;
-//	uint32_t SizeImage;
-//	int32_t PelsPerMeterX;
-//	int32_t PelsPerMeterY;
-//	uint32_t ClrUsed;
-//	uint32_t ClrImportant;
-//} BITMAPINFOHEADER;
-//
-//
-//bool SaveImage(char* szPathName, void* lpBits, int w, int h)
-//{
-//	BITMAPINFOHEADER BMIH;
-//	BITMAPFILEHEADER bmfh;
-//
-//	FILE *pFile = fopen(szPathName, "wb");
-//
-//	if (pFile == NULL)
-//	{
-//		return false;
-//	}
-//
-//	BMIH.HeaderSize = sizeof(BITMAPINFOHEADER);
-//	BMIH.Width = w;
-//	BMIH.Height = h;
-//	BMIH.Planes = 1;
-//	BMIH.BitCount = 24;
-//	BMIH.Compression = BI_RGB;
-//	BMIH.SizeImage = w * h * 3;
-//
-//	int nBitsOffset = sizeof(BITMAPFILEHEADER) + BMIH.HeaderSize;
-//	long lImageSize = BMIH.SizeImage;
-//	long lFileSize = nBitsOffset + lImageSize;
-//	bmfh.Signature = 'B' + ('M' << 8);
-//	bmfh.BitsOffset = nBitsOffset;
-//	bmfh.Size = lFileSize;
-//	bmfh.Reserved = 0;
-//
-//	unsigned int nWrittenFileHeaderSize = fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
-//	unsigned int nWrittenInfoHeaderSize = fwrite(&BMIH, 1, sizeof(BITMAPINFOHEADER), pFile);
-//	unsigned int nWrittenDIBDataSize = fwrite(lpBits, 1, lImageSize, pFile);
-//
-//	fclose(pFile);
-//
-//	return true;
-//
-//}
-//
-//void setPixel(int x, int y, RGB rgb)
-//{
-//	int ptr = ((x + (y*w)) * 3);
-//
-//	bitmapImage[ptr] = rgb.b;
-//	bitmapImage[ptr + 1] = rgb.g;
-//	bitmapImage[ptr + 2] = rgb.r;
-//}
-//
-//int gcnt = 15;
-//int gw = w / gcnt;
-//int full = 255;
-//int depth[15] = { 250,235,220,205,190,175,160,145,130,115,100,85,70,55,40 };
-//void Line()
-//{
-//	int i, j, c;
-//	RGB rgb;
-//	for (i = 0; i < w; i++)
-//	{
-//		rgb.r = full;
-//		c = depth[i / gw];
-//		rgb.g = c;
-//		rgb.b = c;
-//		for (j = 0; j < h / 4; j++)
-//			setPixel(i, j, rgb);
-//	}
-//
-//	for (i = 0; i < w; i++)
-//	{
-//		rgb.g = full;
-//		c = depth[i / gw];
-//		rgb.r = c;
-//		rgb.b = c;
-//		for (j = h / 4; j < h / 4 * 2.0f; j++)
-//			setPixel(i, j, rgb);
-//	}
-//	for (i = 0; i < w; i++)
-//	{
-//		rgb.b = full;
-//		c = depth[i / gw];
-//		rgb.r = c;
-//		rgb.g = c;
-//		for (j = h / 4 * 2.0f; j < h / 4 * 3.0f; j++)
-//			setPixel(i, j, rgb);
-//	}
-//
-//	for (i = 0; i < w; i++)
-//	{
-//		c = depth[i / gw];
-//		rgb.r = c;
-//		rgb.g = c;
-//		rgb.b = c;
-//		for (j = h / 4 * 3.0f; j < h; j++)
-//			setPixel(i, j, rgb);
-//	}
-//
-//}
+
 void setPixel(BYTE bytes[], int w, int x, int y, int r, int g, int b)
 {
 	int ptr = ((x + (y*w)) * 3);
@@ -146,53 +13,138 @@ void setPixel(BYTE bytes[], int w, int x, int y, int r, int g, int b)
 	bytes[ptr + 1] = g;
 	bytes[ptr + 2] = r;
 }
+
+#define FILE_g "R_g_hokan.txt"
+#define FILE_b "R_b_hokan.txt"
+typedef struct color
+{
+	int id;
+	float value;
+}color;
+
+color allcolorsg[300];
+int allcolorsgcount = 0;
+color allcolorsb[300];
+int allcolorsbcount = 0;
+
+
+color getcolorfromline(char *line)
+{
+	char *part;
+	int index = 0;
+	color b;
+	part = strtok(line, " \t\n");
+	while (part != NULL)
+	{
+		switch (++index)
+		{
+		case 1:
+			b.id = atoi(part);
+			break;
+		case 2:
+			b.value = atof(part);
+			break;
+		default:
+			break;
+		}
+		part = strtok(NULL, " \t\n");
+	}
+	return b;
+}
+
+void readallcolorsg()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_g, "r");
+	if (fp == NULL)
+	{
+		printf("\n error open g!");
+	}
+	else
+	{
+		allcolorsgcount = 0;
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 6)
+				continue;
+			allcolorsg[allcolorsgcount++] = getcolorfromline(line);
+		}
+	}
+}
+
+void readallcolorsb()
+{
+	char line[200];
+	FILE *fp = fopen(FILE_b, "r");
+	if (fp == NULL)
+	{
+		printf("\n error open b!");
+	}
+	else
+	{
+		allcolorsbcount = 0;
+
+		while (fgets(line, 1024, fp) != NULL)
+		{
+			if (strlen(line) < 6)
+				continue;
+			allcolorsb[allcolorsbcount++] = getcolorfromline(line);
+		}
+	}
+}
+
+float getcolorgidexbyno(int  id)
+{
+	int i;
+	for (i = 0; i < allcolorsgcount; i++)
+	{
+		if (allcolorsg[i].id == id)
+			return allcolorsg[i].value;
+	}
+	return 0;
+}
+
+float getcolorbidexbyno(int  id)
+{
+	int i;
+	for (i = 0; i < allcolorsbcount; i++)
+	{
+		if (allcolorsb[i].id == id)
+			return allcolorsb[i].value;
+	}
+	return 0;
+}
 int main()
 {
-	//bitmapImage = (unsigned char*)malloc(w*h * 3);
-	//memset(bitmapImage, 0, w*h * 3);
-
-	//RGB color;
-	//color.r = 255;
-
-	//Line();
-	//color.g = 255;
-
-	//char fname[] = "test.bmp\0";
-	//SaveImage(fname, bitmapImage, w, h);
-
+	int i, id;
+	readallcolorsg();
+	readallcolorsb();
 
 	BMP bmp;
 
-	bmp.load("bmp1024768.bmp");
+	bmp.load("t.bmp");//input, width must > height
 	int width = bmp.width();
 	int height = bmp.height();
 	int ch = bmp.channels;
 	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch);
-	//printf("r=%d\t c=%d\n", bmp.rows, bmp.cols);
-	//bmp.save("test.bmp");
+
 	BYTE* bytes = bmp.data();
 
 
-	for (int w = 0; w < width / 2; w++)
+	for (int w = 0; w < width; w++)
 	{
 		for (int h = 0; h < height; h++)
 		{
-			setPixel(bytes, width, w, h, 0, 0, 255);
-		}
+			int ptr = ((w + (h*width)) * 3);
 
-	}
-	for (int w = width / 2; w < width; w++)
-	{
-		for (int h = 0; h < height; h++)
-		{
-			setPixel(bytes, width, w, h, 0, 0, 0);
+			//bytes[ptr] = b;//red
+			bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
+			bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
 		}
 	}
 
-
-	//printf("%d\t", bytes[height*w*ch + 0]);
 	bmp.save("test.bmp");
-
 	system("pause");
 	return 0;
 }
