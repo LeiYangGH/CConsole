@@ -13,6 +13,9 @@ struct RGB
 	uint8_t r, g, b;
 };
 
+
+
+
 #define BI_RGB        0L
 
 typedef   struct {
@@ -86,11 +89,12 @@ void setPixel(int x, int y, RGB rgb)
 	bitmapImage[ptr + 2] = rgb.r;
 }
 
-int / = 15;
+int gcnt = 15;
 int gw = w / gcnt;
 int full = 255;
 //调整下面的参数可以调颜色
-int depth[15] = { 254,189,151,124,103,86,71,59,48,38,29,21,13,6,0 };
+//int depth[15] = { 254,189,151,124,103,86,71,59,48,38,29,21,13,6,0 };
+int depth[15] = { 250,235,220,205,190,175,160,145,130,115,100,85,70,55,40 };
 void Line()
 {
 	int i, j, c;
