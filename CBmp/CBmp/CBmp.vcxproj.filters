@@ -18,13 +18,5 @@
     <ClCompile Include="CBmp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="bmp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="bmp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
