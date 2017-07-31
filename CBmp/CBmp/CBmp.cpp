@@ -300,30 +300,34 @@ int main()
 	ClImgBMP imgvar; // create a image var
 	imgvar.LoadImage(path); // load a bmpfile
 	//uint8_t a = imgvar.imgData[0]; // acces value
-	imgvar.SaveImage("test.bmp"); // save to disk
 
 	//bmp.load("t.bmp");//input, width must > height
-	//int width = bmp.width();
-	//int height = bmp.height();
-	//int ch = bmp.channels;
-	//printf("w=%d\t h=%d\t ch=%d\n", width, height, ch);
+	int width = imgvar.bmpInfoHeaderData.biWidth;
+	int height = imgvar.bmpInfoHeaderData.biHeight;;
+	int ch = imgvar.bmpInfoHeaderData.biBitCount;
+	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch / 8);
 
-	//BYTE* bytes = bmp.data();
+	//uint8_t* bytes = imgvar.imgData;
 
 
-	//for (int w = 0; w < width; w++)
-	//{
-	//	for (int h = 0; h < height; h++)
-	//	{
-	//		int ptr = ((w + (h*width)) * 3);
+	for (int w = 0; w < width; w++)
+	{
+		for (int h = 0; h < height; h++)
+		{
+			int ptr = ((w + (h*width)) * 3);
+			//imgvar.imgData[ptr + 0] = 0;
+			//imgvar.imgData[ptr + 1] = 0;
+			//imgvar.imgData[ptr + 2] = 0;
+			//imgvar.imgData[ptr] = b;//red
+			//bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
+			//bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
+			imgvar.imgData[ptr + 1] = getcolorgidexbyno(imgvar.imgData[ptr + 1]);//green
+			imgvar.imgData[ptr + 2] = getcolorbidexbyno(imgvar.imgData[ptr + 2]);//blue
+		}
+	}
 
-	//		//bytes[ptr] = b;//red
-	//		bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
-	//		bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
-	//	}
-	//}
+	imgvar.SaveImage("test.bmp"); // save to disk
 
-	//bmp.save("test.bmp");
 	system("pause");
 	return 0;
 }
