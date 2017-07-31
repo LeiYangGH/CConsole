@@ -206,7 +206,7 @@ BYTE* BMP::load(const std::string &location)
 
 void BMP::save(const std::string &location)
 {
-	std::ofstream file(location, std::ios::binary);
+	std::ofstream file(location.c_str());
 	if (!file)
 	{
 		std::cout << "Failed to open or create bitmap file." << std::endl;
