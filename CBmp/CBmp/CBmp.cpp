@@ -3,298 +3,175 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
-//#include "bmp.h"
-//bmp.h--
-/* \file bmp.h
-*  BMP image format
-*
-*  Author:	rjianwang
-*	Date:	2016-09-06
-*  Email:  rjianwang@foxmail.com
-*/
 
-#pragma once
+#ifndef SIMPLEBMP_H
+#define SIMPLEBMP_H
 
-#include <string>
+#include <vector>
+#include <stdio.h>
+#include <stdint.h>
 
-typedef long			LONG;
-typedef unsigned long	DWORD;
-typedef int				BOOL;
-typedef unsigned char   BYTE;
-typedef unsigned short	WORD;
-typedef BYTE			*LPBYTE;
-typedef DWORD			*LPDWORD;
+//BMP structure infomation : http://www.cnblogs.com/xiekeli/archive/2012/05/09/2491191.html
 
-
-#pragma pack(1)
-typedef struct tagRGBQUAD
+#pragma pack(1) // For MSVC,disable struct Pack,or short will take 32bit mem as int32_t
+typedef struct
 {
-	BYTE	rgbBlue;
-	BYTE	rgbGreen;
-	BYTE	rgbRed;
-	BYTE	rgbReserved;
-}RGBQUAD;
+	uint16_t bfType;
+	uint32_t bfSize;
+	uint16_t bfReserved1;
+	uint16_t bfReserved2;
+	uint32_t bfOffBits;
+} ClBitMapFileHeader;
 
-typedef struct  tagBITMAPFILEHEADER
+typedef struct
 {
-	WORD	bfType;				// 文件类型，必须是0x424D，即字符“BM”   
-	DWORD	bfSize;				// 文件大小   
-	WORD	bfReserved1;		// 保留字   
-	WORD	bfReserved2;		// 保留字   
-	DWORD	bfOffBits;			// 从文件头到实际位图数据的偏移字节数   
-}BITMAPFILEHEADER;				// 位图文件头定义 
+	uint32_t biSize;
+	int32_t biWidth;
+	int32_t biHeight;
+	uint16_t biPlanes;
+	uint16_t biBitCount;
+	uint32_t biCompression;
+	uint32_t biSizeImage;
+	int32_t biXPelsPerMeter;
+	int32_t biYPelsPerMeter;
+	uint32_t biClrUsed;
+	uint32_t biClrImportant;
+} ClBitMapInfoHeader;
 
-typedef struct tagBITMAPINFOHEADER
+typedef struct
 {
-	DWORD	biSize;				// 信息头大小   
-	LONG	biWidth;			// 图像宽度   
-	LONG	biHeight;			// 图像高度   
-	WORD	biPlanes;			// 位平面数，必须为1   
-	WORD	biBitCount;			// 每像素位数: 1, 2, 4, 8, 16, 24, 32
-	DWORD	biCompression;		// 压缩类型   
-	DWORD	biSizeImage;		// 压缩图像大小字节数   
-	LONG	biXPelsPerMeter;	// 水平分辨率   
-	LONG	biYPelsPerMeter;	// 垂直分辨率   
-	DWORD	biClrUsed;			// 位图实际用到的色彩数   
-	DWORD	biClrImportant;		// 本位图中重要的色彩数   
-}BITMAPINFOHEADER;				// 位图信息头定义   
-#pragma pack()
+	uint8_t rgbBlue;
+	uint8_t rgbGreen;
+	uint8_t rgbRed;
+	uint8_t rgbReserved;
+} ClrgbMap;
 
-								// class BMP
-								//
-								// BMP is an image file format that stores bitmap digital images and retains 
-								// information for each pixel of the image. The BMP format stores color data 
-								// for each pixel in the image without any compression. For example, a 10x10 
-								// pixel BMP image will include color data for 100 pixels. This method of 
-								// storing image information allows for crisp, high-quality graphics, but 
-								// also produces large file sizes. 
-class BMP
+class ClImgBMP
 {
 public:
-	BMP();
-	BMP(const std::string &location);
+	ClBitMapFileHeader bmpFileHeaderData;
+	ClBitMapInfoHeader bmpInfoHeaderData;
+	ClrgbMap colorMap[256];
+	std::vector<uint8_t> imgData;
 
-	~BMP();
+	inline bool LoadImage(const char* path);
+	inline bool SaveImage(const char* path);
+};
+#pragma pack()// reset to default
 
-public:
-	BYTE*	load(const std::string &location);
-	void	save(const std::string &location);
-private:
-	void	swap(BYTE **src, DWORD width, DWORD height, WORD channel);
 
-public:
-	LONG	width();
-	LONG	height();
-	BYTE	depth();
-	BYTE*	data();
-	WORD	_channels();
-
-public:
-	DWORD	rows;
-	DWORD	cols;
-	WORD	channels;
-
-private:
-	BITMAPFILEHEADER	*head;
-	BITMAPINFOHEADER	*info;
-	RGBQUAD				*palette;   // color table
-	BYTE				*pixels;	// iamge pixel data  
-
-}; /* end for class BMP */
-
-//--bmp.h
-
-//bmp.cpp--
-/* \file bmp.cpp
-*  Bitmap file format
-*
-*  Author: rjianwang
-*	Date:	2016-09-09
-*	Email:	rjianwang@foxmail.com
-*/
-
-#include <iostream>
-#include <fstream>
-
-BMP::BMP()
+bool ClImgBMP::LoadImage(const char* path)
 {
-	head = NULL;
-	info = NULL;
-	palette = NULL;
-	pixels = NULL;
-
-	rows = -1;
-	cols = -1;
-}
-
-BMP::BMP(const std::string &location)
-{
-	head = NULL;
-	info = NULL;
-	palette = NULL;
-	pixels = NULL;
-
-	rows = -1;
-	cols = -1;
-
-	this->load(location);
-}
-
-BMP::~BMP()
-{
-	if (pixels != NULL)
-		delete[] pixels;
-	if (palette != NULL)
-		delete[] palette;
-	if (info != NULL)
-		delete info;
-	if (head != NULL)
-		delete head;
-}
-
-BYTE* BMP::load(const std::string &location)
-{
-	// The file... We open it with it's constructor
-	std::ifstream file(location.c_str(), std::ios::binary);
-	if (!file)
+	FILE* pFile;
+	pFile = fopen(path, "rb");
+	if (!pFile)
 	{
-		std::cout << "Failed to open bitmap file.\n";
-		return NULL;
+		return 0;
 	}
-
-	// Allocate byte memory that will hold the two headers
-	head = new BITMAPFILEHEADER;
-	info = new BITMAPINFOHEADER;
-
-	file.read((char*)head, sizeof(BITMAPFILEHEADER));
-	file.read((char*)info, sizeof(BITMAPINFOHEADER));
-
-	// Check if the file is an actual BMP file
-	if (head->bfType != 0x4D42)
+	// Processing
+	fread(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
+	if (bmpFileHeaderData.bfType == 0x4D42) // Check is it an RGB file
 	{
-		std::cout << "File \"" << location << "\" isn't a bitmap file\n";
-		return pixels;
-	}
-
-	// Set values for rows, cols and channels 
-	this->rows = (DWORD)info->biHeight;
-	this->cols = (DWORD)info->biWidth;
-	this->channels = this->_channels();
-
-	// Check if the file is a true color BMP file
-	// If not, read in color table
-	if (info->biBitCount == 8)
-	{
-		palette = new RGBQUAD[256];
-		file.read((char*)palette, 256 * sizeof(RGBQUAD));
-	}
-
-	// First allocate pixel memory
-	unsigned long size = info->biWidth * info->biHeight * this->_channels();
-	pixels = new BYTE[size];
-
-	// Go to where image data starts, then read in image data
-	file.seekg(head->bfOffBits, std::ios::beg);
-	file.read((char*)pixels, size);
-
-	// Image is loaded, however it's not in the right format.
-	// .bmp files store image data in the BGR format, and we have to convert it to RGB.
-	this->swap(&pixels, cols, rows, channels);
-
-	return pixels;
-}
-
-void BMP::save(const std::string &location)
-{
-	std::ofstream file(location.c_str());
-	if (!file)
-	{
-		std::cout << "Failed to open or create bitmap file." << std::endl;
-		return;
-	}
-
-	if (head == NULL || info == NULL || pixels == NULL)
-	{
-		std::cout << "Failed to save bitmap file." << std::endl;
-		return;
-	}
-
-	file.write((char*)head, sizeof(BITMAPFILEHEADER));
-	file.write((char*)info, sizeof(BITMAPINFOHEADER));
-
-	if (info->biBitCount < 24)
-		file.write((char*)palette, sizeof(RGBQUAD) * 256);
-
-	this->swap(&pixels, cols, rows, channels);
-	file.write((char*)pixels, this->rows * this->cols * this->channels);
-	this->swap(&pixels, cols, rows, channels);
-}
-
-void BMP::swap(BYTE **src, unsigned long width, unsigned long height, WORD channel)
-{
-	BYTE temp;
-	for (unsigned long w = 0; w < width * channel; w++)
-	{
-		for (unsigned long i = 0, j = height - 1; i <= j; i++, j--)
+		// Get Channel num of a pixel
+		int channels = 0;
+		fread(&bmpInfoHeaderData, sizeof(ClBitMapInfoHeader), 1, pFile);
+		if (bmpInfoHeaderData.biBitCount == 8)// grayscale format
 		{
-			temp = (*src)[i * width * channel + w];
-			(*src)[i * width * channel + w] = (*src)[j * width * channel + w];
-			(*src)[j * width * channel + w] = temp;
+
+			channels = 1;
+			fread(&colorMap, sizeof(ClrgbMap), 256, pFile);
+		}
+		else if (bmpInfoHeaderData.biBitCount == 24)// RGB format
+		{
+			channels = 3;
+		}
+		// Get offset of every scanline,length(scanline)=length(pixel)+offset
+		int offset = 0;
+		int linelength = bmpInfoHeaderData.biWidth * channels;
+		offset = linelength % 4;
+		if (offset > 0)
+		{
+			offset = 4 - offset;
+		}
+		// Read Pixel
+		uint8_t pixVal;
+		for (int i = 0; i < bmpInfoHeaderData.biHeight; i++)
+		{
+			for (int j = 0; j < linelength; j++)
+			{
+				fread(&pixVal, sizeof(uint8_t), 1, pFile);
+				imgData.push_back(pixVal);
+			}
+			for (int k = 0; k < offset; k++)
+			{
+				fread(&pixVal, sizeof(uint8_t), 1, pFile);
+			}
 		}
 	}
-}
-
-LONG BMP::width()
-{
-	//assert(info != NULL);
-
-	return info->biWidth;
-}
-
-LONG BMP::height()
-{
-	//assert(info != NULL);
-
-	return info->biHeight;
-}
-
-BYTE BMP::depth()
-{
-	//assert(info != NULL);
-
-	if (info->biBitCount <= 8)
-		return info->biBitCount;
 	else
-		return 8;
-}
-
-BYTE* BMP::data()
-{
-	return pixels;
-}
-
-WORD BMP::_channels()
-{
-	//assert(info != NULL);
-
-	switch (info->biBitCount)
 	{
-	case 1:
-	case 2:
-	case 4:
-	case 8:
-		return 1;
-	case 16:
-		return 2;
-	case 24:
-		return 3;
-	case 32:
-		return 4;
+		return false;
 	}
+
+
+	fclose(pFile);
+	return true;
 }
 
-//--bmp.cpp
+bool ClImgBMP::SaveImage(const char* path)
+{
+	FILE* pFile;
+	pFile = fopen(path, "wb");
+	if (!pFile)
+	{
+		return 0;
+	}
 
+	// Processing
+	fwrite(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
+	fwrite(&bmpInfoHeaderData, sizeof(ClBitMapInfoHeader), 1, pFile);
+	// Get Channel num of a pixel
+	int channels = 0;
+	if (bmpInfoHeaderData.biBitCount == 8)
+	{
+		channels = 1;
+		fwrite(&colorMap, sizeof(ClrgbMap), 256, pFile);
+	}
+	else if (bmpInfoHeaderData.biBitCount == 24)
+	{
+		channels = 3;
+	}
+	// Get offset of every scanline,length(scanline)=length(pixel)+offset
+	int offset = 0;
+	int linelength = bmpInfoHeaderData.biWidth * channels;
+	offset = (channels * bmpInfoHeaderData.biWidth) % 4;
+	if (offset > 0)
+	{
+		offset = 4 - offset;
+	}
+	// Write Pixel
+	uint8_t pixVal;
+	auto iter = imgData.begin();
+	for (int i = 0; i < bmpInfoHeaderData.biHeight; i++)
+	{
+		for (int j = 0; j < linelength; j++)
+		{
+			pixVal = *iter;
+			fwrite(&pixVal, sizeof(uint8_t), 1, pFile);
+			iter += 1;
+		}
+		pixVal = 0;
+		for (int k = 0; k < offset; k++)
+		{
+			fwrite(&pixVal, sizeof(uint8_t), 1, pFile);
+		}
+	}
+	fclose(pFile);
+	return true;
+}
+
+
+#endif
 
 
 //read file--
@@ -403,7 +280,7 @@ float getcolorbidexbyno(int  id)
 
 
 //directly set color
-void setPixel(BYTE bytes[], int w, int x, int y, int r, int g, int b)
+void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 {
 	int ptr = ((x + (y*w)) * 3);
 
@@ -419,30 +296,34 @@ int main()
 	readallcolorsg();
 	readallcolorsb();
 
-	BMP bmp;
+	char * path = "t.bmp";
+	ClImgBMP imgvar; // create a image var
+	imgvar.LoadImage(path); // load a bmpfile
+	//uint8_t a = imgvar.imgData[0]; // acces value
+	imgvar.SaveImage("test.bmp"); // save to disk
 
-	bmp.load("t.bmp");//input, width must > height
-	int width = bmp.width();
-	int height = bmp.height();
-	int ch = bmp.channels;
-	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch);
+	//bmp.load("t.bmp");//input, width must > height
+	//int width = bmp.width();
+	//int height = bmp.height();
+	//int ch = bmp.channels;
+	//printf("w=%d\t h=%d\t ch=%d\n", width, height, ch);
 
-	BYTE* bytes = bmp.data();
+	//BYTE* bytes = bmp.data();
 
 
-	for (int w = 0; w < width; w++)
-	{
-		for (int h = 0; h < height; h++)
-		{
-			int ptr = ((w + (h*width)) * 3);
+	//for (int w = 0; w < width; w++)
+	//{
+	//	for (int h = 0; h < height; h++)
+	//	{
+	//		int ptr = ((w + (h*width)) * 3);
 
-			//bytes[ptr] = b;//red
-			bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
-			bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
-		}
-	}
+	//		//bytes[ptr] = b;//red
+	//		bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
+	//		bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
+	//	}
+	//}
 
-	bmp.save("test.bmp");
+	//bmp.save("test.bmp");
 	system("pause");
 	return 0;
 }
