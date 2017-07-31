@@ -151,7 +151,8 @@ bool ClImgBMP::SaveImage(const char* path)
 	}
 	// Write Pixel
 	uint8_t pixVal;
-	auto iter = imgData.begin();
+	std::vector<uint8_t>::iterator iter = imgData.begin();
+	//auto iter = imgData.begin();
 	for (int i = 0; i < bmpInfoHeaderData.biHeight; i++)
 	{
 		for (int j = 0; j < linelength; j++)
