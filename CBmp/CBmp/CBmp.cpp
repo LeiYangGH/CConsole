@@ -261,12 +261,20 @@ int main()
 	strcpy(replacecolor_G_b.filename, "G_b_hokan.txt");
 	strcpy(replacecolor_B_r.filename, "B_r_hokan.txt");
 	strcpy(replacecolor_B_g.filename, "B_g_hokan.txt");
-	replacecolor_R_g.count = 0;
-	replacecolor_R_b.count = 0;
-	memset(replacecolor_R_g.colors, 0, 300);
-	memset(replacecolor_R_b.colors, 0, 300);
+	//replacecolor_R_g.count = 0;
+	//replacecolor_R_b.count = 0;
+	//replacecolor_G_r.count = 0;
+	//replacecolor_G_b.count = 0;
+	//replacecolor_B_r.count = 0;
+	//replacecolor_B_g.count = 0;
+	//memset(replacecolor_R_g.colors, 0, 300);
+	//memset(replacecolor_R_b.colors, 0, 300);
 	readallcolors(replacecolor_R_b.filename, replacecolor_R_b.colors, &replacecolor_R_b.count);
 	readallcolors(replacecolor_R_g.filename, replacecolor_R_g.colors, &replacecolor_R_g.count);
+	readallcolors(replacecolor_G_r.filename, replacecolor_G_r.colors, &replacecolor_G_r.count);
+	readallcolors(replacecolor_G_b.filename, replacecolor_G_b.colors, &replacecolor_G_b.count);
+	readallcolors(replacecolor_B_r.filename, replacecolor_B_r.colors, &replacecolor_B_r.count);
+	readallcolors(replacecolor_B_g.filename, replacecolor_B_g.colors, &replacecolor_B_g.count);
 
 	char * path = "t.bmp";
 	ClImgBMP bmp; // create a image var
@@ -282,9 +290,15 @@ int main()
 		for (int h = 0; h < height; h++)
 		{
 			int ptr = ((w + (h*width)) * 3);
+			//bmp.imgData[ptr + 0] // 0 red  1 green 2 blue
 
-			bmp.imgData[ptr + 1] = chcol(bmp.imgData[ptr + 1], replacecolor_R_g.colors, &replacecolor_R_g.count);//green
-			bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_R_b.colors, &replacecolor_R_b.count);//green
+			//replace like this way: 
+			bmp.imgData[ptr + 1] = chcol(bmp.imgData[ptr + 1], replacecolor_R_g.colors, &replacecolor_R_g.count);
+			bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_R_b.colors, &replacecolor_R_b.count);
+	
+			//you can replace again using some other files
+			//bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_B_g.colors, &replacecolor_B_g.count);//
+																												 //
 		}
 	}
 
