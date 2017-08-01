@@ -161,18 +161,26 @@ bool ClImgBMP::SaveImage(const char* path)
 }
 
 //read file--
-#define FILE_g "R_g_hokan.txt"
-#define FILE_b "R_b_hokan.txt"
+
 typedef struct color
 {
 	int id;
 	float value;
 }color;
 
-color allcolorsg[300];
-int allcolorsgcount = 0;
-color allcolorsb[300];
-int allcolorsbcount = 0;
+typedef struct replacecolor
+{
+	char filename[20];
+	color colors[300];
+	int count;
+}replacecolor;
+
+replacecolor replacecolor_R_g;
+replacecolor replacecolor_R_b;
+replacecolor replacecolor_G_r;
+replacecolor replacecolor_G_b;
+replacecolor replacecolor_B_r;
+replacecolor replacecolor_B_g;
 
 
 color getcolorfromline(char *line)
@@ -199,66 +207,34 @@ color getcolorfromline(char *line)
 	return b;
 }
 
-void readallcolorsg()
+void readallcolors(char *fn, color cols[], int *cnt)
 {
 	char line[200];
-	FILE *fp = fopen(FILE_g, "r");
+	FILE *fp = fopen(fn, "r");
 	if (fp == NULL)
 	{
-		printf("\n error open g!");
+		printf("\n error open %s!", fn);
 	}
 	else
 	{
-		allcolorsgcount = 0;
-
+		*cnt = 0;
 		while (fgets(line, 1024, fp) != NULL)
 		{
 			if (strlen(line) < 6)
 				continue;
-			allcolorsg[allcolorsgcount++] = getcolorfromline(line);
+			cols[(*cnt)++] = getcolorfromline(line);
 		}
+		fclose(fp);
 	}
 }
 
-void readallcolorsb()
-{
-	char line[200];
-	FILE *fp = fopen(FILE_b, "r");
-	if (fp == NULL)
-	{
-		printf("\n error open b!");
-	}
-	else
-	{
-		allcolorsbcount = 0;
-
-		while (fgets(line, 1024, fp) != NULL)
-		{
-			if (strlen(line) < 6)
-				continue;
-			allcolorsb[allcolorsbcount++] = getcolorfromline(line);
-		}
-	}
-}
-
-float getcolorgidexbyno(int  id)
+float chcol(int  id, color cols[], int *cnt)
 {
 	int i;
-	for (i = 0; i < allcolorsgcount; i++)
+	for (i = 0; i < *cnt; i++)
 	{
-		if (allcolorsg[i].id == id)
-			return allcolorsg[i].value;
-	}
-	return 0;
-}
-
-float getcolorbidexbyno(int  id)
-{
-	int i;
-	for (i = 0; i < allcolorsbcount; i++)
-	{
-		if (allcolorsb[i].id == id)
-			return allcolorsb[i].value;
+		if (cols[i].id == id)
+			return cols[i].value;
 	}
 	return 0;
 }
@@ -279,41 +255,40 @@ void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 int main()
 {
 	int i, id;
-	readallcolorsg();
-	readallcolorsb();
+	strcpy(replacecolor_R_g.filename, "R_g_hokan.txt");
+	strcpy(replacecolor_R_b.filename, "R_b_hokan.txt");
+	strcpy(replacecolor_G_r.filename, "G_r_hokan.txt");
+	strcpy(replacecolor_G_b.filename, "G_b_hokan.txt");
+	strcpy(replacecolor_B_r.filename, "B_r_hokan.txt");
+	strcpy(replacecolor_B_g.filename, "B_g_hokan.txt");
+	replacecolor_R_g.count = 0;
+	replacecolor_R_b.count = 0;
+	memset(replacecolor_R_g.colors, 0, 300);
+	memset(replacecolor_R_b.colors, 0, 300);
+	readallcolors(replacecolor_R_b.filename, replacecolor_R_b.colors, &replacecolor_R_b.count);
+	readallcolors(replacecolor_R_g.filename, replacecolor_R_g.colors, &replacecolor_R_g.count);
 
 	char * path = "t.bmp";
-	ClImgBMP imgvar; // create a image var
-	imgvar.LoadImage(path); // load a bmpfile
-	//uint8_t a = imgvar.imgData[0]; // acces value
+	ClImgBMP bmp; // create a image var
+	bmp.LoadImage(path); // load a bmpfile
 
-	//bmp.load("t.bmp");//input, width must > height
-	int width = imgvar.bmpInfoHeaderData.biWidth;
-	int height = imgvar.bmpInfoHeaderData.biHeight;;
-	int ch = imgvar.bmpInfoHeaderData.biBitCount;
+	int width = bmp.bmpInfoHeaderData.biWidth;
+	int height = bmp.bmpInfoHeaderData.biHeight;;
+	int ch = bmp.bmpInfoHeaderData.biBitCount;
 	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch / 8);
-
-	//uint8_t* bytes = imgvar.imgData;
-
 
 	for (int w = 0; w < width; w++)
 	{
 		for (int h = 0; h < height; h++)
 		{
 			int ptr = ((w + (h*width)) * 3);
-			//imgvar.imgData[ptr + 0] = 0;
-			//imgvar.imgData[ptr + 1] = 0;
-			//imgvar.imgData[ptr + 2] = 0;
-			//imgvar.imgData[ptr] = b;//red
-			//bytes[ptr + 1] = getcolorgidexbyno(bytes[ptr + 1]);//green
-			//bytes[ptr + 2] = getcolorbidexbyno(bytes[ptr + 2]);//blue
-			imgvar.imgData[ptr + 1] = getcolorgidexbyno(imgvar.imgData[ptr + 1]);//green
-			imgvar.imgData[ptr + 2] = getcolorbidexbyno(imgvar.imgData[ptr + 2]);//blue
+
+			bmp.imgData[ptr + 1] = chcol(bmp.imgData[ptr + 1], replacecolor_R_g.colors, &replacecolor_R_g.count);//green
+			bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_R_b.colors, &replacecolor_R_b.count);//green
 		}
 	}
 
-	imgvar.SaveImage("test.bmp"); // save to disk
-
+	bmp.SaveImage("test.bmp"); // save to disk
 	system("pause");
 	return 0;
 }
