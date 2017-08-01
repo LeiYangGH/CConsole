@@ -3,15 +3,8 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
-
-#ifndef SIMPLEBMP_H
-#define SIMPLEBMP_H
-
 #include <vector>
-#include <stdio.h>
-#include <stdint.h>
-
-//BMP structure infomation : http://www.cnblogs.com/xiekeli/archive/2012/05/09/2491191.html
+#include <stdint.h>//
 
 #pragma pack(1) // For MSVC,disable struct Pack,or short will take 32bit mem as int32_t
 typedef struct
@@ -68,7 +61,6 @@ bool ClImgBMP::LoadImage(const char* path)
 	{
 		return 0;
 	}
-	// Processing
 	fread(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
 	if (bmpFileHeaderData.bfType == 0x4D42) // Check is it an RGB file
 	{
@@ -112,8 +104,6 @@ bool ClImgBMP::LoadImage(const char* path)
 	{
 		return false;
 	}
-
-
 	fclose(pFile);
 	return true;
 }
@@ -126,7 +116,6 @@ bool ClImgBMP::SaveImage(const char* path)
 	{
 		return 0;
 	}
-
 	// Processing
 	fwrite(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
 	fwrite(&bmpInfoHeaderData, sizeof(ClBitMapInfoHeader), 1, pFile);
@@ -170,10 +159,6 @@ bool ClImgBMP::SaveImage(const char* path)
 	fclose(pFile);
 	return true;
 }
-
-
-#endif
-
 
 //read file--
 #define FILE_g "R_g_hokan.txt"
