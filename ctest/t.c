@@ -1,7 +1,8 @@
 #include<stdio.h>
-#include"h.c"
+//#include"h.c"
 int main()
 {
+    extern int ext;
     printf("ext = %d\n",ext);
     printf("end");
 

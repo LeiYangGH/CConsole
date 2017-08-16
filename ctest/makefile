@@ -1,2 +1,4 @@
 t.exe:h.c t.c
-	gcc  t.c -o t.exe
+	gcc  -c t.c -o t.o
+	gcc  -c h.c -o h.o
+	gcc  t.o h.o -o t.exe
