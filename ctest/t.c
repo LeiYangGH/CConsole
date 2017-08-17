@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<string.h>
 #include"assert.h"
 #include<stdlib.h>
 #include<stdarg.h>
@@ -28,6 +29,13 @@ int rnd()
     for(i=0;i<100;i++)
        printf("%d\t",1+rand()%(max-min)+min);
 }
+char* outstring() 
+{
+    //char s[] = "hello world\n";
+    char* s =(char *)malloc(sizeof(char)*20);
+    strcpy(s,"hello world\n");
+    return s; 
+}
 int main()
 {
     extern int ext;
@@ -38,7 +46,8 @@ int main()
 
     printf("sum = %d\n",sum);
     srand(time(NULL));
-    rnd();
+    //rnd();
+    printf("%s\n",outstring());
     printf("end");
 
 }
