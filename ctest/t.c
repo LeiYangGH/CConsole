@@ -1,7 +1,8 @@
 #include<stdio.h>
 #include"assert.h"
-
+#include<stdlib.h>
 #include<stdarg.h>
+#include<time.h>
 
 int add(int num,...) 
 {
@@ -20,6 +21,13 @@ int add(int num,...)
     return sum;
 }
 
+int rnd() 
+{
+    int i;
+    int min = 5, max =10;
+    for(i=0;i<100;i++)
+       printf("%d\t",1+rand()%(max-min)+min);
+}
 int main()
 {
     extern int ext;
@@ -29,6 +37,8 @@ int main()
     int sum = add(2,3,7);
 
     printf("sum = %d\n",sum);
+    srand(time(NULL));
+    rnd();
     printf("end");
 
 }
