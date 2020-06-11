@@ -228,15 +228,11 @@ void readallcolors(char *fn, color cols[], int *cnt)
 	}
 }
 
-float chcol(int  id, color cols[], int *cnt)
+float chcol(int  id)
 {
 	int i;
-	for (i = 0; i < *cnt; i++)
-	{
-		if (cols[i].id == id)
-			return cols[i].value;
-	}
-	return 0;
+	return 50;
+	 
 }
 //--read file
 
@@ -269,12 +265,12 @@ int main()
 	//replacecolor_B_g.count = 0;
 	//memset(replacecolor_R_g.colors, 0, 300);
 	//memset(replacecolor_R_b.colors, 0, 300);
-	readallcolors(replacecolor_R_b.filename, replacecolor_R_b.colors, &replacecolor_R_b.count);
-	readallcolors(replacecolor_R_g.filename, replacecolor_R_g.colors, &replacecolor_R_g.count);
-	readallcolors(replacecolor_G_r.filename, replacecolor_G_r.colors, &replacecolor_G_r.count);
-	readallcolors(replacecolor_G_b.filename, replacecolor_G_b.colors, &replacecolor_G_b.count);
-	readallcolors(replacecolor_B_r.filename, replacecolor_B_r.colors, &replacecolor_B_r.count);
-	readallcolors(replacecolor_B_g.filename, replacecolor_B_g.colors, &replacecolor_B_g.count);
+	//readallcolors(replacecolor_R_b.filename, replacecolor_R_b.colors, &replacecolor_R_b.count);
+	//readallcolors(replacecolor_R_g.filename, replacecolor_R_g.colors, &replacecolor_R_g.count);
+	//readallcolors(replacecolor_G_r.filename, replacecolor_G_r.colors, &replacecolor_G_r.count);
+	//readallcolors(replacecolor_G_b.filename, replacecolor_G_b.colors, &replacecolor_G_b.count);
+	//readallcolors(replacecolor_B_r.filename, replacecolor_B_r.colors, &replacecolor_B_r.count);
+	//readallcolors(replacecolor_B_g.filename, replacecolor_B_g.colors, &replacecolor_B_g.count);
 
 	char * path = "t.bmp";
 	ClImgBMP bmp; // create a image var
@@ -293,8 +289,9 @@ int main()
 			//bmp.imgData[ptr + 0] // 0 red  1 green 2 blue
 
 			//replace like this way: 
-			bmp.imgData[ptr + 1] = chcol(bmp.imgData[ptr + 1], replacecolor_R_g.colors, &replacecolor_R_g.count);
-			bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_R_b.colors, &replacecolor_R_b.count);
+			bmp.imgData[ptr ] =  255- bmp.imgData[ptr];
+			bmp.imgData[ptr + 1] = 255- bmp.imgData[ptr + 1];
+			bmp.imgData[ptr + 2] = 255- bmp.imgData[ptr + 2];
 	
 			//you can replace again using some other files
 			//bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_B_g.colors, &replacecolor_B_g.count);//
