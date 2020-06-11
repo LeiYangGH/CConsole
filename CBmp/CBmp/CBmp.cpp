@@ -153,15 +153,6 @@ bool ClImgBMP::SaveImage(const char* path)
 }
 
 
-void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
-{
-	int ptr = ((x + (y * w)) * 3);
-
-	bytes[ptr] = b;
-	bytes[ptr + 1] = g;
-	bytes[ptr + 2] = r;
-}
-
 int exists(const char* fname)
 {
 	FILE* file;
@@ -180,8 +171,9 @@ int main()
 
 	char* inputBmp = "in.bmp";
 	if (!exists(inputBmp)) {
-		printf("需要在exe旁边放置in.bmp!");
-		exit(1);
+		printf("需要在exe旁边放置in.bmp!\n");
+		system("pause");
+		exit(0);
 	}
 
 	ClImgBMP bmp;
@@ -191,7 +183,7 @@ int main()
 	int height = bmp.bmpInfoHeaderData.biHeight;;
 	int ch = bmp.bmpInfoHeaderData.biBitCount;
 	printf("宽度=%d\t 高度=%d\t 深度=%d\n", width, height, ch / 8);
-	printf("正在把一半反色!");
+	printf("正在把一半反色!\n");
 
 	for (int w = 0; w < width; w++)
 	{
