@@ -50,7 +50,7 @@ public:
 	inline bool LoadImage(const char* path);
 	inline bool SaveImage(const char* path);
 };
-#pragma pack()// reset to default
+#pragma pack() 
 
 
 bool ClImgBMP::LoadImage(const char* path)
@@ -62,22 +62,20 @@ bool ClImgBMP::LoadImage(const char* path)
 		return 0;
 	}
 	fread(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
-	if (bmpFileHeaderData.bfType == 0x4D42) // Check is it an RGB file
+	if (bmpFileHeaderData.bfType == 0x4D42)
 	{
-		// Get Channel num of a pixel
 		int channels = 0;
 		fread(&bmpInfoHeaderData, sizeof(ClBitMapInfoHeader), 1, pFile);
-		if (bmpInfoHeaderData.biBitCount == 8)// grayscale format
+		if (bmpInfoHeaderData.biBitCount == 8)
 		{
 
 			channels = 1;
 			fread(&colorMap, sizeof(ClrgbMap), 256, pFile);
 		}
-		else if (bmpInfoHeaderData.biBitCount == 24)// RGB format
+		else if (bmpInfoHeaderData.biBitCount == 24)
 		{
 			channels = 3;
 		}
-		// Get offset of every scanline,length(scanline)=length(pixel)+offset
 		int offset = 0;
 		int linelength = bmpInfoHeaderData.biWidth * channels;
 		offset = linelength % 4;
@@ -85,7 +83,6 @@ bool ClImgBMP::LoadImage(const char* path)
 		{
 			offset = 4 - offset;
 		}
-		// Read Pixel
 		uint8_t pixVal;
 		for (int i = 0; i < bmpInfoHeaderData.biHeight; i++)
 		{
@@ -116,10 +113,8 @@ bool ClImgBMP::SaveImage(const char* path)
 	{
 		return 0;
 	}
-	// Processing
 	fwrite(&bmpFileHeaderData, sizeof(ClBitMapFileHeader), 1, pFile);
 	fwrite(&bmpInfoHeaderData, sizeof(ClBitMapInfoHeader), 1, pFile);
-	// Get Channel num of a pixel
 	int channels = 0;
 	if (bmpInfoHeaderData.biBitCount == 8)
 	{
@@ -130,7 +125,6 @@ bool ClImgBMP::SaveImage(const char* path)
 	{
 		channels = 3;
 	}
-	// Get offset of every scanline,length(scanline)=length(pixel)+offset
 	int offset = 0;
 	int linelength = bmpInfoHeaderData.biWidth * channels;
 	offset = (channels * bmpInfoHeaderData.biWidth) % 4;
@@ -138,10 +132,8 @@ bool ClImgBMP::SaveImage(const char* path)
 	{
 		offset = 4 - offset;
 	}
-	// Write Pixel
 	uint8_t pixVal;
 	std::vector<uint8_t>::iterator iter = imgData.begin();
-	//auto iter = imgData.begin();
 	for (int i = 0; i < bmpInfoHeaderData.biHeight; i++)
 	{
 		for (int j = 0; j < linelength; j++)
@@ -161,11 +153,6 @@ bool ClImgBMP::SaveImage(const char* path)
 }
 
 
-
-
-
-
-//directly set color
 void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 {
 	int ptr = ((x + (y * w)) * 3);
@@ -175,20 +162,36 @@ void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 	bytes[ptr + 2] = r;
 }
 
+int exists(const char* fname)
+{
+	FILE* file;
+	if ((file = fopen(fname, "r")))
+	{
+		fclose(file);
+		return 1;
+	}
+	return 0;
+}
 
 int main()
 {
 	int i, id;
 
 
-	char* path = "in.bmp";
-	ClImgBMP bmp; // create a image var
-	bmp.LoadImage(path); // load a bmpfile
+	char* inputBmp = "in.bmp";
+	if (!exists(inputBmp)) {
+		printf("需要在exe旁边放置in.bmp!");
+		exit(1);
+	}
 
+	ClImgBMP bmp;
+	bmp.LoadImage(inputBmp);
+	printf("成功打开in.bmp!");
 	int width = bmp.bmpInfoHeaderData.biWidth;
 	int height = bmp.bmpInfoHeaderData.biHeight;;
 	int ch = bmp.bmpInfoHeaderData.biBitCount;
-	printf("w=%d\t h=%d\t ch=%d\n", width, height, ch / 8);
+	printf("宽度=%d\t 高度=%d\t 深度=%d\n", width, height, ch / 8);
+	printf("正在把一半反色!");
 
 	for (int w = 0; w < width; w++)
 	{
@@ -201,6 +204,7 @@ int main()
 		}
 	}
 	bmp.SaveImage("out.bmp");
+	printf("成功反色保存到out.bmp!");
 	system("pause");
 	return 0;
 }
