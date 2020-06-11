@@ -160,87 +160,15 @@ bool ClImgBMP::SaveImage(const char* path)
 	return true;
 }
 
-//read file--
-
-typedef struct color
-{
-	int id;
-	float value;
-}color;
-
-typedef struct replacecolor
-{
-	char filename[20];
-	color colors[300];
-	int count;
-}replacecolor;
-
-replacecolor replacecolor_R_g;
-replacecolor replacecolor_R_b;
-replacecolor replacecolor_G_r;
-replacecolor replacecolor_G_b;
-replacecolor replacecolor_B_r;
-replacecolor replacecolor_B_g;
 
 
-color getcolorfromline(char *line)
-{
-	char *part;
-	int index = 0;
-	color b;
-	part = strtok(line, " \t\n");
-	while (part != NULL)
-	{
-		switch (++index)
-		{
-		case 1:
-			b.id = atoi(part);
-			break;
-		case 2:
-			b.value = atof(part);
-			break;
-		default:
-			break;
-		}
-		part = strtok(NULL, " \t\n");
-	}
-	return b;
-}
 
-void readallcolors(char *fn, color cols[], int *cnt)
-{
-	char line[200];
-	FILE *fp = fopen(fn, "r");
-	if (fp == NULL)
-	{
-		printf("\n error open %s!", fn);
-	}
-	else
-	{
-		*cnt = 0;
-		while (fgets(line, 1024, fp) != NULL)
-		{
-			if (strlen(line) < 6)
-				continue;
-			cols[(*cnt)++] = getcolorfromline(line);
-		}
-		fclose(fp);
-	}
-}
-
-float chcol(int  id)
-{
-	int i;
-	return 50;
-	 
-}
-//--read file
 
 
 //directly set color
 void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 {
-	int ptr = ((x + (y*w)) * 3);
+	int ptr = ((x + (y * w)) * 3);
 
 	bytes[ptr] = b;
 	bytes[ptr + 1] = g;
@@ -251,28 +179,9 @@ void setPixel(uint8_t bytes[], int w, int x, int y, int r, int g, int b)
 int main()
 {
 	int i, id;
-	strcpy(replacecolor_R_g.filename, "R_g_hokan.txt");
-	strcpy(replacecolor_R_b.filename, "R_b_hokan.txt");
-	strcpy(replacecolor_G_r.filename, "G_r_hokan.txt");
-	strcpy(replacecolor_G_b.filename, "G_b_hokan.txt");
-	strcpy(replacecolor_B_r.filename, "B_r_hokan.txt");
-	strcpy(replacecolor_B_g.filename, "B_g_hokan.txt");
-	//replacecolor_R_g.count = 0;
-	//replacecolor_R_b.count = 0;
-	//replacecolor_G_r.count = 0;
-	//replacecolor_G_b.count = 0;
-	//replacecolor_B_r.count = 0;
-	//replacecolor_B_g.count = 0;
-	//memset(replacecolor_R_g.colors, 0, 300);
-	//memset(replacecolor_R_b.colors, 0, 300);
-	//readallcolors(replacecolor_R_b.filename, replacecolor_R_b.colors, &replacecolor_R_b.count);
-	//readallcolors(replacecolor_R_g.filename, replacecolor_R_g.colors, &replacecolor_R_g.count);
-	//readallcolors(replacecolor_G_r.filename, replacecolor_G_r.colors, &replacecolor_G_r.count);
-	//readallcolors(replacecolor_G_b.filename, replacecolor_G_b.colors, &replacecolor_G_b.count);
-	//readallcolors(replacecolor_B_r.filename, replacecolor_B_r.colors, &replacecolor_B_r.count);
-	//readallcolors(replacecolor_B_g.filename, replacecolor_B_g.colors, &replacecolor_B_g.count);
 
-	char * path = "t.bmp";
+
+	char* path = "in.bmp";
 	ClImgBMP bmp; // create a image var
 	bmp.LoadImage(path); // load a bmpfile
 
@@ -283,23 +192,15 @@ int main()
 
 	for (int w = 0; w < width; w++)
 	{
-		for (int h = 0; h < height; h++)
+		for (int h = 0; h < height / 2; h++)
 		{
-			int ptr = ((w + (h*width)) * 3);
-			//bmp.imgData[ptr + 0] // 0 red  1 green 2 blue
-
-			//replace like this way: 
-			bmp.imgData[ptr ] =  255- bmp.imgData[ptr];
-			bmp.imgData[ptr + 1] = 255- bmp.imgData[ptr + 1];
-			bmp.imgData[ptr + 2] = 255- bmp.imgData[ptr + 2];
-	
-			//you can replace again using some other files
-			//bmp.imgData[ptr + 2] = chcol(bmp.imgData[ptr + 2], replacecolor_B_g.colors, &replacecolor_B_g.count);//
-																												 //
+			int ptr = ((w + (h * width)) * 3);
+			bmp.imgData[ptr] = 255 - bmp.imgData[ptr];
+			bmp.imgData[ptr + 1] = 255 - bmp.imgData[ptr + 1];
+			bmp.imgData[ptr + 2] = 255 - bmp.imgData[ptr + 2];
 		}
 	}
-
-	bmp.SaveImage("test.bmp"); // save to disk
+	bmp.SaveImage("out.bmp");
 	system("pause");
 	return 0;
 }
